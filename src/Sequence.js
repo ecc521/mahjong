@@ -1,0 +1,41 @@
+function Sequence(tiles, exposed) {
+	if (exposed === undefined) {throw "Exposed must not be undefined. "}
+
+	this.isDouble = function(userWind) {return false}
+	this.getPoints = function() {return 0}
+
+	this.tiles = tiles
+
+	this.exposed = exposed
+	this.isSequence = true
+	this.isPongOrKong = false
+	this.isPair = false
+}
+
+
+function isValidSequence(tiles) {
+	let type = tiles[0].type
+	let values = []
+
+	if (!["bamboo", "character", "circle"].includes(type)) {
+		return false
+	}
+
+	//Sort the sequence. 
+	tiles = tiles.sort(function(tile1, tile2) {
+		return tile1.value - tile2.value
+	})
+
+	for (let i=1;i<tiles.length;i++) {
+		let tile = tiles[i]
+		if (tile.type !== type) {return false} //Tiles are not the same suit.
+		if (Math.abs(tiles[i-1].value - tile.value) !== 1) {return false} //Tiles are not in a sequence. There is a difference between the values that is not 1.
+	}
+
+}
+
+
+module.exports = {
+	Sequence,
+	isValidSequence
+}
