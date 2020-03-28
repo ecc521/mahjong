@@ -1,5 +1,6 @@
 function Pretty(value, seasonOrFlower) {
 
+	console.log(seasonOrFlower)
 	if (!["season", "flower"].includes(seasonOrFlower)) {
 		throw "seasorOrFlower must either be 'season' or 'flower'"
 	}
@@ -19,7 +20,11 @@ function Pretty(value, seasonOrFlower) {
 
 	this.getPoints = function() {return 4}
 
+	this.imageUrl = seasonOrFlower + "/" + value + ".png"
+
 	this.isSequence = false
 	this.isPongOrKong = false
 	this.isPair = false
 }
+
+module.exports = Pretty
