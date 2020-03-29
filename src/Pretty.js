@@ -19,7 +19,7 @@ function Pretty(config = {}) {
 
 	this.getPoints = function() {return 4}
 
-	this.imageUrl = seasonOrFlower + "/" + value + ".png"
+	this.imageUrl = config.seasonOrFlower + "/" + config.value + ".png"
 
 	this.isSequence = false
 	this.isPongOrKong = false
