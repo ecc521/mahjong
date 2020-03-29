@@ -1,4 +1,4 @@
-function Tile(config) {
+function Tile(config = {}) {
 	this.type = config.type //Ex. wind, bamboo, character, pretty, dragon
 	this.value = config.value //Ex. 1,3 red, west
 
@@ -11,7 +11,7 @@ function Tile(config) {
 
 	this.isDouble = function(userWind) {return 0}
 	this.getPoints = function() {return 0}
-	
+
 	this.isSequence = false
 	this.isPongOrKong = false
 	this.isPair = false

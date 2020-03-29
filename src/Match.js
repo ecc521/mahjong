@@ -1,13 +1,13 @@
-function Match(type, value, amount, exposed) {
+function Match(config = {}) {
 
-	if (exposed === undefined) {throw "Must specify either true or false for exposed. "}
+	if (config.exposed === undefined) {throw "Must specify either true or false for config.exposed. "}
 
-	if (amount < 2 || amount > 4) {throw "Amount must be either 2, 3, or 4. "}
+	if (config.amount < 2 || config.amount > 4) {throw "config.mount must be either 2, 3, or 4. "}
 
-	this.type = type
-	this.value = value
-	this.amount = amount
-	this.exposed = exposed
+	this.type = config.type
+	this.value = config.value
+	this.amount = config.amount
+	this.exposed = config.exposed
 
 	this.getPoints = function(userWind) {
 

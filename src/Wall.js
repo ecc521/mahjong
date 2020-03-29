@@ -44,7 +44,10 @@ function Wall() {
 
 	;[false, true].forEach((isSeason) => {
 		for (let i=0;i<4;i++) {
-			this.tiles.push(new Pretty(i, isSeason?"season":"flower"))
+			this.tiles.push(new Pretty({
+				value: i,
+				seasonOrFlower: isSeason?"season":"flower"
+			}))
 		}
 	})
 

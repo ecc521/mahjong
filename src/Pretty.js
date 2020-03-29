@@ -1,13 +1,12 @@
-function Pretty(value, seasonOrFlower) {
+function Pretty(config = {}) {
 
-	console.log(seasonOrFlower)
-	if (!["season", "flower"].includes(seasonOrFlower)) {
-		throw "seasorOrFlower must either be 'season' or 'flower'"
+	if (!["season", "flower"].includes(config.seasonOrFlower)) {
+		throw "config.seasorOrFlower must either be 'season' or 'flower'"
 	}
 
 	this.type = "pretty"
-	this.value = value
-	this.seasonOrFlower = seasonOrFlower
+	this.value = config.value
+	this.seasonOrFlower = config.seasonOrFlower
 
 	let numberToWind = ["east", "south", "west", "north"]
 
