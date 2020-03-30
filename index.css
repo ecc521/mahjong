@@ -1,0 +1,87 @@
+html, body {
+	width: 100vw;
+	height: 100vh;
+	margin: 0;
+	padding: 0;
+}
+
+#topHand {
+	position: absolute;
+	top: 0;
+	left: 9.52vh;
+	max-height: 12vh;
+	width: calc(100vw - 19.04vh);
+	text-align: center; /*Center tiles horizontally. */
+	background-color: #4c3329;
+}
+
+#leftHand {
+	position: absolute;
+	left: 0;
+	top: 0;
+	max-width: 9.52vh;
+	height: 100vh;
+	background-color: #4c3329;
+}
+
+#rightHand {
+	position: absolute;
+	right: 0;
+	top: 0;
+	max-width:9.52vh;
+	height: 100vh;
+	background-color: #4c3329;
+}
+
+#userHand {
+	position: absolute;
+	bottom: 0;
+	left: 9.52vh;
+	max-height:12vh;
+	width: calc(100vw - 19.04vh);
+	text-align: center; /*Center tiles horizontally. */
+	background-color: #7d4b37;
+}
+
+
+/*Containers used on left and right hands for vertical alignment. */
+#rightHandContainer {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+#leftHandContainer {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+
+.topHandTile {
+	max-width: calc(calc(100vw - 19.04vh) / 14);
+	max-height: 12vh;
+	/*transform: rotate(180deg);*/ /*Rotate tiles 180 degrees away from the viewer (they would be across from this person)*/
+}
+
+.leftHandTile {
+	transform: rotate(270deg);
+	max-width: 9.52vh;
+	max-height: 9vh;
+	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
+	margin-bottom: -2.9vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+}
+
+.rightHandTile {
+	transform: rotate(90deg);
+	max-width: 9.52vh;
+	max-height: 9vh;
+	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
+	margin-top: -2.38vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: -0.52vh;
+}
+
+.userHandTile {
+	max-width: calc(calc(100vw - 19.04vh) / 14);
+	max-height: 12vh;
+}
