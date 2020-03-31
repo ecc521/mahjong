@@ -1,3 +1,5 @@
+const Tile = require("./Tile.js")
+
 function Match(config = {}) {
 
 	if (config.exposed === undefined) {throw "Must specify either true or false for config.exposed. "}
@@ -41,6 +43,19 @@ function Match(config = {}) {
 		if (this.type === "wind" && this.value === userWind) {return true}
 		return false
 	}
+
+	Object.defineProperty(this, "tiles", {
+		get: function getTiles() {
+			let arr = []
+			for (let i=0;i<this.amount;i++) {
+				arr.push(new Tile({
+					value: this.value,
+					amount: this.amount
+				}))
+			}
+			return arr
+		}
+	})
 
 	Object.defineProperty(this, "isPair", {
 		get: function isPair() {

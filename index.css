@@ -12,7 +12,7 @@ html, body {
 	max-height: 12vh;
 	width: calc(100vw - 19.04vh);
 	text-align: center; /*Center tiles horizontally. */
-	background-color: #4c3329;
+	background-color: #5a3e32;
 }
 
 #leftHand {
@@ -58,14 +58,14 @@ html, body {
 }
 
 /*TODO: If width is substantially below 640 and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
-
-.topHandTile {
+#topHand img {
 	max-width: calc(calc(100vw - 19.04vh) / 14);
 	max-height: 12vh;
 	/*transform: rotate(180deg);*/ /*Rotate tiles 180 degrees away from the viewer (they would be across from this person)*/
 }
 
-.leftHandTile {
+/*Note: Currently leftHand and rightHand tiles are facing 180 degrees away from where they would in a real game, however this probably makes it easier to read the tiles. */
+#leftHand img {
 	transform: rotate(270deg);
 	max-width: 9.52vh;
 	max-height: 9vh;
@@ -73,7 +73,7 @@ html, body {
 	margin-bottom: -3.4vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
 }
 
-.rightHandTile {
+#rightHand img {
 	transform: rotate(90deg);
 	max-width: 9.52vh;
 	max-height: 9vh;
@@ -82,7 +82,7 @@ html, body {
 	margin-bottom: -1.02vh;
 }
 
-.userHandTile {
+#userHand img {
 	max-width: calc(calc(100vw - 19.04vh) / 14);
 	max-height: 12vh;
 }

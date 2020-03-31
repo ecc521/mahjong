@@ -1,5 +1,5 @@
 const Tile = require("./Tile.js")
-
+const Hand = require("./Hand.js")
 
 function createTopOrBottomHand(handId) {
 	let hand = document.createElement("div")
@@ -18,21 +18,6 @@ function createLeftOrRightHand(handId, containerId) {
 
 	return container
 }
-
-
-
-
-
-
-
-
-//For testing.
-
-let tiles = new (require("./Wall.js"))().tiles
-console.log(tiles)
-
-let handTiles = tiles.slice(-14)
-console.log(handTiles)
 
 
 function allowDrop(ev) {
@@ -56,55 +41,51 @@ function drop(ev) {
 
 	if (targetBounds.right - ev.x > targetBounds.width/2) {
 		//Dropped on left side of tile. Insert before.
-		userHand.insertBefore(elem, ev.target)
+		userHandElem.insertBefore(elem, ev.target)
 	}
 	else {
 		//Dropped on right side of tile. Insert after.
-		userHand.insertBefore(elem, ev.target.nextElementSibling)
+		userHandElem.insertBefore(elem, ev.target.nextElementSibling)
 	}
 }
 
 
-let userHand = createTopOrBottomHand("userHand")
 
-function drawTile(tile) {
-	let elem = document.createElement("img")
-	elem.src = tile.imageUrl
-	elem.className = "userHandTile"
-	elem.draggable = true
-	elem.addEventListener("dragstart", drag)
-	userHand.appendChild(elem)
-}
 
-for (let i=0;i<handTiles.length;i++) {
-	let handTile = handTiles[i]
-	console.log(handTile)
-	drawTile(handTile)
-}
 
-userHand.addEventListener("dragover", allowDrop)
-userHand.addEventListener("drop", drop)
+
+
+//For testing.
+
+let tiles = new (require("./Wall.js"))().tiles
+console.log(tiles)
+
+
+
+let handTiles = tiles.slice(-14)
+
+let userHandElem = createTopOrBottomHand("userHand")
+let userHand = new Hand()
+console.log(userHand)
+
+//userHand.sortTiles(handTiles)
+handTiles.forEach((value) => {userHand.add(value)})
+userHand.renderTiles(userHandElem, undefined, drag)
+
+userHandElem.addEventListener("dragover", allowDrop)
+userHandElem.addEventListener("drop", drop)
+
+
+
 
 
 let leftHandTiles = tiles.slice(-28, -14)
-
-console.log(leftHandTiles)
-
-
 let leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer")
 
-function drawLeftTile(tile) {
-	let elem = document.createElement("img")
-	elem.src = tile.imageUrl
-	elem.className = "leftHandTile"
-	leftHandContainer.appendChild(elem)
-}
+let leftHand = new Hand()
 
-for (let i=0;i<leftHandTiles.length;i++) {
-	let leftHandTile = leftHandTiles[i]
-	console.log(leftHandTile)
-	drawLeftTile(leftHandTile)
-}
+leftHandTiles.forEach((value) => {leftHand.add(value)})
+leftHand.renderTiles(leftHandContainer)
 
 
 
@@ -118,13 +99,11 @@ let rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer"
 function drawRightTile(tile) {
 	let elem = document.createElement("img")
 	elem.src = tile.imageUrl
-	elem.className = "rightHandTile"
 	rightHandContainer.appendChild(elem)
 }
 
 for (let i=0;i<rightHandTiles.length;i++) {
 	let rightHandTile = rightHandTiles[i]
-	console.log(rightHandTile)
 	drawRightTile(rightHandTile)
 }
 
@@ -141,12 +120,10 @@ let topHand = createTopOrBottomHand("topHand")
 function drawTopTile(tile) {
 	let elem = document.createElement("img")
 	elem.src = tile.imageUrl
-	elem.className = "topHandTile"
 	topHand.appendChild(elem)
 }
 
 for (let i=0;i<topHandTiles.length;i++) {
 	let topHandTile = topHandTiles[i]
-	console.log(topHandTile)
 	drawTopTile(topHandTile)
 }

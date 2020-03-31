@@ -7,6 +7,7 @@ function Pretty(config = {}) {
 	this.type = "pretty"
 	this.value = config.value
 	this.seasonOrFlower = config.seasonOrFlower
+	this.exposed = true
 
 	let numberToWind = ["east", "south", "west", "north"]
 
