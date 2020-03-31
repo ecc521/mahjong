@@ -89,14 +89,26 @@ function Hand() {
 
 			let dropPosition = ev.x
 			let targetBounds = ev.target.getBoundingClientRect()
-			if (targetBounds.right - ev.x > targetBounds.width/2) {
-				//Dropped on left side of tile. Insert before.
-				this.contents.splice(ev.target.tileIndex, 0, this.contents.splice(elem.tileIndex, 1)[0])
+
+			let targetIndex = ev.target.tileIndex
+
+			if (targetBounds.right - ev.x < targetBounds.width/2) {
+				//Dropped on right side of tile. Insert after.
+				targetIndex++
+			}
+
+			let targetTile = this.contents[targetIndex]
+			let currentTile = this.contents.splice(elem.tileIndex, 1)[0]
+
+			if (targetIndex <= this.contents.length) {
+				let newTargetIndex = this.contents.findIndex((tile) => {return targetTile === tile})
+
+				this.contents.splice(newTargetIndex, 0, currentTile)
 			}
 			else {
-				//Dropped on right side of tile. Insert after.
-				this.contents.splice(ev.target.tileIndex + 1, 0, this.contents.splice(elem.tileIndex, 1)[0])
+				this.contents.push(currentTile)
 			}
+
 			this.renderTiles(handToRender, handForExposed, interactive) //Re-render.
 		}).bind(this)
 
