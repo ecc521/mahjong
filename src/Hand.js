@@ -31,7 +31,6 @@ function Hand() {
 				return
 			}
 		}
-
 		this.contents.push(obj)
 	}
 
@@ -113,8 +112,10 @@ function Hand() {
 		}).bind(this)
 
 		//TODO: Use addEventListener, but make sure to avoid having multiple identical listeners.
-		handToRender.ondragover = allowDrop
-		handToRender.ondrop = drop
+		if (interactive) {
+			handToRender.ondragover = allowDrop
+			handToRender.ondrop = drop
+		}
 
 		while (handToRender.firstChild) {handToRender.firstChild.remove()} //Delete everything currently rendered in the hand.
 
@@ -166,17 +167,17 @@ function Hand() {
 					handToRender.appendChild(elem)
 				}
 				else {
-					elem.draggable = true
-					elem.addEventListener("dragstart", dragstart)
-					elem.tileIndex = this.contents.findIndex((item) => {return item === tile})
-
+					if (interactive) {
+						elem.draggable = true
+						elem.addEventListener("dragstart", dragstart)
+						elem.tileIndex = this.contents.findIndex((item) => {return item === tile})
+					}
 					handToRender.appendChild(elem)
 				}
 			}
 		}).bind(this)
-
-		drawTiles(unexposedTiles, false)
 		drawTiles(exposedTiles, true)
+		drawTiles(unexposedTiles, false)
 	}
 }
 
