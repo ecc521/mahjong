@@ -8,7 +8,7 @@ function Hand() {
 
 	this.add = function(obj) {
 		//We will insert the tile where our sorting algorithm would find it most appropriate.
-		//TODO: this should probably receive some improvement, as if the user changes the location of suits, or puts, say honors first, it will fail to properly insert. 
+		//TODO: this should probably receive some improvement, as if the user changes the location of suits, or puts, say honors first, it will fail to properly insert.
 		let newItemScore;
 		if (obj instanceof Sequence) {
 			newItemScore = getTileValue(obj.tiles[0]) //Use value of first tile in sequence.
@@ -66,46 +66,105 @@ function Hand() {
 		})
 	}
 
-	this.renderTiles = function(handToRender, handForExposed, dragstart) {
+	this.renderTiles = function(handToRender, handForExposed, interactive) {
 		//handForExposed - Optional. If exposed tiles should be placed in a seperate hand, they will be placed here.
-		//dragstart - Optional. If passed, the function will be added to the dragstart event, and the draggable attribute will be set.
+		//dragstart - Optional. If passed, tiles can be dragged and dropped to reorder the hand.
 		//dragstart does not apply for tiles in handForExposed, if it exists.
+
+		function allowDrop(ev) {
+			ev.preventDefault();
+		}
+
+		function dragstart(ev) {
+			let randomClass = "randomClassForTransfer" + (2**53) * Math.random()
+			ev.target.classList.add(randomClass)
+			ev.dataTransfer.setData("randomClass", randomClass);
+		}
+
+		let drop = (function drop(ev) {
+			ev.preventDefault();
+			let randomClass = ev.dataTransfer.getData("randomClass");
+			let elem = document.getElementsByClassName(randomClass)[0]
+			elem.classList.remove(randomClass)
+
+			let dropPosition = ev.x
+			let targetBounds = ev.target.getBoundingClientRect()
+			if (targetBounds.right - ev.x > targetBounds.width/2) {
+				//Dropped on left side of tile. Insert before.
+				this.contents.splice(ev.target.tileIndex, 0, this.contents.splice(elem.tileIndex, 1)[0])
+			}
+			else {
+				//Dropped on right side of tile. Insert after.
+				this.contents.splice(ev.target.tileIndex + 1, 0, this.contents.splice(elem.tileIndex, 1)[0])
+			}
+			this.renderTiles(handToRender, handForExposed, interactive) //Re-render.
+		}).bind(this)
+
+		//TODO: Use addEventListener, but make sure to avoid having multiple identical listeners.
+		handToRender.ondragover = allowDrop
+		handToRender.ondrop = drop
 
 		while (handToRender.firstChild) {handToRender.firstChild.remove()} //Delete everything currently rendered in the hand.
 
-		let tiles = []
+		let unexposedTiles = []
+		let exposedTiles = []
 
 		for (let i=0;i<this.contents.length;i++) {
 			let item = this.contents[i]
-			if (item instanceof Tile || item instanceof Pretty)	{
-				tiles.push(item)
+			if (item instanceof Tile)	{
+				unexposedTiles.push(item)
+			}
+			else if (item instanceof Pretty) {
+				exposedTiles.push(item)
 			}
 			else if (item instanceof Match || item instanceof Sequence) {
-				let items = item.tiles
-				items.forEach((value) => {value.tempExposed = item.exposed})
-				tiles = tiles.concat(items)
+				let items = item.tiles.slice(0) //Clone, as we modify for kongs.
+				if (item.exposed) {
+					if (item instanceof Match && item.amount === 4) {
+						//kong. Flip 1 tile.
+						items[0] = new Tile({faceDown: true})
+					}
+					exposedTiles = tiles.concat(items)
+				}
+				else {
+					if (item instanceof Match && item.amount === 4) {
+						//In hand kong. Expose with 2 flipped tiles.
+						items[0] = new Tile({faceDown: true})
+						items[3] = new Tile({faceDown: true})
+						exposedTiles.concat(items)
+					}
+					else {
+						unexposedTiles = tiles.concat(items)
+					}
+				}
 			}
 			else {console.error("Unknown item " + item)}
 		}
 
-		for (let i=0;i<tiles.length;i++) {
-			let tile = tiles[i]
-			let elem = document.createElement("img")
-			elem.src = tile.imageUrl
+		let drawTiles = (function drawTiles(tiles, exposed) {
+			for (let i=0;i<tiles.length;i++) {
+				let tile = tiles[i]
+				let elem = document.createElement("img")
+				elem.src = tile.imageUrl
 
-			if (tile.tempExposed && handForExposed) {
-				handForExposed.appendChild(elem)
-			}
-			else {
-				if (dragstart instanceof Function) {
+				if (exposed && handForExposed) {
+					handForExposed.appendChild(elem)
+				}
+				else if (exposed) {
+					handToRender.appendChild(elem)
+				}
+				else {
 					elem.draggable = true
 					elem.addEventListener("dragstart", dragstart)
-				}
+					elem.tileIndex = this.contents.findIndex((item) => {return item === tile})
 
-				handToRender.appendChild(elem)
+					handToRender.appendChild(elem)
+				}
 			}
-			delete tile.tempExposed
-		}
+		}).bind(this)
+
+		drawTiles(unexposedTiles, false)
+		drawTiles(exposedTiles, true)
 	}
 }
 

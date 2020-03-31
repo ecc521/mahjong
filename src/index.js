@@ -20,36 +20,6 @@ function createLeftOrRightHand(handId, containerId) {
 }
 
 
-function allowDrop(ev) {
-	ev.preventDefault();
-}
-
-function drag(ev) {
-	let randomClass = "randomClassForTransfer" + (2**53) * Math.random()
-	ev.target.classList.add(randomClass)
-	ev.dataTransfer.setData("randomClass", randomClass);
-}
-
-function drop(ev) {
-	ev.preventDefault();
-	let randomClass = ev.dataTransfer.getData("randomClass");
-	let elem = document.getElementsByClassName(randomClass)[0]
-	elem.classList.remove(randomClass)
-
-	let dropPosition = ev.x
-	let targetBounds = ev.target.getBoundingClientRect()
-
-	if (targetBounds.right - ev.x > targetBounds.width/2) {
-		//Dropped on left side of tile. Insert before.
-		userHandElem.insertBefore(elem, ev.target)
-	}
-	else {
-		//Dropped on right side of tile. Insert after.
-		userHandElem.insertBefore(elem, ev.target.nextElementSibling)
-	}
-}
-
-
 
 
 
@@ -70,12 +40,7 @@ console.log(userHand)
 
 //userHand.sortTiles(handTiles)
 handTiles.forEach((value) => {userHand.add(value)})
-userHand.renderTiles(userHandElem, undefined, drag)
-
-userHandElem.addEventListener("dragover", allowDrop)
-userHandElem.addEventListener("drop", drop)
-
-
+userHand.renderTiles(userHandElem, undefined, true)
 
 
 
@@ -125,5 +90,6 @@ function drawTopTile(tile) {
 
 for (let i=0;i<topHandTiles.length;i++) {
 	let topHandTile = topHandTiles[i]
-	drawTopTile(topHandTile)
+	//drawTopTile(topHandTile)
+	drawTopTile(new Tile({faceDown: true}))
 }
