@@ -1816,6 +1816,13 @@ function Hand() {
     } //Delete everything currently rendered in the hand.
 
 
+    if (handForExposed) {
+      while (handForExposed.firstChild) {
+        handForExposed.firstChild.remove();
+      } //Delete everything currently rendered in the hand.
+
+    }
+
     var unexposedTiles = [];
     var exposedTiles = [];
 

@@ -118,6 +118,9 @@ function Hand() {
 		}
 
 		while (handToRender.firstChild) {handToRender.firstChild.remove()} //Delete everything currently rendered in the hand.
+		if (handForExposed) {
+			while (handForExposed.firstChild) {handForExposed.firstChild.remove()} //Delete everything currently rendered in the hand.
+		}
 
 		let unexposedTiles = []
 		let exposedTiles = []
