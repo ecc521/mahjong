@@ -1236,13 +1236,14 @@ var tiles = new (__webpack_require__(80))().tiles;
 console.log(tiles);
 var handTiles = tiles.slice(-14);
 var userHandElem = createTopOrBottomHand("userHand");
+var userHandElemExposed = createTopOrBottomHand("userHandExposed");
 var userHand = new Hand();
 console.log(userHand); //userHand.sortTiles(handTiles)
 
 handTiles.forEach(function (value) {
   userHand.add(value);
 });
-userHand.renderTiles(userHandElem, undefined, true);
+userHand.renderTiles(userHandElem, userHandExposed, true);
 var leftHandTiles = tiles.slice(-28, -14);
 var leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer");
 var leftHand = new Hand();
@@ -1251,7 +1252,6 @@ leftHandTiles.forEach(function (value) {
 });
 leftHand.renderTiles(leftHandContainer);
 var rightHandTiles = tiles.slice(-42, -28);
-console.log(rightHandTiles);
 var rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer");
 
 function drawRightTile(tile) {
@@ -1266,7 +1266,6 @@ for (var i = 0; i < rightHandTiles.length; i++) {
 }
 
 var topHandTiles = tiles.slice(-56, -42);
-console.log(topHandTiles);
 var topHand = createTopOrBottomHand("topHand");
 
 function drawTopTile(tile) {
@@ -1807,8 +1806,10 @@ function Hand() {
     }.bind(this); //TODO: Use addEventListener, but make sure to avoid having multiple identical listeners.
 
 
-    handToRender.ondragover = allowDrop;
-    handToRender.ondrop = drop;
+    if (interactive) {
+      handToRender.ondragover = allowDrop;
+      handToRender.ondrop = drop;
+    }
 
     while (handToRender.firstChild) {
       handToRender.firstChild.remove();
@@ -1869,11 +1870,14 @@ function Hand() {
         } else if (exposed) {
           handToRender.appendChild(elem);
         } else {
-          elem.draggable = true;
-          elem.addEventListener("dragstart", dragstart);
-          elem.tileIndex = _this.contents.findIndex(function (item) {
-            return item === tile;
-          });
+          if (interactive) {
+            elem.draggable = true;
+            elem.addEventListener("dragstart", dragstart);
+            elem.tileIndex = _this.contents.findIndex(function (item) {
+              return item === tile;
+            });
+          }
+
           handToRender.appendChild(elem);
         }
       };
@@ -1883,8 +1887,8 @@ function Hand() {
       }
     }.bind(this);
 
-    drawTiles(unexposedTiles, false);
     drawTiles(exposedTiles, true);
+    drawTiles(unexposedTiles, false);
   };
 }
 

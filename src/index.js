@@ -35,12 +35,15 @@ console.log(tiles)
 let handTiles = tiles.slice(-14)
 
 let userHandElem = createTopOrBottomHand("userHand")
+let userHandElemExposed = createTopOrBottomHand("userHandExposed")
 let userHand = new Hand()
 console.log(userHand)
 
 //userHand.sortTiles(handTiles)
-handTiles.forEach((value) => {userHand.add(value)})
-userHand.renderTiles(userHandElem, undefined, true)
+handTiles.forEach((value) => {
+	userHand.add(value)
+})
+userHand.renderTiles(userHandElem, userHandExposed, true)
 
 
 
@@ -57,7 +60,6 @@ leftHand.renderTiles(leftHandContainer)
 
 let rightHandTiles = tiles.slice(-42, -28)
 
-console.log(rightHandTiles)
 
 let rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer")
 
@@ -77,7 +79,6 @@ for (let i=0;i<rightHandTiles.length;i++) {
 
 let topHandTiles = tiles.slice(-56, -42)
 
-console.log(topHandTiles)
 
 let topHand = createTopOrBottomHand("topHand")
 
