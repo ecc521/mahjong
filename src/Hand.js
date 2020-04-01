@@ -1,12 +1,12 @@
 const Tile = require("./Tile.js")
 const Match = require("./Match.js")
-const Sequence = require("./Sequence.js").Sequence
+const Sequence = require("./Sequence.js")
 const Pretty = require("./Pretty.js")
 
 function Hand() {
 	this.contents = []
 
-	this.add = function(obj) {
+	this.add = (function(obj) {
 		//We will insert the tile where our sorting algorithm would find it most appropriate.
 		//TODO: this should probably receive some improvement, as if the user changes the location of suits, or puts, say honors first, it will fail to properly insert.
 		let newItemScore;
@@ -32,15 +32,15 @@ function Hand() {
 			}
 		}
 		this.contents.push(obj)
-	}
+	}).bind(this)
 
-	this.remove = function(obj) {
+	this.remove = (function(obj) {
 		let index = this.contents.findIndex((value) => {return value === obj})
 		if (index) {
 			this.contents.splice(index, 1)
 		}
 		else {throw obj + " does not exist in hand. "}
-	}
+	}).bind(this)
 
 	function getTileValue(tile) {
 		//The greater the value, the further to the right we place the tile.
@@ -65,7 +65,7 @@ function Hand() {
 		})
 	}
 
-	this.renderTiles = function(handToRender, handForExposed, interactive) {
+	this.renderTiles = (function(handToRender, handForExposed, interactive) {
 		//handForExposed - Optional. If exposed tiles should be placed in a seperate hand, they will be placed here.
 		//dragstart - Optional. If passed, tiles can be dragged and dropped to reorder the hand.
 		//dragstart does not apply for tiles in handForExposed, if it exists.
@@ -181,7 +181,7 @@ function Hand() {
 		}).bind(this)
 		drawTiles(exposedTiles, true)
 		drawTiles(unexposedTiles, false)
-	}
+	}).bind(this)
 }
 
 module.exports = Hand
