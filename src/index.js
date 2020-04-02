@@ -19,11 +19,19 @@ function createLeftOrRightHand(handId, containerId) {
 	return container
 }
 
+window.Tile = Tile
+window.Sequence = require("./Sequence.js")
+window.Match = require("./Match.js")
 
 
+function createTilePlacemat() {
+	let tilePlacemat = document.createElement("div")
+	tilePlacemat.id = "tilePlacemat"
+	return tilePlacemat
+}
 
-
-
+let tilePlacemat = createTilePlacemat()
+document.body.appendChild(tilePlacemat)
 
 //For testing.
 
@@ -36,24 +44,33 @@ let handTiles = tiles.slice(-14)
 
 let userHandElem = createTopOrBottomHand("userHand")
 let userHandElemExposed = createTopOrBottomHand("userHandExposed")
-let userHand = new Hand()
+let userHand = new Hand({
+	handToRender: userHandElem,
+	handForExposed: userHandExposed,
+	interactive: true,
+	tilePlacemat: tilePlacemat
+})
 console.log(userHand)
+
+window.userHand = userHand
 
 //userHand.sortTiles(handTiles)
 handTiles.forEach((value) => {
 	userHand.add(value)
 })
-userHand.renderTiles(userHandElem, userHandExposed, true)
+userHand.renderTiles()
 
 
 
 let leftHandTiles = tiles.slice(-28, -14)
 let leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer")
 
-let leftHand = new Hand()
+let leftHand = new Hand({
+	handToRender: leftHandContainer
+})
 
 leftHandTiles.forEach((value) => {leftHand.add(value)})
-leftHand.renderTiles(leftHandContainer)
+leftHand.renderTiles()
 
 
 
