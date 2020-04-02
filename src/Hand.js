@@ -113,9 +113,13 @@ class Hand {
 			elem.classList.remove(randomClass)
 
 			let currentTile = this.contents[elem.tileIndex]
-			console.log(currentTile)
 
-			if (this.inPlacemat.includes(elem)) {return} //This exact Tile is already in the placemat. Reject.
+			if (!currentTile) {return}
+			
+			if (this.inPlacemat.length >= 4) {
+				alert("Placemat is already full. ")
+				return
+			}
 			else {
 				this.inPlacemat.push(this.contents.splice(elem.tileIndex, 1)[0])
 			}
@@ -131,6 +135,16 @@ class Hand {
 			if (this.tilePlacemat) {
 				this.tilePlacemat.addEventListener("dragover", allowDrop)
 				this.tilePlacemat.addEventListener("drop", dropOnPlacemat)
+
+				this.tilePlacemat.addEventListener("dragover", function() {
+					this.style.backgroundColor = "lightblue"
+				})
+				this.tilePlacemat.addEventListener("dragleave", function() {
+					this.style.backgroundColor = ""
+				})
+				this.tilePlacemat.addEventListener("drop", function() {
+					this.style.backgroundColor = ""
+				})
 			}
 		}
 
@@ -142,7 +156,7 @@ class Hand {
 				let elem = document.createElement("img")
 				if (tile) {
 					elem.src = tile.imageUrl
-					//Both work. Using i is faster and simpler. 
+					//Both work. Using i is faster and simpler.
 					elem.placematIndex = i //this.inPlacemat.findIndex((item) => {return item === tile})
 					elem.addEventListener("dragstart", dragstart)
 				}
@@ -150,16 +164,6 @@ class Hand {
 					elem.src = "assets/tiles/tile-outline.png"
 				}
 				this.tilePlacemat.appendChild(elem)
-
-				elem.addEventListener("dragover", function() {
-					this.style.backgroundColor = "lightblue"
-				})
-				elem.addEventListener("dragleave", function() {
-					this.style.backgroundColor = ""
-				})
-				elem.addEventListener("drop", function() {
-					this.style.backgroundColor = ""
-				})
 			}
 
 
