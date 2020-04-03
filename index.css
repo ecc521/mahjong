@@ -20,6 +20,7 @@ html, body {
 	left: 0;
 	top: 0;
 	max-width: 9.52vh;
+	width: 9.52vh;
 	height: 100vh;
 	background-color: #4c3329;
 }
@@ -29,6 +30,7 @@ html, body {
 	right: 0;
 	top: 0;
 	max-width:9.52vh;
+	width: 9.52vh;
 	height: 100vh;
 	background-color: #4c3329;
 }
@@ -101,4 +103,16 @@ html, body {
 
 #tilePlacemat img {
 	margin-right: 20px;
+}
+
+#compass {
+	position: absolute;
+	right: 9.52vh;
+	top: 12vh;
+	width: 12vw;
+	height: 12vw;
+	max-width: 12vh;
+	max-height: 12vh;
+	margin-right: 1vw;
+	margin-top: 1vh;  
 }

@@ -19,6 +19,31 @@ function createLeftOrRightHand(handId, containerId) {
 	return container
 }
 
+
+
+function Compass(config = {}) {
+	config.id = config.id || "compass"
+
+	this.compass = document.createElement("img")
+	this.compass.id = config.id
+	document.body.appendChild(this.compass)
+
+	this.setDirectionForUserWind = function(userWind) {
+		//There are four compasses - compass-north, compass-south, etc. They specify which direction is at the top of the compass, or for the hand across from the users.
+		//Convert userWind to the direction for the compass.
+		let translations = {
+			"north": "south",
+			"east": "west",
+			"south": "north",
+			"west": "east"
+		}
+		this.compass.src = "assets/compass-" + translations[userWind] + ".svg"
+	}
+}
+
+let compass = new Compass({id: "compass"})
+compass.setDirectionForUserWind("east")
+
 window.Tile = Tile
 window.Sequence = require("./Sequence.js")
 window.Match = require("./Match.js")
@@ -71,8 +96,6 @@ let leftHand = new Hand({
 
 leftHandTiles.forEach((value) => {leftHand.add(value)})
 leftHand.renderTiles()
-
-
 
 
 let rightHandTiles = tiles.slice(-42, -28)
