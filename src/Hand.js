@@ -130,10 +130,12 @@ class Hand {
 
 		if (this.interactive) {
 			this.handToRender.addEventListener("dragover", allowDrop)
+			this.handToRender.addEventListener("dragenter", allowDrop)
 			this.handToRender.addEventListener("drop", dropOnHand)
 
 			if (this.tilePlacemat) {
 				this.tilePlacemat.addEventListener("dragover", allowDrop)
+				this.tilePlacemat.addEventListener("dragenter", allowDrop)
 				this.tilePlacemat.addEventListener("drop", dropOnPlacemat)
 
 				this.tilePlacemat.addEventListener("dragover", function() {

@@ -1,6 +1,19 @@
 const Tile = require("./Tile.js")
 const Hand = require("./Hand.js")
 
+
+//Mobile browsers use the touch API - desktop is drag and drop. We'll use a polyfill so we don't have to implement both.
+let mobile_drag_drop_polyfill = require("mobile-drag-drop").polyfill
+// optional import of scroll behaviour
+import {scrollBehaviourDragImageTranslateOverride} from "mobile-drag-drop/scroll-behaviour";
+// options are optional ;)
+mobile_drag_drop_polyfill({
+    // use this to make use of the scroll behaviour
+    dragImageTranslateOverride: scrollBehaviourDragImageTranslateOverride
+});
+
+
+
 function createTopOrBottomHand(handId) {
 	let hand = document.createElement("div")
 	hand.id = handId
@@ -63,6 +76,12 @@ document.body.appendChild(tilePlacemat)
 let tiles = new (require("./Wall.js"))().tiles
 console.log(tiles)
 
+let wallRendering = document.createElement("div")
+window.wallRendering = wallRendering
+window.Wall = require("./Wall.js")
+Wall.renderWall(wallRendering, 91)
+wallRendering.id = "wall"
+document.body.appendChild(wallRendering)
 
 
 let handTiles = tiles.slice(-14)

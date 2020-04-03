@@ -114,5 +114,30 @@ html, body {
 	max-width: 12vh;
 	max-height: 12vh;
 	margin-right: 1vw;
-	margin-top: 1vh;  
+	margin-top: 1vh;
+}
+
+/*The max number of tiles should be 91. Therefore, we will prepare for tiles 31 by 3. The last two spots will be filled by a count of the tiles in the wall.  */
+#wall {
+	position: absolute;
+	left: 9.52vh;
+	top: 12vh;
+	margin-left: 1vw;
+	margin-top: 1vh;
+	max-width: 50vw;
+	max-height: 10vh;
+}
+
+#wall * {
+	max-width: calc(50vw / 31);
+	max-height: 3.33vh;
+}
+
+#wall p {
+	display: inline-block;
+	margin: 0;
+	font-size: 2.5vh;
+	vertical-align: top;
+	width: calc(50vw / 31);
+	text-align: center;
 }
