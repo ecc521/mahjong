@@ -2334,7 +2334,12 @@ function setVisibleAreaHeight() {
 }
 
 window.addEventListener('resize', setVisibleAreaHeight);
-setVisibleAreaHeight();
+setVisibleAreaHeight(); //Otherwise Safari will scroll the page when the user drags tiles.
+//It's possible that we need feature detection for passive listeners, as it may be misinterpreted by older browsers, however I currently observe no side effects.
+
+window.addEventListener('touchmove', function () {}, {
+  passive: false
+});
 
 /***/ }),
 /* 65 */
