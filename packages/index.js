@@ -2253,32 +2253,57 @@ compass.setDirectionForUserWind("east");
 function FullscreenControls(elementId) {
   var goFullscreenImage = "assets/go-full-screen.svg";
   var exitFullscreenImage = "assets/exit-full-screen.svg";
-  this.toggleElement = document.createElement("img");
-  this.toggleElement.id = elementId;
-  this.toggleElement.addEventListener("click", function () {
-    if (document.fullscreenElement) {
-      document.exitFullscreen();
-    } else {
-      document.documentElement.requestFullscreen();
-    }
-  });
 
-  var setIcon = function setIcon() {
-    if (document.fullscreenElement) {
-      this.toggleElement.src = exitFullscreenImage;
-    } else {
-      this.toggleElement.src = goFullscreenImage;
-    }
-  }.bind(this);
+  if (!document.fullscreenEnabled && document.webkitFullscreenEnabled) {
+    //We'll add some support for the webkit prefix.
+    Object.defineProperty(document, "fullscreenElement", {
+      get: function get() {
+        return document.webkitFullscreenElement;
+      }
+    });
 
-  document.addEventListener("fullscreenchange", setIcon);
-  setIcon();
-  return this.toggleElement;
+    document.documentElement.requestFullscreen = function () {
+      document.documentElement.webkitRequestFullScreen();
+    };
+
+    document.exitFullscreen = function () {
+      document.webkitExitFullscreen();
+    };
+
+    document.addEventListener("webkitfullscreenchange", function () {
+      document.dispatchEvent(new Event("fullscreenchange"));
+    });
+  }
+
+  if (document.fullscreenElement !== undefined) {
+    //Support check. This allows users to check toggleElement.
+    this.toggleElement = document.createElement("img");
+    this.toggleElement.id = elementId;
+    this.toggleElement.addEventListener("click", function () {
+      if (document.fullscreenElement) {
+        document.exitFullscreen();
+      } else {
+        document.documentElement.requestFullscreen();
+      }
+    });
+
+    var setIcon = function setIcon() {
+      if (document.fullscreenElement) {
+        this.toggleElement.src = exitFullscreenImage;
+      } else {
+        this.toggleElement.src = goFullscreenImage;
+      }
+    }.bind(this);
+
+    document.addEventListener("fullscreenchange", setIcon);
+    setIcon();
+  }
 }
 
-if (document.fullscreenEnabled) {
-  var fullscreenControls = new FullscreenControls("fullscreenControls");
-  document.body.appendChild(fullscreenControls);
+var fullscreenControls = new FullscreenControls("fullscreenControls");
+
+if (fullscreenControls.toggleElement) {
+  document.body.appendChild(fullscreenControls.toggleElement);
 }
 
 window.Tile = Tile;

@@ -61,36 +61,49 @@ function FullscreenControls(elementId) {
 	let goFullscreenImage = "assets/go-full-screen.svg"
 	let exitFullscreenImage = "assets/exit-full-screen.svg"
 
-	this.toggleElement = document.createElement("img")
-	this.toggleElement.id = elementId
-	this.toggleElement.addEventListener("click", function() {
-		if (document.fullscreenElement) {
-			document.exitFullscreen()
-		}
-		else {
-			document.documentElement.requestFullscreen()
-		}
-	})
+	if (!document.fullscreenEnabled && document.webkitFullscreenEnabled) {
+		//We'll add some support for the webkit prefix.
+		Object.defineProperty(document, "fullscreenElement", {
+			get: function() {return document.webkitFullscreenElement}
+		})
+		document.documentElement.requestFullscreen = function() {document.documentElement.webkitRequestFullScreen()}
+		document.exitFullscreen = function() {document.webkitExitFullscreen()}
+		document.addEventListener("webkitfullscreenchange", function() {
+			document.dispatchEvent(new Event("fullscreenchange"))
+		})
+	}
 
-	let setIcon = (function setIcon() {
-		if (document.fullscreenElement) {
-			this.toggleElement.src = exitFullscreenImage
-		}
-		else {
-			this.toggleElement.src = goFullscreenImage
-		}
-	}).bind(this)
-	document.addEventListener("fullscreenchange", setIcon)
-	setIcon()
+	if (document.fullscreenElement !== undefined) {
+		//Support check. This allows users to check toggleElement.
+		this.toggleElement = document.createElement("img")
+		this.toggleElement.id = elementId
+		this.toggleElement.addEventListener("click", function() {
+			if (document.fullscreenElement) {
+				document.exitFullscreen()
+			}
+			else {
+				document.documentElement.requestFullscreen()
+			}
+		})
 
-	return this.toggleElement
+		let setIcon = (function setIcon() {
+			if (document.fullscreenElement) {
+				this.toggleElement.src = exitFullscreenImage
+			}
+			else {
+				this.toggleElement.src = goFullscreenImage
+			}
+		}).bind(this)
+
+		document.addEventListener("fullscreenchange", setIcon)
+		setIcon()
+	}
 }
 
-if (document.fullscreenEnabled) {
-	let fullscreenControls = new FullscreenControls("fullscreenControls")
-	document.body.appendChild(fullscreenControls)
+let fullscreenControls = new FullscreenControls("fullscreenControls")
+if (fullscreenControls.toggleElement) {
+	document.body.appendChild(fullscreenControls.toggleElement)
 }
-
 
 window.Tile = Tile
 window.Sequence = require("./Sequence.js")
