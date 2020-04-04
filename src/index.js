@@ -32,8 +32,6 @@ function createLeftOrRightHand(handId, containerId) {
 	return container
 }
 
-
-
 function Compass(config = {}) {
 	config.id = config.id || "compass"
 
@@ -152,4 +150,29 @@ for (let i=0;i<topHandTiles.length;i++) {
 	let topHandTile = topHandTiles[i]
 	//drawTopTile(topHandTile)
 	drawTopTile(new Tile({faceDown: true}))
+}
+
+
+
+function detectViewportUnitBug() {
+	//While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
+	//This leads to things going off the screen. We will use fullscreen to get around this.
+	if (
+		document.getElementById("userHand").getBoundingClientRect().bottom
+		!== document.getElementById("leftHand").getBoundingClientRect().bottom
+	) {return true}
+	else {return false}
+}
+
+if (detectViewportUnitBug()) {
+	//Mandatory fullscreen.
+	document.documentElement.addEventListener("click", function() {
+		document.documentElement.requestFullscreen()
+	})
+	window.addEventListener("orientationchange", function() {
+		document.documentElement.requestFullscreen()
+	})
+}
+else {
+	//Implement optional fullscreen.
 }

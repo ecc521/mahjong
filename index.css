@@ -1,3 +1,9 @@
+/*
+While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
+See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
+As of now, we'll just use full screen.
+*/
+
 html, body {
 	width: 100vw;
 	height: 100vh;
@@ -71,7 +77,7 @@ html, body {
 	transform: translateY(-50%);
 }
 
-/*TODO: If width is substantially below 640 and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
+/*TODO: If tiles aren't at max size and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
 #topHand img {
 	max-width: calc(calc(100vw - 19.04vh) / 14);
 	max-height: 12vh;

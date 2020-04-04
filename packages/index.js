@@ -2334,6 +2334,27 @@ for (var _i = 0; _i < topHandTiles.length; _i++) {
   }));
 }
 
+function detectViewportUnitBug() {
+  //While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
+  //This leads to things going off the screen. We will use fullscreen to get around this.
+  if (document.getElementById("userHand").getBoundingClientRect().bottom !== document.getElementById("leftHand").getBoundingClientRect().bottom) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+if (detectViewportUnitBug()) {
+  //Mandatory fullscreen.
+  document.documentElement.addEventListener("click", function () {
+    document.documentElement.requestFullscreen();
+  });
+  window.addEventListener("orientationchange", function () {
+    document.documentElement.requestFullscreen();
+  });
+} else {//Implement optional fullscreen.
+}
+
 /***/ }),
 /* 66 */
 /***/ (function(module, exports) {
