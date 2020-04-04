@@ -153,26 +153,11 @@ for (let i=0;i<topHandTiles.length;i++) {
 }
 
 
-
-function detectViewportUnitBug() {
-	//While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
-	//This leads to things going off the screen. We will use fullscreen to get around this.
-	if (
-		document.getElementById("userHand").getBoundingClientRect().bottom
-		!== document.getElementById("leftHand").getBoundingClientRect().bottom
-	) {return true}
-	else {return false}
+//While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
+//See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
+//We will use CSS variables to counteract this bug.
+function setVisibleAreaHeight() {
+	document.documentElement.style.setProperty('--vh', `${window.innerHeight/100}px`)
 }
-
-if (detectViewportUnitBug()) {
-	//Mandatory fullscreen.
-	document.documentElement.addEventListener("click", function() {
-		document.documentElement.requestFullscreen()
-	})
-	window.addEventListener("orientationchange", function() {
-		document.documentElement.requestFullscreen()
-	})
-}
-else {
-	//Implement optional fullscreen.
-}
+window.addEventListener('resize', setVisibleAreaHeight)
+setVisibleAreaHeight()

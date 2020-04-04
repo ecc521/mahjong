@@ -1,0 +1,196 @@
+:root {
+	--vh: 1vh;
+	/*
+	While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
+	See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
+
+	To counteract this, we will use a CSS variable that will be dynamically changed by JavaScript.
+	In order to convert vh to use the relative variable, use the following two find and replace regexp. (note: make sure that every single declaration ends in a semicolon)
+
+	Find and replace (-)?([\d.]+)vh with calc(var(--vh) * $1$2)
+	*/
+}
+
+html, body {
+	width: 100vw;
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	margin: 0;
+	padding: 0;
+}
+
+#topHand {
+	position: absolute;
+	top: 0;
+	left: 9.52vh;
+	left: calc(var(--vh) * 9.52);
+	max-height: 12vh;
+	max-height: calc(var(--vh) * 12);
+	width: calc(100vw - 19.04vh);
+	width: calc(100vw - calc(var(--vh) * 19.04));
+	text-align: center; /*Center tiles horizontally. */
+	background-color: #5a3e32;
+}
+
+#leftHand {
+	position: absolute;
+	left: 0;
+	top: 0;
+	max-width: 9.52vh;
+	max-width: calc(var(--vh) * 9.52);
+	width: 9.52vh;
+	width: calc(var(--vh) * 9.52);
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	background-color: #4c3329;
+}
+
+#rightHand {
+	position: absolute;
+	right: 0;
+	top: 0;
+	max-width:9.52vh;
+	max-width:calc(var(--vh) * 9.52);
+	width: 9.52vh;
+	width: calc(var(--vh) * 9.52);
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	background-color: #4c3329;
+}
+
+#userHand, #userHandExposed, #tilePlacemat {
+	position: absolute;
+	bottom: 0;
+	left: 9.52vh;
+	left: calc(var(--vh) * 9.52);
+	height:12vh;
+	height:calc(var(--vh) * 12);
+	max-height: 12vh;
+	max-height: calc(var(--vh) * 12);
+	width: calc(100vw - 19.04vh);
+	width: calc(100vw - calc(var(--vh) * 19.04));
+	text-align: center; /*Center tiles horizontally. */
+	background-color: #7d4b37;
+}
+
+#userHandExposed {
+	bottom: 12vh;
+	bottom: calc(var(--vh) * 12);
+	background-color: #a04622;
+	text-align: left;
+}
+
+#tilePlacemat {
+	bottom: 24vh;
+	bottom: calc(var(--vh) * 24);
+	background-color: #FFFFFF00;
+}
+
+
+/*Containers used on left and right hands for vertical alignment. */
+#rightHandContainer {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+#leftHandContainer {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+/*TODO: If tiles aren't at max size and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
+#topHand img {
+	max-width: calc(calc(100vw - 19.04vh) / 14);
+	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14);
+	max-height: 12vh;
+	max-height: calc(var(--vh) * 12);
+	/*transform: rotate(180deg);*/ /*Rotate tiles 180 degrees away from the viewer (they would be across from this person)*/
+}
+
+/*Note: Currently leftHand and rightHand tiles are facing 180 degrees away from where they would in a real game, however this probably makes it easier to read the tiles. */
+#leftHand img {
+	transform: rotate(270deg);
+	max-width: 9.52vh;
+	max-width: calc(var(--vh) * 9.52);
+	max-height: 9vh;
+	max-height: calc(var(--vh) * 9);
+	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
+	padding-left: calc(var(--vh) * 2.38); /*Otherwise it is transformed partially off the screen. */
+	margin-bottom: -3.4vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: calc(var(--vh) * -3.4); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+}
+
+#rightHand img {
+	transform: rotate(90deg);
+	max-width: 9.52vh;
+	max-width: calc(var(--vh) * 9.52);
+	max-height: 9vh;
+	max-height: calc(var(--vh) * 9);
+	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
+	padding-left: calc(var(--vh) * 2.38); /*Otherwise it is transformed partially off the screen. */
+	margin-top: -2.38vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-top: calc(var(--vh) * -2.38); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: -1.02vh;
+	margin-bottom: calc(var(--vh) * -1.02);
+}
+
+#userHand img, #userHandExposed img, #tilePlacemat img {
+	max-width: calc(calc(100vw - 19.04vh) / 14);
+	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14);
+	max-height: 12vh;
+	max-height: calc(var(--vh) * 12);
+}
+
+#tilePlacemat img {
+	margin-right: 20px;
+}
+
+#compass {
+	position: absolute;
+	right: 9.52vh;
+	right: calc(var(--vh) * 9.52);
+	top: 12vh;
+	top: calc(var(--vh) * 12);
+	width: 12vw;
+	height: 12vw;
+	max-width: 12vh;
+	max-width: calc(var(--vh) * 12);
+	max-height: 12vh;
+	max-height: calc(var(--vh) * 12);
+	margin-right: 1vw;
+	margin-top: 1vh;
+	margin-top: calc(var(--vh) * 1);
+}
+
+/*The max number of tiles should be 91. Therefore, we will prepare for tiles 31 by 3. The last two spots will be filled by a count of the tiles in the wall.  */
+#wall {
+	position: absolute;
+	left: 9.52vh;
+	left: calc(var(--vh) * 9.52);
+	top: 12vh;
+	top: calc(var(--vh) * 12);
+	margin-left: 1vw;
+	margin-top: 1vh;
+	margin-top: calc(var(--vh) * 1);
+	max-width: 50vw;
+	max-height: 10vh;
+	max-height: calc(var(--vh) * 10);
+}
+
+#wall * {
+	max-width: calc(50vw / 31);
+	max-height: 3.33vh;
+	max-height: calc(var(--vh) * 3.33);
+}
+
+#wall p {
+	display: inline-block;
+	margin: 0;
+	font-size: 2.5vh;
+	font-size: calc(var(--vh) * 2.5);
+	vertical-align: top;
+	width: calc(50vw / 31);
+	text-align: center;
+}
