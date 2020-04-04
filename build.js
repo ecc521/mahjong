@@ -24,9 +24,10 @@ function reformatCSSForViewportBug(inputText) {
 
 let indexCSSPath = path.join(__dirname, "index.css")
 function buildCSS() {
+	let startTime = Date.now()
 	let indexCSS = fs.readFileSync(indexCSSPath, {encoding: "utf8"})
 	fs.writeFileSync(path.join(__dirname, "packages", "index.css"), reformatCSSForViewportBug(indexCSS))
-	console.log("Built CSS!")
+	console.log("Built CSS! (" + (Date.now() - startTime) + "ms)")
 }
 
 buildCSS()

@@ -162,8 +162,9 @@ This means that something using bottom is off the page - hence we must use top. 
 
 #fullscreenControls {
 	position: absolute;
-	left: 65vw;
-	top: 13vh;
-	max-height: 12vh;
-	max-width: 12vw;
+	right: 9.52vh;
+	top: 71vh;
+	max-height: 5vh;
+	max-width: 5vw;
+	z-index: 1;
 }

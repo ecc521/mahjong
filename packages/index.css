@@ -205,10 +205,12 @@ This means that something using bottom is off the page - hence we must use top. 
 
 #fullscreenControls {
 	position: absolute;
-	left: 65vw;
-	top: 13vh;
-	top: calc(var(--vh) * 13);
-	max-height: 12vh;
-	max-height: calc(var(--vh) * 12);
-	max-width: 12vw;
+	right: 9.52vh;
+	right: calc(var(--vh) * 9.52);
+	top: 71vh;
+	top: calc(var(--vh) * 71);
+	max-height: 5vh;
+	max-height: calc(var(--vh) * 5);
+	max-width: 5vw;
+	z-index: 1;
 }
