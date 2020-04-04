@@ -2249,6 +2249,38 @@ var compass = new Compass({
   id: "compass"
 });
 compass.setDirectionForUserWind("east");
+
+function FullscreenControls(elementId) {
+  var goFullscreenImage = "assets/go-full-screen.svg";
+  var exitFullscreenImage = "assets/exit-full-screen.svg";
+  this.toggleElement = document.createElement("img");
+  this.toggleElement.id = elementId;
+  this.toggleElement.addEventListener("click", function () {
+    if (document.fullscreenElement) {
+      document.exitFullscreen();
+    } else {
+      document.documentElement.requestFullscreen();
+    }
+  });
+
+  var setIcon = function setIcon() {
+    if (document.fullscreenElement) {
+      this.toggleElement.src = exitFullscreenImage;
+    } else {
+      this.toggleElement.src = goFullscreenImage;
+    }
+  }.bind(this);
+
+  document.addEventListener("fullscreenchange", setIcon);
+  setIcon();
+  return this.toggleElement;
+}
+
+if (document.fullscreenEnabled) {
+  var fullscreenControls = new FullscreenControls("fullscreenControls");
+  document.body.appendChild(fullscreenControls);
+}
+
 window.Tile = Tile;
 window.Sequence = __webpack_require__(59);
 window.Match = __webpack_require__(58);

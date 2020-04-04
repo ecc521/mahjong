@@ -55,6 +55,43 @@ function Compass(config = {}) {
 let compass = new Compass({id: "compass"})
 compass.setDirectionForUserWind("east")
 
+
+function FullscreenControls(elementId) {
+
+	let goFullscreenImage = "assets/go-full-screen.svg"
+	let exitFullscreenImage = "assets/exit-full-screen.svg"
+
+	this.toggleElement = document.createElement("img")
+	this.toggleElement.id = elementId
+	this.toggleElement.addEventListener("click", function() {
+		if (document.fullscreenElement) {
+			document.exitFullscreen()
+		}
+		else {
+			document.documentElement.requestFullscreen()
+		}
+	})
+
+	let setIcon = (function setIcon() {
+		if (document.fullscreenElement) {
+			this.toggleElement.src = exitFullscreenImage
+		}
+		else {
+			this.toggleElement.src = goFullscreenImage
+		}
+	}).bind(this)
+	document.addEventListener("fullscreenchange", setIcon)
+	setIcon()
+
+	return this.toggleElement
+}
+
+if (document.fullscreenEnabled) {
+	let fullscreenControls = new FullscreenControls("fullscreenControls")
+	document.body.appendChild(fullscreenControls)
+}
+
+
 window.Tile = Tile
 window.Sequence = require("./Sequence.js")
 window.Match = require("./Match.js")
@@ -151,6 +188,8 @@ for (let i=0;i<topHandTiles.length;i++) {
 	//drawTopTile(topHandTile)
 	drawTopTile(new Tile({faceDown: true}))
 }
+
+
 
 
 //While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.

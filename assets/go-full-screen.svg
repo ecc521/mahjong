@@ -1,0 +1,28 @@
+<svg width="520" height="400" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
+ <g>
+  <title>background</title>
+  <rect fill="#fff" id="canvas_background" height="402" width="522" y="-1" x="-1"/>
+  <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
+   <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
+  </g>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <rect rx="10" id="svg_1" height="300" width="400" y="51" x="58" stroke-width="10" stroke="#000" fill="#ffffff"/>
+  <rect stroke="#000" id="svg_7" height="88" width="25" y="10" x="17" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+  <rect transform="rotate(-90 70.50000000000001,21.999999999999996) " stroke="#000" id="svg_8" height="90" width="25" y="-23" x="58" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+  <g transform="rotate(-90 62.250000000000064,340.75000000000006) " id="svg_13">
+   <rect stroke="#000" id="svg_11" height="88" width="25" y="297" x="13" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+   <rect transform="rotate(-90 66.50000000000007,309.00000000000006) " stroke="#000" id="svg_12" height="90" width="25" y="264" x="54" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+  </g>
+  <g transform="rotate(180 449.25,345.75) " id="svg_16">
+   <rect stroke="#000" id="svg_14" height="88" width="25" y="302" x="400" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+   <rect transform="rotate(-90 453.50000000000006,314) " stroke="#000" id="svg_15" height="90" width="25" y="269" x="441" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+  </g>
+  <g transform="rotate(90 453.25,60.75000762939457) " id="svg_19">
+   <rect stroke="#000" id="svg_17" height="88" width="25" y="17" x="404" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+   <rect transform="rotate(-90 457.50000000000006,28.999999999999975) " stroke="#000" id="svg_18" height="90" width="25" y="-16" x="445" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
+  </g>
+ </g>
+</svg>

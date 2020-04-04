@@ -202,3 +202,13 @@ This means that something using bottom is off the page - hence we must use top. 
 	width: calc(50vw / 31);
 	text-align: center;
 }
+
+#fullscreenControls {
+	position: absolute;
+	left: 65vw;
+	top: 13vh;
+	top: calc(var(--vh) * 13);
+	max-height: 12vh;
+	max-height: calc(var(--vh) * 12);
+	max-width: 12vw;
+}
