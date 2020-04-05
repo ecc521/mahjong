@@ -2279,6 +2279,7 @@ function FullscreenControls(elementId) {
     //Support check. This allows users to check toggleElement.
     this.toggleElement = document.createElement("img");
     this.toggleElement.id = elementId;
+    this.toggleElement.title = "Toggle Full Screen";
     this.toggleElement.addEventListener("click", function () {
       if (document.fullscreenElement) {
         document.exitFullscreen();
@@ -2317,7 +2318,23 @@ function createTilePlacemat() {
 }
 
 var tilePlacemat = createTilePlacemat();
-document.body.appendChild(tilePlacemat); //For testing.
+document.body.appendChild(tilePlacemat);
+var websocketURL = "ws:127.0.0.1:3000";
+var websocket = new WebSocket(websocketURL);
+window.websocket = websocket;
+
+websocket.onmessage = function (message) {
+  console.log(message);
+};
+
+websocket.onerror = function (e) {
+  console.error(e);
+};
+
+websocket.onclose = function (e) {
+  console.warn(e);
+}; //For testing.
+
 
 var tiles = new (__webpack_require__(61))().tiles;
 console.log(tiles);

@@ -34,6 +34,7 @@
     "@babel/runtime": "^7.9.2",
     "babel-loader": "^8.1.0",
     "core-js": "^3.6.4",
-    "webpack": "^4.42.1"
+    "webpack": "^4.42.1",
+    "ws": "^7.2.3"
   }
 }
