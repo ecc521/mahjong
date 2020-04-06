@@ -2224,12 +2224,17 @@ window.addEventListener('touchmove', function () {}, {
 
 /***/ }),
 /* 66 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
 
-//Allow the user to join and create rooms.
+__webpack_require__(104);
+
+var ErrorPopup = __webpack_require__(102); //Allow the user to join and create rooms.
+
+
 var roomManager = document.createElement("div");
 roomManager.id = "roomManager";
-document.body.appendChild(roomManager);
+document.body.appendChild(roomManager); //In order to get the "with friends" part styled differently, we will need 3 elements for our heading.
+
 var heading = document.createElement("div");
 heading.id = "heading";
 roomManager.appendChild(heading);
@@ -2243,8 +2248,29 @@ withFriendsHeading.id = "withFriendsHeading";
 heading.appendChild(withFriendsHeading);
 var roomIdInput = document.createElement("input");
 roomIdInput.id = "roomIdInput";
-roomIdInput.placeholder = "Enter Room ID...";
+roomIdInput.placeholder = "Enter Room Name...";
 roomManager.appendChild(roomIdInput);
+var joinOrCreateRoom = document.createElement("div");
+joinOrCreateRoom.id = "joinOrCreateRoom";
+roomManager.appendChild(joinOrCreateRoom);
+var joinRoom = document.createElement("button");
+joinRoom.id = "joinRoom";
+joinRoom.innerHTML = "Join Room";
+joinRoom.addEventListener("click", function () {
+  if (roomIdInput.value.trim().length < 5) {
+    return new ErrorPopup("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show();
+  }
+});
+joinOrCreateRoom.appendChild(joinRoom);
+var createRoom = document.createElement("button");
+createRoom.id = "createRoom";
+createRoom.innerHTML = "Create Room";
+createRoom.addEventListener("click", function () {
+  if (roomIdInput.value.trim().length < 5) {
+    return new ErrorPopup("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show();
+  }
+});
+joinOrCreateRoom.appendChild(createRoom);
 module.exports = roomManager;
 
 /***/ }),
@@ -3966,6 +3992,142 @@ module.exports = function (R, S) {
   return regexpExec.call(R, S);
 };
 
+
+
+/***/ }),
+/* 102 */
+/***/ (function(module, exports) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var ErrorPopup = function ErrorPopup(errorText, messageText) {
+  "use strict";
+
+  _classCallCheck(this, ErrorPopup);
+
+  var cover = document.createElement("div");
+  cover.id = "errorPopupCover";
+  cover.style.display = "none";
+  document.body.appendChild(cover);
+  var popup = document.createElement("div");
+  popup.id = "errorPopup";
+  cover.appendChild(popup);
+  var error = document.createElement("p");
+  error.innerHTML = errorText;
+  error.id = "errorText";
+  popup.appendChild(error);
+  var message = document.createElement("p");
+  message.innerHTML = messageText;
+  message.id = "messageText";
+  popup.appendChild(message);
+  var dismissButton = document.createElement("button");
+  dismissButton.id = "dismissButton";
+  dismissButton.innerHTML = "Dismiss";
+  popup.appendChild(dismissButton);
+
+  var dismiss = function dismiss(ev) {
+    if (this.ondismissed) {
+      this.ondismissed();
+    }
+
+    cover.remove();
+  }.bind(this); //Prevent people from accidentally closing the message before they can read it.
+
+
+  setTimeout(function () {
+    dismissButton.addEventListener("click", dismiss);
+    cover.addEventListener("click", function (event) {
+      if (event.target === cover) {
+        dismiss();
+      }
+    });
+  }, 500);
+
+  this.show = function () {
+    cover.style.display = "";
+  };
+};
+
+module.exports = ErrorPopup;
+
+/***/ }),
+/* 103 */
+/***/ (function(module, exports) {
+
+// a string of all valid unicode whitespaces
+// eslint-disable-next-line max-len
+module.exports = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000\u2028\u2029\uFEFF';
+
+
+/***/ }),
+/* 104 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(3);
+var $trim = __webpack_require__(105).trim;
+var forcedStringTrimMethod = __webpack_require__(106);
+
+// `String.prototype.trim` method
+// https://tc39.github.io/ecma262/#sec-string.prototype.trim
+$({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
+  trim: function trim() {
+    return $trim(this);
+  }
+});
+
+
+/***/ }),
+/* 105 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var requireObjectCoercible = __webpack_require__(15);
+var whitespaces = __webpack_require__(103);
+
+var whitespace = '[' + whitespaces + ']';
+var ltrim = RegExp('^' + whitespace + whitespace + '*');
+var rtrim = RegExp(whitespace + whitespace + '*$');
+
+// `String.prototype.{ trim, trimStart, trimEnd, trimLeft, trimRight }` methods implementation
+var createMethod = function (TYPE) {
+  return function ($this) {
+    var string = String(requireObjectCoercible($this));
+    if (TYPE & 1) string = string.replace(ltrim, '');
+    if (TYPE & 2) string = string.replace(rtrim, '');
+    return string;
+  };
+};
+
+module.exports = {
+  // `String.prototype.{ trimLeft, trimStart }` methods
+  // https://tc39.github.io/ecma262/#sec-string.prototype.trimstart
+  start: createMethod(1),
+  // `String.prototype.{ trimRight, trimEnd }` methods
+  // https://tc39.github.io/ecma262/#sec-string.prototype.trimend
+  end: createMethod(2),
+  // `String.prototype.trim` method
+  // https://tc39.github.io/ecma262/#sec-string.prototype.trim
+  trim: createMethod(3)
+};
+
+
+/***/ }),
+/* 106 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var fails = __webpack_require__(0);
+var whitespaces = __webpack_require__(103);
+
+var non = '\u200B\u0085\u180E';
+
+// check that a method works with the correct list
+// of whitespaces and has a correct name
+module.exports = function (METHOD_NAME) {
+  return fails(function () {
+    return !!whitespaces[METHOD_NAME]() || non[METHOD_NAME]() != non || whitespaces[METHOD_NAME].name !== METHOD_NAME;
+  });
+};
 
 
 /***/ })

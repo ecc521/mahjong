@@ -15,7 +15,7 @@
 
 #roomManager #withFriendsHeading {
 	font-size: 5vh;
-	vertical-align: text-bottom;
+	vertical-align: top;
 	margin-left: 1.5vw;
 	color: #ffe100;
 }
@@ -25,4 +25,24 @@
 	width: 30vw;
 	font-size: 3vh;
 	padding-left: 1vh;
+}
+
+#roomManager #joinOrCreateRoom {
+	margin-top: 2vh;
+}
+
+#roomManager #joinRoom, #roomManager #createRoom{
+	width: 15vw;
+	height: 7vh;
+	border-radius: 3.5vh;
+	font-size: 2vh;
+}
+
+#roomManager #joinRoom {
+	background: linear-gradient(45deg, lightyellow, lightgreen, lightblue);
+}
+
+#roomManager #createRoom {
+	margin-left: 1vw;
+	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
 }
