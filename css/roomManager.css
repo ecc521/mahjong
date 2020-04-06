@@ -1,0 +1,28 @@
+#roomManager {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	z-index: 10;
+	background-color: #368a36;
+	text-align: center;
+}
+
+#roomManager #mahjongHeading, #roomManager #withFriendsHeading {
+	font-size: 7vh;
+	color: #ffbd17;
+	display: inline-block;
+}
+
+#roomManager #withFriendsHeading {
+	font-size: 5vh;
+	vertical-align: text-bottom;
+	margin-left: 1.5vw;
+	color: #ffe100;
+}
+
+#roomManager #roomIdInput {
+	height: 5vh;
+	width: 30vw;
+	font-size: 3vh;
+	padding-left: 1vh;
+}

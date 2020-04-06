@@ -12,10 +12,18 @@ if (!fs.existsSync(serverDataDirectory)) {fs.mkdirSync(serverDataDirectory, {rec
 const httpserver = http.createServer();
 const websocketServer = new WebSocket.Server({server: httpserver});
 
+const Wall = require("./src/Wall.js")
+const Tile = require("./src/Tile.js")
+const Room = require("./server/Room.js")
+const Client = require("./server/Client.js")
 
-let rooms = {}
-let clients = {}
 
+function getMessage(type, message) {
+	return JSON.stringify({
+		type: "error",
+		message
+	})
+}
 
 websocketServer.on('connection', function connection(websocket) {
 	let clientId;
@@ -26,10 +34,7 @@ websocketServer.on('connection', function connection(websocket) {
 			obj = JSON.parse(message)
 		}
 		catch(e) {
-			return websocket.send(JSON.stringify({
-				type: "error",
-				message: "Message must be valid JSON"
-			}))
+			return websocket.send(errorMessage("Message must be valid JSON"))
 		}
 
 		console.log('received: ' + JSON.stringify(obj));
@@ -45,28 +50,20 @@ websocketServer.on('connection', function connection(websocket) {
 				clientId = obj.clientId
 			}
 			else if (clientId !== obj.clientId) {
-				return websocket.send(JSON.stringify({
-					type: "error",
-					message: "clientId changed. "
-				}))
+				return websocket.send(errorMessage("clientId changed"))
 			}
 		}
 
 
-		//Now we have clientId, which allowebsocket us to identify an individual client.
+		//Now we have clientId, which allows us to identify an individual client.
 		if (obj.type = "createRoom") {
 			if (typeof obj.roomId !== "string" || obj.roomId.length < 5) {
-				return websocket.send(JSON.stringify({
-					type: "error",
-					message: "roomId must be a string with length of at least 5. "
-				}))
+				return websocket.send(errorMessage("roomId must be a string with length of at least 5"))
 			}
 			else if (rooms[obj.roomId]) {
-				return websocket.send(JSON.stringify({
-					type: "error",
-					message: "Room already exists. "
-				}))
+				return websocket.send(errorMessage("Room already exists"))
 			}
+
 
 			websocket.send(JSON.stringify({
 				type: "roomCreated",

@@ -2,14 +2,14 @@
  <!-- Created with Method Draw - http://github.com/duopixel/Method-Draw/ -->
  <g>
   <title>background</title>
-  <rect fill="#fff" id="canvas_background" height="402" width="522" y="-1" x="-1"/>
+  <rect fill="#ffffff00" id="canvas_background" height="402" width="522" y="-1" x="-1"/>
   <g display="none" overflow="visible" y="0" x="0" height="100%" width="100%" id="canvasGrid">
    <rect fill="url(#gridpattern)" stroke-width="0" y="0" x="0" height="100%" width="100%"/>
   </g>
  </g>
  <g>
   <title>Layer 1</title>
-  <rect stroke="#000" rx="10" id="svg_1" height="365.999985" width="483.999966" y="17.999996" x="17.000016" stroke-width="10" fill="#ffffff"/>
+  <rect stroke="#000" rx="10" id="svg_1" height="365.999985" width="483.999966" y="17.999996" x="17.000016" stroke-width="10" fill="#ffffff00"/>
   <g transform="rotate(-90 90.25000000000007,312.75000000000006) " id="svg_13">
    <rect stroke="#000" id="svg_11" height="88" width="25" y="269" x="41" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>
    <rect transform="rotate(-90 94.50000000000007,281.00000000000006) " stroke="#000" id="svg_12" height="90" width="25" y="236" x="82" fill-opacity="null" stroke-opacity="null" stroke-width="0" fill="#000000"/>

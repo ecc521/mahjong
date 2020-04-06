@@ -1,0 +1,158 @@
+#topHand {
+	position: absolute;
+	top: 0;
+	left: 9.52vh;
+	max-height: 12vh;
+	width: calc(100vw - 19.04vh);
+	text-align: center; /*Center tiles horizontally. */
+	background-color: #5a3e32;
+}
+
+#leftHand {
+	position: absolute;
+	left: 0;
+	top: 0;
+	max-width: 9.52vh;
+	width: 9.52vh;
+	height: 100vh;
+	background-color: #4c3329;
+}
+
+#rightHand {
+	position: absolute;
+	right: 0;
+	top: 0;
+	max-width:9.52vh;
+	width: 9.52vh;
+	height: 100vh;
+	background-color: #4c3329;
+}
+
+/*We would use bottom, however Safari treats bottom as the bottom of the viewport, and Safari has the viewport != visible area bug.
+This means that something using bottom is off the page - hence we must use top. */
+#gameBoard #userHand, #gameBoard #userHandExposed, #gameBoard #tilePlacemat {
+	position: absolute;
+	/*bottom: 0;*/
+	top: 88vh;
+	left: 9.52vh;
+	height:12vh;
+	max-height: 12vh;
+	width: calc(100vw - 19.04vh);
+	text-align: center; /*Center tiles horizontally. */
+	background-color: #7d4b37;
+}
+
+#gameBoard #userHandExposed {
+	/*bottom: 12vh;*/
+	top: 76vh;
+	background-color: #a04622;
+	text-align: left;
+}
+
+#gameBoard #tilePlacemat {
+	/*bottom: 24vh;*/
+	top: 64vh;
+	background-color: #FFFFFF00;
+}
+
+
+/*Containers used on left and right hands for vertical alignment. */
+#gameBoard #rightHandContainer {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+#gameBoard #leftHandContainer {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
+/*TODO: If tiles aren't at max size and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
+#gameBoard #topHand img {
+	max-width: calc(calc(100vw - 19.04vh) / 14);
+	max-height: 12vh;
+	/*transform: rotate(180deg);*/ /*Rotate tiles 180 degrees away from the viewer (they would be across from this person)*/
+}
+
+/*Note: Currently leftHand and rightHand tiles are facing 180 degrees away from where they would in a real game, however this probably makes it easier to read the tiles. */
+#gameBoard #leftHand img {
+	transform: rotate(270deg);
+	max-width: 9.52vh;
+	max-height: 9vh;
+	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
+	margin-bottom: -3.4vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+}
+
+#gameBoard #rightHand img {
+	transform: rotate(90deg);
+	max-width: 9.52vh;
+	max-height: 9vh;
+	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
+	margin-top: -2.38vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: -1.02vh;
+}
+
+#gameBoard #userHand img, #gameBoard #userHandExposed img, #gameBoard #tilePlacemat img {
+	max-width: calc(calc(100vw - 19.04vh) / 14);
+	max-height: 12vh;
+}
+
+#gameBoard #tilePlacemat img {
+	margin-right: 20px;
+}
+
+#gameBoard #compass {
+	position: absolute;
+	right: 9.52vh;
+	top: 12vh;
+	width: 12vw;
+	height: 12vw;
+	max-width: 12vh;
+	max-height: 12vh;
+	margin-right: 1vw;
+	margin-top: 1vh;
+}
+
+/*The max number of tiles should be 91. Therefore, we will prepare for tiles 31 by 3. The last two spots will be filled by a count of the tiles in the wall.  */
+#gameBoard #wall {
+	position: absolute;
+	left: 9.52vh;
+	top: 12vh;
+	margin-left: 1vw;
+	margin-top: 1vh;
+	max-width: 50vw;
+	max-height: 10vh;
+}
+
+#gameBoard #wall * {
+	max-width: calc(50vw / 31);
+	max-height: 3.33vh;
+}
+
+#gameBoard #wall p {
+	display: inline-block;
+	margin: 0;
+	font-size: 2.5vh;
+	vertical-align: top;
+	width: calc(50vw / 31);
+	text-align: center;
+}
+
+/*Since we have to use top instead of bottom due to viewport bugs, this can be floating above where it should be. */
+#gameBoard #fullscreenControls {
+	position: absolute;
+	right: 9.52vh;
+	top: 71vh;
+	max-height: 5vh;
+	max-width: 5vw;
+	z-index: 1;
+}
+
+#gameBoard {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	background-color: #09790944;
+}

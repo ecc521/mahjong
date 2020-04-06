@@ -1,22 +1,36 @@
-:root {
-	--vh: 1vh;
-	/*
-	While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
-	See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
-
-	To counteract this, we will use a CSS variable that will be dynamically changed by JavaScript.
-	In order to convert vh to use the relative variable, use the following two find and replace regexp. (note: make sure that every single declaration ends in a semicolon)
-
-	Find and replace (-)?([\d.]+)vh with calc(var(--vh) * $1$2)
-	*/
-}
-
-html, body {
+#roomManager {
+	position: absolute;
 	width: 100vw;
 	height: 100vh;
 	height: calc(var(--vh) * 100);
-	margin: 0;
-	padding: 0;
+	z-index: 10;
+	background-color: #368a36;
+	text-align: center;
+}
+
+#roomManager #mahjongHeading, #roomManager #withFriendsHeading {
+	font-size: 7vh;
+	font-size: calc(var(--vh) * 7);
+	color: #ffbd17;
+	display: inline-block;
+}
+
+#roomManager #withFriendsHeading {
+	font-size: 5vh;
+	font-size: calc(var(--vh) * 5);
+	vertical-align: text-bottom;
+	margin-left: 1.5vw;
+	color: #ffe100;
+}
+
+#roomManager #roomIdInput {
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	width: 30vw;
+	font-size: 3vh;
+	font-size: calc(var(--vh) * 3);
+	padding-left: 1vh;
+	padding-left: calc(var(--vh) * 1);
 }
 
 #topHand {
@@ -60,7 +74,7 @@ html, body {
 
 /*We would use bottom, however Safari treats bottom as the bottom of the viewport, and Safari has the viewport != visible area bug.
 This means that something using bottom is off the page - hence we must use top. */
-#userHand, #userHandExposed, #tilePlacemat {
+#gameBoard #userHand, #gameBoard #userHandExposed, #gameBoard #tilePlacemat {
 	position: absolute;
 	/*bottom: 0;*/
 	top: 88vh;
@@ -77,7 +91,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	background-color: #7d4b37;
 }
 
-#userHandExposed {
+#gameBoard #userHandExposed {
 	/*bottom: 12vh;*/
 	/*bottom: calc(var(--vh) * 12);*/
 	top: 76vh;
@@ -86,7 +100,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	text-align: left;
 }
 
-#tilePlacemat {
+#gameBoard #tilePlacemat {
 	/*bottom: 24vh;*/
 	/*bottom: calc(var(--vh) * 24);*/
 	top: 64vh;
@@ -96,20 +110,20 @@ This means that something using bottom is off the page - hence we must use top. 
 
 
 /*Containers used on left and right hands for vertical alignment. */
-#rightHandContainer {
+#gameBoard #rightHandContainer {
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
 }
 
-#leftHandContainer {
+#gameBoard #leftHandContainer {
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
 }
 
 /*TODO: If tiles aren't at max size and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
-#topHand img {
+#gameBoard #topHand img {
 	max-width: calc(calc(100vw - 19.04vh) / 14);
 	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14);
 	max-height: 12vh;
@@ -118,7 +132,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 /*Note: Currently leftHand and rightHand tiles are facing 180 degrees away from where they would in a real game, however this probably makes it easier to read the tiles. */
-#leftHand img {
+#gameBoard #leftHand img {
 	transform: rotate(270deg);
 	max-width: 9.52vh;
 	max-width: calc(var(--vh) * 9.52);
@@ -130,7 +144,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	margin-bottom: calc(var(--vh) * -3.4); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
 }
 
-#rightHand img {
+#gameBoard #rightHand img {
 	transform: rotate(90deg);
 	max-width: 9.52vh;
 	max-width: calc(var(--vh) * 9.52);
@@ -144,18 +158,18 @@ This means that something using bottom is off the page - hence we must use top. 
 	margin-bottom: calc(var(--vh) * -1.02);
 }
 
-#userHand img, #userHandExposed img, #tilePlacemat img {
+#gameBoard #userHand img, #gameBoard #userHandExposed img, #gameBoard #tilePlacemat img {
 	max-width: calc(calc(100vw - 19.04vh) / 14);
 	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14);
 	max-height: 12vh;
 	max-height: calc(var(--vh) * 12);
 }
 
-#tilePlacemat img {
+#gameBoard #tilePlacemat img {
 	margin-right: 20px;
 }
 
-#compass {
+#gameBoard #compass {
 	position: absolute;
 	right: 9.52vh;
 	right: calc(var(--vh) * 9.52);
@@ -173,7 +187,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 /*The max number of tiles should be 91. Therefore, we will prepare for tiles 31 by 3. The last two spots will be filled by a count of the tiles in the wall.  */
-#wall {
+#gameBoard #wall {
 	position: absolute;
 	left: 9.52vh;
 	left: calc(var(--vh) * 9.52);
@@ -187,13 +201,13 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-height: calc(var(--vh) * 10);
 }
 
-#wall * {
+#gameBoard #wall * {
 	max-width: calc(50vw / 31);
 	max-height: 3.33vh;
 	max-height: calc(var(--vh) * 3.33);
 }
 
-#wall p {
+#gameBoard #wall p {
 	display: inline-block;
 	margin: 0;
 	font-size: 2.5vh;
@@ -203,7 +217,8 @@ This means that something using bottom is off the page - hence we must use top. 
 	text-align: center;
 }
 
-#fullscreenControls {
+/*Since we have to use top instead of bottom due to viewport bugs, this can be floating above where it should be. */
+#gameBoard #fullscreenControls {
 	position: absolute;
 	right: 9.52vh;
 	right: calc(var(--vh) * 9.52);
@@ -213,4 +228,36 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-height: calc(var(--vh) * 5);
 	max-width: 5vw;
 	z-index: 1;
+}
+
+#gameBoard {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	background-color: #09790944;
+}
+
+
+
+
+:root {
+	--vh: 1vh;
+	/*
+	While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
+	See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
+
+	To counteract this, we will use a CSS variable that will be dynamically changed by JavaScript.
+	In order to convert vh to use the relative variable, use the following two find and replace regexp. (note: make sure that every single declaration ends in a semicolon)
+
+	Find and replace (-)?([\d.]+)vh with calc(var(--vh) * $1$2)
+	*/
+}
+
+html, body {
+	width: 100vw;
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	margin: 0;
+	padding: 0;
 }
