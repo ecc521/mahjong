@@ -2257,7 +2257,13 @@ heading.appendChild(withFriendsHeading);
 var roomIdInput = document.createElement("input");
 roomIdInput.id = "roomIdInput";
 roomIdInput.placeholder = "Enter Room Name...";
-roomManager.appendChild(roomIdInput);
+roomManager.appendChild(roomIdInput); //Put the nickname input on a new line.
+
+roomManager.appendChild(document.createElement("br"));
+var nicknameInput = document.createElement("input");
+nicknameInput.id = "nicknameInput";
+nicknameInput.placeholder = "Choose a Nickname...";
+roomManager.appendChild(nicknameInput);
 var joinOrCreateRoom = document.createElement("div");
 joinOrCreateRoom.id = "joinOrCreateRoom";
 roomManager.appendChild(joinOrCreateRoom);
@@ -2268,6 +2274,8 @@ joinRoom.addEventListener("click", function () {
   if (roomIdInput.value.trim().length < 5) {
     return new ErrorPopup("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show();
   }
+
+  window.stateManager.joinRoom(roomIdInput.value, nicknameInput.value);
 });
 joinOrCreateRoom.appendChild(joinRoom);
 var createRoom = document.createElement("button");
@@ -2277,8 +2285,23 @@ createRoom.addEventListener("click", function () {
   if (roomIdInput.value.trim().length < 5) {
     return new ErrorPopup("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show();
   }
+
+  window.stateManager.createRoom(roomIdInput.value, nicknameInput.value);
 });
 joinOrCreateRoom.appendChild(createRoom);
+
+window.stateManager.onJoinRoom = function (obj) {
+  if (obj.status === "error") {
+    return new ErrorPopup("Unable to Join Room", obj.message).show();
+  }
+};
+
+window.stateManager.onCreateRoom = function (obj) {
+  if (obj.status === "error") {
+    return new ErrorPopup("Unable to Create Room", obj.message).show();
+  }
+};
+
 module.exports = roomManager;
 
 /***/ }),
@@ -4246,6 +4269,7 @@ var StateManager = function StateManager(websocketURL) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
+              //TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second. 
               this.websocket = new WebSocket(websocketURL);
               this.websocket.onmessage = onmessage;
 
@@ -4355,33 +4379,54 @@ var StateManager = function StateManager(websocketURL) {
     var obj = JSON.parse(message.data);
     console.log(obj);
 
-    if (obj.type === "gameState") {
-      this.onStateReceived(obj);
-    } else if (obj.type === "tileThrown") {}
+    if (obj.type === "joinRoom") {
+      onJoinRoom(obj);
+    } else if (obj.type === "createRoom") {
+      onCreateRoom(obj);
+    }
   }
 
   this.inRoom = false;
   this.isHost = false;
 
-  this.joinRoom = function (roomId) {
+  this.joinRoom = function (roomId, nickname) {
     this.sendMessage(JSON.stringify({
       "type": "joinRoom",
       clientId: clientId,
-      roomId: roomId
+      roomId: roomId,
+      nickname: nickname
     }));
   };
 
-  this.createRoom = function (roomId) {
+  this.createRoom = function (roomId, nickname) {
     this.sendMessage(JSON.stringify({
       "type": "createRoom",
       clientId: clientId,
-      roomId: roomId
+      roomId: roomId,
+      nickname: nickname
     }));
   };
 
-  function onRoomCreated() {}
+  var onCreateRoom = function onCreateRoom(obj) {
+    if (this.onCreateRoom instanceof Function) {
+      this.onCreateRoom(obj);
+    }
 
-  function onRoomJoined() {}
+    if (obj.status === "success") {
+      this.inRoom = true;
+      this.isHost = true;
+    }
+  }.bind(this);
+
+  var onJoinRoom = function onJoinRoom(obj) {
+    if (this.onJoinRoom instanceof Function) {
+      this.onJoinRoom(obj);
+    }
+
+    if (obj.status === "success") {
+      this.inRoom = true;
+    }
+  }.bind(this);
 
   function onStateReceived() {}
 

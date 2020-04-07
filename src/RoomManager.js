@@ -28,12 +28,18 @@ withFriendsHeading.id = "withFriendsHeading"
 heading.appendChild(withFriendsHeading)
 
 
-
 let roomIdInput = document.createElement("input")
 roomIdInput.id = "roomIdInput"
 roomIdInput.placeholder = "Enter Room Name..."
 roomManager.appendChild(roomIdInput)
 
+//Put the nickname input on a new line.
+roomManager.appendChild(document.createElement("br"))
+
+let nicknameInput = document.createElement("input")
+nicknameInput.id = "nicknameInput"
+nicknameInput.placeholder = "Choose a Nickname..."
+roomManager.appendChild(nicknameInput)
 
 
 let joinOrCreateRoom = document.createElement("div")
@@ -47,6 +53,7 @@ joinRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length < 5) {
 		return new ErrorPopup("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show()
 	}
+	window.stateManager.joinRoom(roomIdInput.value, nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(joinRoom)
 
@@ -57,8 +64,22 @@ createRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length < 5) {
 		return new ErrorPopup("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
+	window.stateManager.createRoom(roomIdInput.value, nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(createRoom)
+
+
+window.stateManager.onJoinRoom = function(obj) {
+	if (obj.status === "error") {
+		return new ErrorPopup("Unable to Join Room", obj.message).show()
+	}
+}
+
+window.stateManager.onCreateRoom = function(obj) {
+	if (obj.status === "error") {
+		return new ErrorPopup("Unable to Create Room", obj.message).show()
+	}
+}
 
 
 module.exports = roomManager

@@ -23,14 +23,20 @@
 	color: #ffe100;
 }
 
-#roomManager #roomIdInput {
+#roomManager #roomIdInput, #roomManager #nicknameInput{
 	height: 5vh;
 	height: calc(var(--vh) * 5);
-	width: 30vw;
+	width: 32vw;
+	min-width: 300px;
 	font-size: 3vh;
 	font-size: calc(var(--vh) * 3);
 	padding-left: 1vh;
 	padding-left: calc(var(--vh) * 1);
+}
+
+#roomManager #nicknameInput {
+	margin-top: 1vh;
+	margin-top: calc(var(--vh) * 1);
 }
 
 #roomManager #joinOrCreateRoom {
@@ -39,7 +45,8 @@
 }
 
 #roomManager #joinRoom, #roomManager #createRoom{
-	width: 15vw;
+	width: 16vw;
+	min-width: 150px;
 	height: 7vh;
 	height: calc(var(--vh) * 7);
 	border-radius: 3.5vh;

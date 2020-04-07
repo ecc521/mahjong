@@ -58,24 +58,31 @@ websocketServer.on('connection', function connection(websocket) {
 			if (typeof obj.roomId !== "string" || obj.roomId.length < 5) {
 				return websocket.send(getMessage("createRoom", "roomId must be a string with length of at least 5", "error"))
 			}
-			else if (global.stateManager.getRoom(roomId)) {
+			else if (global.stateManager.getRoom(obj.roomId)) {
 				return websocket.send(getMessage("createRoom", "Room Already Exists", "error"))
 			}
 			else {
-				global.stateManager.createRoom(roomId, clientId)
-				return websocket.send(getMessage("createRoom", roomId, "success"))
+				global.stateManager.getClient(clientId).setNickname(obj.nickname)
+				global.stateManager.createRoom(obj.roomId, clientId)
+				return websocket.send(getMessage("createRoom", obj.roomId, "success"))
 			}
 		}
 		else if (obj.type === "joinRoom") {
-			if (!global.stateManager.getRoom(roomId)) {
+			if (!global.stateManager.getRoom(obj.roomId)) {
 				return websocket.send(getMessage("joinRoom", "Room Does Not Exist", "error"))
 			}
-			global.stateManager.getRoom(roomId).addClient(clientId)
-			return websocket.send(getMessage("joinRoom", roomId, "success"))
+			global.stateManager.getClient(clientId).setNickname(obj.nickname)
+			let status = global.stateManager.getRoom(obj.roomId).addClient(clientId)
+			if (status === true) {
+				return websocket.send(getMessage("joinRoom", obj.roomId, "success"))
+			}
+			else {
+				return websocket.send(getMessage("joinRoom", status, "error"))
+			}
 		}
 		else if (obj.type.includes("roomAction")) {
 			//The user is in a room, and this action will be handled by the room.
-			let room = global.stateManager.getRoom(roomId)
+			let room = global.stateManager.getRoom(obj.roomId)
 			if (!room) {
 				return websocket.send(getMessage(obj.type, "Room Does Not Exist", "error"))
 			}

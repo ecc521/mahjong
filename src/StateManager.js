@@ -9,6 +9,7 @@ class StateManager {
 	constructor(websocketURL) {
 
 		this.createWebsocket = (async function createWebsocket() {
+			//TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second. 
 			this.websocket = new WebSocket(websocketURL)
 			this.websocket.onmessage = onmessage
 			this.websocket.onerror = (async function(e) {
@@ -27,7 +28,7 @@ class StateManager {
 			}).bind(this)
 
 			this.sendMessage = async function(message) {
-				//Send message once socket opens. 
+				//Send message once socket opens.
 				if (this.websocket.readyState === 0) {
 					await new Promise((resolve, reject) => {
 						this.websocket.onopen = resolve
@@ -42,41 +43,50 @@ class StateManager {
 		function onmessage(message) {
 			let obj = JSON.parse(message.data)
 			console.log(obj)
-			if (obj.type === "gameState") {
-				this.onStateReceived(obj)
+			if (obj.type === "joinRoom") {
+				onJoinRoom(obj)
 			}
-			else if (obj.type === "tileThrown") {
-
+			else if (obj.type === "createRoom") {
+				onCreateRoom(obj)
 			}
 		}
 
 		this.inRoom = false
 		this.isHost = false
 
-		this.joinRoom = function(roomId) {
+		this.joinRoom = function(roomId, nickname) {
 			this.sendMessage(JSON.stringify({
 				"type": "joinRoom",
 				clientId,
-				roomId
+				roomId,
+				nickname
 			}))
 		}
 
-		this.createRoom = function(roomId) {
+		this.createRoom = function(roomId, nickname) {
 			this.sendMessage(JSON.stringify({
 				"type": "createRoom",
 				clientId,
-				roomId
+				roomId,
+				nickname
 			}))
 		}
 
 
-		function onRoomCreated() {
+		let onCreateRoom = (function onCreateRoom(obj) {
+			if (this.onCreateRoom instanceof Function) {this.onCreateRoom(obj)}
+			if (obj.status === "success") {
+				this.inRoom = true
+				this.isHost = true
+			}
+		}).bind(this)
 
-		}
-
-		function onRoomJoined() {
-
-		}
+		let onJoinRoom = (function onJoinRoom(obj) {
+			if (this.onJoinRoom instanceof Function) {this.onJoinRoom(obj)}
+			if (obj.status === "success") {
+				this.inRoom = true
+			}
+		}).bind(this)
 
 		function onStateReceived() {
 
