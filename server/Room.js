@@ -1,7 +1,7 @@
 class Room {
-	constructor(roomId) {
+	constructor(roomId, hostClientId) {
 		this.roomId = roomId
-		rooms[roomId] = this
+		this.hostClientId = hostClientId
 
 		this.clients = []
 		this.inGame = false
@@ -47,9 +47,41 @@ class Room {
 		}).bind(this)
 
 		this.close = (function(reason) {
-			this.messageAll(reason)
-			this.clients.forEach((client) => {client.end("Room Closed")})
-			delete rooms[roomId]
+			this.clients.forEach((client) => {client.close()})
+			global.stateManager.deleteRoom(roomId)
+		}).bind(this)
+
+		this.incomingMessage = (function(clientId, obj) {
+			console.log("Received message")
+			console.log(clientId)
+			console.log(JSON.stringify(obj))
+			let client = global.stateManager.getClient(clientId)
+			let isHost = (clientId === this.hostClientId)
+			if (obj.type === "roomActionLeaveRoom") {
+				this.removeClient(clientId)
+				return client.message(obj.type, "Left Room", "success")
+			}
+			else if (obj.type === "roomActionKickFromRoom") {
+				if (!isHost) {
+					return client.message(obj.type, "Only Host Can Kick", "error")
+				}
+				this.removeClient(clientId)
+				return client.message(obj.type, "Kicked Client", "success")
+			}
+			else if (obj.type === "roomActionStartGame") {
+				if (!isHost) {
+					return client.message(obj.type, "Only Host Can Start", "error")
+				}
+
+
+
+			}
+			else if (obj.type === "roomActionEndGame") {
+				//If the game is started, anybody can end the game. Otherwise, only the host can.
+
+
+				
+			}
 		}).bind(this)
 	}
 }

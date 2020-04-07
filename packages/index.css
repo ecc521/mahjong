@@ -49,12 +49,21 @@
 }
 
 #roomManager #joinRoom {
-	background: linear-gradient(45deg, lightyellow, lightgreen, lightblue);
+	background: linear-gradient(45deg, #ffff39, #5bff5b, #609fff);
 }
 
 #roomManager #createRoom {
 	margin-left: 1vw;
 	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
+}
+
+#roomManager #copyrightNotice {
+	position: absolute;
+	text-align: center;
+	top: 96vh;
+	top: calc(var(--vh) * 96);
+	width: 100vw;
+	color: #ffbd17;
 }
 
 #topHand {

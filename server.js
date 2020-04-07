@@ -16,12 +16,12 @@ const Wall = require("./src/Wall.js")
 const Tile = require("./src/Tile.js")
 const Room = require("./server/Room.js")
 const Client = require("./server/Client.js")
+const StateManager = require("./server/StateManager.js")
+global.stateManager = new StateManager()
 
-
-function getMessage(type, message) {
+function getMessage(type, message, status) {
 	return JSON.stringify({
-		type: "error",
-		message
+		type, message, status
 	})
 }
 
@@ -34,54 +34,52 @@ websocketServer.on('connection', function connection(websocket) {
 			obj = JSON.parse(message)
 		}
 		catch(e) {
-			return websocket.send(errorMessage("Message must be valid JSON"))
+			return websocket.send(getMessage("error", "Message must be valid JSON"))
 		}
 
 		console.log('received: ' + JSON.stringify(obj));
 
 		if (!obj.clientId) {
-			return websocket.send(JSON.stringify({
-				type: "error",
-				message: "No clientId specified. "
-			}))
+			return websocket.send(getMessage("error", "No clientId specified"))
 		}
 		else {
 			if (!clientId) {
 				clientId = obj.clientId
+				if (!global.stateManager.getClient(clientId)) {
+					global.stateManager.createClient(clientId, websocket)
+				}
 			}
 			else if (clientId !== obj.clientId) {
-				return websocket.send(errorMessage("clientId changed"))
+				return websocket.send(getMessage("error", "clientId changed"))
 			}
 		}
 
-
-		//Now we have clientId, which allows us to identify an individual client.
-		if (obj.type = "createRoom") {
+		if (obj.type === "createRoom") {
 			if (typeof obj.roomId !== "string" || obj.roomId.length < 5) {
-				return websocket.send(errorMessage("roomId must be a string with length of at least 5"))
+				return websocket.send(getMessage("createRoom", "roomId must be a string with length of at least 5", "error"))
 			}
-			else if (rooms[obj.roomId]) {
-				return websocket.send(errorMessage("Room already exists"))
+			else if (global.stateManager.getRoom(roomId)) {
+				return websocket.send(getMessage("createRoom", "Room Already Exists", "error"))
 			}
-
-
-			websocket.send(JSON.stringify({
-				type: "roomCreated",
-				roomId: obj.roomId
-			}))
+			else {
+				global.stateManager.createRoom(roomId, clientId)
+				return websocket.send(getMessage("createRoom", roomId, "success"))
+			}
 		}
-		else if (obj.type = "joinRoom") {
-			if (!rooms[obj.roomId]) {
-				return websocket.send(JSON.stringify({
-					type: "error",
-					message: "Room does not exist. "
-				}))
+		else if (obj.type === "joinRoom") {
+			if (!global.stateManager.getRoom(roomId)) {
+				return websocket.send(getMessage("joinRoom", "Room Does Not Exist", "error"))
 			}
-
-			websocket.send(JSON.stringify({
-				type: "roomJoined",
-				roomId: obj.roomId
-			}))
+			global.stateManager.getRoom(roomId).addClient(clientId)
+			return websocket.send(getMessage("joinRoom", roomId, "success"))
+		}
+		else if (obj.type.includes("roomAction")) {
+			//The user is in a room, and this action will be handled by the room.
+			let room = global.stateManager.getRoom(roomId)
+			if (!room) {
+				return websocket.send(getMessage(obj.type, "Room Does Not Exist", "error"))
+			}
+			room.incomingMessage(clientId, obj)
 		}
 	});
 });

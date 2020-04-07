@@ -2,17 +2,20 @@ class Client {
 	constructor(clientId, websocket) {
 		this.clientId = clientId
 		this.websocket = websocket
-		clients[clientId] = this
 
-		this.message = (function(message, type = "message") {
-			this.websocket.send(JSON.stringify({
-				type, message
-			}))
+		this.setWebsocket = function(websocket) {
+			this.websocket = websocket
+		}
+
+		this.message = (function(type, message, status) {
+			return JSON.stringify({
+				type, message, status
+			})
 		}).bind(this)
 
-		this.end = (function(message) {
-			this.message(message, "terminate")
-			delete clients[clientId]
+		this.delete = (function(message) {
+			websocket.close(1000) //Status code: Normal close.
+			global.stateManager.deleteClient(clientId)
 		}).bind(this)
 	}
 }

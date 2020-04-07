@@ -1,3 +1,5 @@
+const StateManager = require("./StateManager.js")
+
 //Mobile browsers use the touch API - desktop is drag and drop. We'll use a polyfill so we don't have to implement both.
 let mobile_drag_drop_polyfill = require("mobile-drag-drop").polyfill
 // optional import of scroll behaviour
@@ -8,12 +10,13 @@ mobile_drag_drop_polyfill({
     dragImageTranslateOverride: scrollBehaviourDragImageTranslateOverride
 });
 
+
+let websocketURL = "ws:127.0.0.1:3000"
+window.stateManager = new StateManager(websocketURL)
+
+
 let roomManager = require("./RoomManager.js")
 let gameBoard = require("./GameBoard.js")
-
-
-
-
 
 
 //While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.

@@ -1,6 +1,6 @@
 const Tile = require("./Tile.js")
 const Hand = require("./Hand.js")
-
+const Wall = require("./Wall.js")
 
 let gameBoard = document.createElement("div")
 gameBoard.id = "gameBoard"
@@ -113,21 +113,106 @@ let tilePlacemat = createTilePlacemat()
 gameBoard.appendChild(tilePlacemat)
 
 
-let websocketURL = "ws:127.0.0.1:3000"
-let websocket = new WebSocket(websocketURL)
-window.websocket = websocket
+/*
+let wallRendering = document.createElement("div")
+Wall.renderWall(wallRendering, 91)
+wallRendering.id = "wall"
+gameBoard.appendChild(wallRendering)
 
-websocket.onmessage = function(message) {
-	console.log(message)
+
+let handTiles = tiles.slice(-14)
+
+let userHandElem = createTopOrBottomHand("userHand")
+let userHandElemExposed = createTopOrBottomHand("userHandExposed")
+let userHand = new Hand({
+	handToRender: userHandElem,
+	handForExposed: userHandExposed,
+	interactive: true,
+	tilePlacemat: tilePlacemat
+})
+console.log(userHand)
+
+window.userHand = userHand
+
+//userHand.sortTiles(handTiles)
+handTiles.forEach((value) => {
+	userHand.add(value)
+})
+userHand.renderTiles()
+
+
+
+let leftHandTiles = tiles.slice(-28, -14)
+let leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer")
+
+let leftHand = new Hand({
+	handToRender: leftHandContainer
+})
+
+leftHandTiles.forEach((value) => {leftHand.add(value)})
+leftHand.renderTiles()
+
+
+let rightHandTiles = tiles.slice(-42, -28)
+
+
+let rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer")
+
+function drawRightTile(tile) {
+	let elem = document.createElement("img")
+	elem.src = tile.imageUrl
+	rightHandContainer.appendChild(elem)
 }
 
-websocket.onerror = function(e) {
-	console.error(e)
+for (let i=0;i<rightHandTiles.length;i++) {
+	let rightHandTile = rightHandTiles[i]
+	drawRightTile(rightHandTile)
 }
 
-websocket.onclose = function(e) {
-	console.warn(e)
+
+
+
+let topHandTiles = tiles.slice(-56, -42)
+
+
+let topHand = createTopOrBottomHand("topHand")
+
+
+function drawTopTile(tile) {
+	let elem = document.createElement("img")
+	elem.src = tile.imageUrl
+	topHand.appendChild(elem)
 }
+
+for (let i=0;i<topHandTiles.length;i++) {
+	let topHandTile = topHandTiles[i]
+	//drawTopTile(topHandTile)
+	drawTopTile(new Tile({faceDown: true}))
+}
+
+
+
+
+
+
+
+
+
+*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

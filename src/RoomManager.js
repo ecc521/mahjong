@@ -6,6 +6,11 @@ let roomManager = document.createElement("div")
 roomManager.id = "roomManager"
 document.body.appendChild(roomManager)
 
+let copyrightNotice = document.createElement("p")
+copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved"
+copyrightNotice.id = "copyrightNotice"
+roomManager.appendChild(copyrightNotice)
+
 
 //In order to get the "with friends" part styled differently, we will need 3 elements for our heading.
 let heading = document.createElement("div")
