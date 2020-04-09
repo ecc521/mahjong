@@ -1,7 +1,6 @@
 class Room {
-	constructor(roomId, hostClientId) {
+	constructor(roomId) {
 		this.roomId = roomId
-		this.hostClientId = hostClientId
 
 		this.clientIds = []
 		this.inGame = false
@@ -9,13 +8,17 @@ class Room {
 		this.gameData = {}
 
 		let sendClientList = (function sendClientList() {
+			console.log("sending client list")
 			let clientList = []
 			this.clientIds.forEach((clientId) => {
 				clientList.push({
 					id: clientId,
-					nickname: global.stateManager.getClient(clientId).getNickname()
+					nickname: global.stateManager.getClient(clientId).getNickname(),
+					isHost: (clientId === this.hostClientId)
 				})
 			})
+			console.log(this.clientIds.length)
+			console.log(clientList.length)
 			this.messageAll("clientList", clientList)
 		}).bind(this)
 
@@ -24,6 +27,7 @@ class Room {
 				return "Room Full"
 			}
 			if (this.clientIds.includes(clientId)) {return "Already In Room"}
+			if (!this.hostClientId) {this.hostClientId = clientId}
 			this.clientIds.push(clientId)
 			sendClientList()
 			return true
@@ -36,6 +40,10 @@ class Room {
 			}
 			else {
 				this.clientIds.splice(clientIdIndex, 1)
+				if (this.hostClientId === clientId) {
+					//Choose a new host client.
+					this.hostClientId = this.clientIds[0]
+				}
 				sendClientList()
 			}
 		}).bind(this)
@@ -48,7 +56,9 @@ class Room {
 		}).bind(this)
 
 		this.messageAll = (function(...args) {
+			console.log(this.clientIds.length)
 			this.clientIds.forEach((clientId) => {
+				console.log("Messaging client " + clientId)
 				let client = global.stateManager.getClient(clientId)
 				client.message(...args)
 			})

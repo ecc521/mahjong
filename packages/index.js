@@ -2230,7 +2230,11 @@ window.addEventListener('touchmove', function () {}, {
 /* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(37);
+
 __webpack_require__(104);
+
+__webpack_require__(54);
 
 var ErrorPopup = __webpack_require__(102); //Allow the user to join and create rooms.
 
@@ -2253,20 +2257,25 @@ heading.appendChild(mahjongHeading);
 var withFriendsHeading = document.createElement("h1");
 withFriendsHeading.innerHTML = "with Friends";
 withFriendsHeading.id = "withFriendsHeading";
-heading.appendChild(withFriendsHeading);
+heading.appendChild(withFriendsHeading); //notInRoomContainer: The stuff to create or join a room.
+
+var notInRoomContainer = document.createElement("div");
+notInRoomContainer.id = "notInRoomContainer";
+roomManager.appendChild(notInRoomContainer);
 var roomIdInput = document.createElement("input");
 roomIdInput.id = "roomIdInput";
 roomIdInput.placeholder = "Enter Room Name...";
-roomManager.appendChild(roomIdInput); //Put the nickname input on a new line.
+notInRoomContainer.appendChild(roomIdInput); //Put the nickname input on a new line.
 
-roomManager.appendChild(document.createElement("br"));
+notInRoomContainer.appendChild(document.createElement("br"));
 var nicknameInput = document.createElement("input");
 nicknameInput.id = "nicknameInput";
 nicknameInput.placeholder = "Choose a Nickname...";
-roomManager.appendChild(nicknameInput);
+notInRoomContainer.appendChild(nicknameInput); //The join/create room buttons.
+
 var joinOrCreateRoom = document.createElement("div");
 joinOrCreateRoom.id = "joinOrCreateRoom";
-roomManager.appendChild(joinOrCreateRoom);
+notInRoomContainer.appendChild(joinOrCreateRoom);
 var joinRoom = document.createElement("button");
 joinRoom.id = "joinRoom";
 joinRoom.innerHTML = "Join Room";
@@ -2289,17 +2298,106 @@ createRoom.addEventListener("click", function () {
   window.stateManager.createRoom(roomIdInput.value, nicknameInput.value);
 });
 joinOrCreateRoom.appendChild(createRoom);
+var inRoomContainer = document.createElement("div");
+inRoomContainer.id = "inRoomContainer";
+inRoomContainer.style.display = "none";
+roomManager.appendChild(inRoomContainer);
+var currentRoom = document.createElement("h2");
+currentRoom.id = "currentRoom";
+inRoomContainer.appendChild(currentRoom);
+var playerCount = document.createElement("h2");
+playerCount.id = "playerCount";
+inRoomContainer.appendChild(playerCount);
+var playerView = document.createElement("div");
+playerView.id = "playerView";
+inRoomContainer.appendChild(playerView);
+
+function renderPlayerView() {
+  var clientList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+  var userId = arguments.length > 1 ? arguments[1] : undefined;
+  var kickUserCallback = arguments.length > 2 ? arguments[2] : undefined;
+
+  while (playerView.firstChild) {
+    playerView.firstChild.remove();
+  }
+
+  var userIsHost;
+  clientList.forEach(function (obj) {
+    if (obj.id === userId) {
+      userIsHost = obj.isHost;
+    }
+  });
+  clientList.forEach(function (obj) {
+    var row = document.createElement("div");
+    row.className = "playerViewRow";
+    var nameSpan = document.createElement("span");
+    nameSpan.className = "playerViewNameSpan";
+    nameSpan.innerHTML = obj.nickname;
+    row.appendChild(nameSpan);
+    var card = document.createElement("span");
+    card.className = "playerViewCard";
+    row.appendChild(card);
+    var idSpan = document.createElement("span");
+    idSpan.className = "playerViewIdSpan";
+    idSpan.innerHTML = "User ID: " + obj.id;
+    row.appendChild(idSpan);
+
+    if (obj.id === userId) {
+      if (userIsHost) {
+        card.innerHTML = "You (Host)";
+      } else {
+        card.innerHTML = "You";
+      }
+    } else if (obj.isHost) {
+      card.innerHTML = "Host";
+    } else if (userIsHost) {
+      card.innerHTML = "Kick " + obj.nickname;
+      card.classList.add("playerViewKickButton");
+      card.addEventListener("click", function () {
+        if (confirm("Are you sure you want to kick " + obj.nickname)) {
+          kickUserCallback(obj);
+        }
+      });
+    } else {
+      card.innerHTML = "Player";
+    }
+
+    playerView.appendChild(row);
+  });
+}
+
+function enterRoom() {
+  inRoomContainer.style.display = "block";
+  notInRoomContainer.style.display = "none";
+}
+
+function exitRoom() {
+  inRoomContainer.style.display = "none";
+  notInRoomContainer.style.display = "block";
+}
 
 window.stateManager.onJoinRoom = function (obj) {
   if (obj.status === "error") {
     return new ErrorPopup("Unable to Join Room", obj.message).show();
+  } else {
+    currentRoom.innerHTML = "You are in room " + obj.message;
+    enterRoom();
   }
 };
 
 window.stateManager.onCreateRoom = function (obj) {
   if (obj.status === "error") {
     return new ErrorPopup("Unable to Create Room", obj.message).show();
+  } else {
+    currentRoom.innerHTML = "You are hosting room " + obj.message;
+    enterRoom();
   }
+};
+
+window.stateManager.onClientListChange = function (obj) {
+  console.log(obj);
+  playerCount.innerHTML = obj.message.length + "/4 Players are Present";
+  renderPlayerView(obj.message, window.clientId);
 };
 
 module.exports = roomManager;
@@ -4251,11 +4349,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 //Get the users clientId, or create a new one.
-var clientId = localStorage.getItem("clientId");
+window.clientId = localStorage.getItem("clientId");
 
-if (clientId === null) {
-  clientId = "mahjongWithFriendsClient" + Math.random() * Math.pow(2, 53);
-  localStorage.setItem("clientId", clientId);
+if (window.clientId === null) {
+  window.clientId = "mahjongWithFriendsClient" + Math.random() * Math.pow(2, 53);
+  localStorage.setItem("clientId", window.clientId);
 }
 
 var StateManager = function StateManager(websocketURL) {
@@ -4269,7 +4367,7 @@ var StateManager = function StateManager(websocketURL) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
-              //TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second. 
+              //TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second.
               this.websocket = new WebSocket(websocketURL);
               this.websocket.onmessage = onmessage;
 
@@ -4306,8 +4404,11 @@ var StateManager = function StateManager(websocketURL) {
 
                           if (e.code !== 1000) {
                             //If not a normal closure, reestablish and sync.
-                            this.createWebsocket();
-                            this.syncState();
+                            setTimeout(function () {
+                              //1 second delay to reduce thrashing
+                              this.createWebsocket();
+                              this.syncState();
+                            }.bind(this), 1000);
                           }
 
                         case 2:
@@ -4343,9 +4444,10 @@ var StateManager = function StateManager(websocketURL) {
                           });
 
                         case 3:
+                          console.log(message);
                           this.websocket.send(message);
 
-                        case 4:
+                        case 5:
                         case "end":
                           return _context3.stop();
                       }
@@ -4376,6 +4478,7 @@ var StateManager = function StateManager(websocketURL) {
   this.createWebsocket();
 
   function onmessage(message) {
+    console.log(message);
     var obj = JSON.parse(message.data);
     console.log(obj);
 
@@ -4383,6 +4486,10 @@ var StateManager = function StateManager(websocketURL) {
       onJoinRoom(obj);
     } else if (obj.type === "createRoom") {
       onCreateRoom(obj);
+    } else if (obj.type === "clientList") {
+      onClientListChange(obj);
+    } else {
+      console.log("Unknown Type " + obj.type);
     }
   }
 
@@ -4428,14 +4535,22 @@ var StateManager = function StateManager(websocketURL) {
     }
   }.bind(this);
 
+  var onClientListChange = function onClientListChange(obj) {
+    console.log("Client List Changed");
+
+    if (this.onClientListChange instanceof Function) {
+      this.onClientListChange(obj);
+    }
+  }.bind(this);
+
   function onStateReceived() {}
 
-  this.syncState = function () {
-    //Sync everything with the server.
-    this.sendMessage(JSON.stringify({
-      "type": "gameStateRequest",
-      clientId: clientId
-    }));
+  this.syncState = function () {//Sync everything with the server.
+
+    /*this.sendMessage(JSON.stringify({
+    	"type": "gameStateRequest",
+    	clientId
+    }))*/
   }.bind(this);
 };
 

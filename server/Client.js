@@ -23,6 +23,7 @@ class Client {
 			}))
 		}).bind(this)
 
+
 		this.delete = (function(message) {
 			websocket.close(1000) //Status code: Normal close.
 			global.stateManager.deleteClient(clientId)

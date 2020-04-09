@@ -1,15 +1,15 @@
 //Get the users clientId, or create a new one.
-let clientId = localStorage.getItem("clientId")
-if (clientId === null) {
-	clientId = "mahjongWithFriendsClient" + (Math.random() * 2**53)
-	localStorage.setItem("clientId", clientId)
+window.clientId = localStorage.getItem("clientId")
+if (window.clientId === null) {
+	window.clientId = "mahjongWithFriendsClient" + (Math.random() * 2**53)
+	localStorage.setItem("clientId", window.clientId)
 }
 
 class StateManager {
 	constructor(websocketURL) {
 
 		this.createWebsocket = (async function createWebsocket() {
-			//TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second. 
+			//TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second.
 			this.websocket = new WebSocket(websocketURL)
 			this.websocket.onmessage = onmessage
 			this.websocket.onerror = (async function(e) {
@@ -22,8 +22,11 @@ class StateManager {
 				console.warn(e)
 				if (e.code !== 1000) {
 					//If not a normal closure, reestablish and sync.
-					this.createWebsocket()
-					this.syncState()
+					setTimeout((function() {
+						//1 second delay to reduce thrashing
+						this.createWebsocket()
+						this.syncState()
+					}).bind(this), 1000)
 				}
 			}).bind(this)
 
@@ -35,12 +38,14 @@ class StateManager {
 						this.websocket.onerror = reject //TODO: Handle error.
 					})
 				}
+				console.log(message)
 				this.websocket.send(message)
 			}
 		}).bind(this)
 		this.createWebsocket()
 
 		function onmessage(message) {
+			console.log(message)
 			let obj = JSON.parse(message.data)
 			console.log(obj)
 			if (obj.type === "joinRoom") {
@@ -48,6 +53,12 @@ class StateManager {
 			}
 			else if (obj.type === "createRoom") {
 				onCreateRoom(obj)
+			}
+			else if (obj.type === "clientList") {
+				onClientListChange(obj)
+			}
+			else {
+				console.log("Unknown Type " + obj.type)
 			}
 		}
 
@@ -88,16 +99,21 @@ class StateManager {
 			}
 		}).bind(this)
 
+		let onClientListChange = (function onClientListChange(obj) {
+			console.log("Client List Changed")
+			if (this.onClientListChange instanceof Function) {this.onClientListChange(obj)}
+		}).bind(this)
+
 		function onStateReceived() {
 
 		}
 
 		this.syncState = (function() {
 			//Sync everything with the server.
-			this.sendMessage(JSON.stringify({
+			/*this.sendMessage(JSON.stringify({
 				"type": "gameStateRequest",
 				clientId
-			}))
+			}))*/
 		}).bind(this)
 	}
 }

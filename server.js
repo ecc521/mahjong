@@ -63,7 +63,7 @@ websocketServer.on('connection', function connection(websocket) {
 			}
 			else {
 				global.stateManager.getClient(clientId).setNickname(obj.nickname)
-				global.stateManager.createRoom(obj.roomId, clientId)
+				global.stateManager.createRoom(obj.roomId).addClient(clientId)
 				return websocket.send(getMessage("createRoom", obj.roomId, "success"))
 			}
 		}
@@ -88,6 +88,8 @@ websocketServer.on('connection', function connection(websocket) {
 			}
 			room.incomingMessage(clientId, obj)
 		}
+
+		console.log("Nothing happened. ")
 	});
 });
 

@@ -73,6 +73,62 @@
 	color: #ffbd17;
 }
 
+#roomManager #inRoomContainer {
+	background-color: #00000011; /*Darken the background slightly. */
+	min-height: 40vh;
+	min-height: calc(var(--vh) * 40);
+}
+
+#roomManager #currentRoom {
+	font-size: 4vh;
+	font-size: calc(var(--vh) * 4);
+	margin: 0;
+}
+
+#roomManager #playerCount {
+	font-size: 3vh;
+	font-size: calc(var(--vh) * 3);
+}
+
+#roomManager .playerViewRow {
+	text-align: left;
+	padding-left: 2vw;
+	padding-right: 2vw;
+	background-color: #00000022; /*Darken even more.*/
+	border: 2px solid #00000044;
+}
+
+#roomManager .playerViewNameSpan {
+	font-size: 4vh;
+	font-size: calc(var(--vh) * 4);
+	width: 70%;
+	display: inline-block;
+}
+
+#roomManager .playerViewIdSpan {
+	font-size: 2vh;
+	font-size: calc(var(--vh) * 2);
+}
+
+#roomManager .playerViewCard {
+	width: 30%;
+	display: inline-block;
+	font-size: 3vh;
+	font-size: calc(var(--vh) * 3);
+	text-align: center;
+}
+
+#roomManager .playerViewKickButton {
+	background: linear-gradient(45deg, #f23f3f,#eeb972);
+	border-radius: 10vh;
+	border-radius: calc(var(--vh) * 10);
+	padding-top: 1vh;
+	padding-top: calc(var(--vh) * 1);
+	padding-bottom: 1vh;
+	padding-bottom: calc(var(--vh) * 1);
+	cursor: pointer;
+}
+
 #topHand {
 	position: absolute;
 	top: 0;
