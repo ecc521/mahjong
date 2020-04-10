@@ -129,6 +129,28 @@
 	cursor: pointer;
 }
 
+#roomManager #startGameButton {
+	width: 30vw;
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	font-size: 3vh;
+	font-size: calc(var(--vh) * 3);
+	border-radius: 2.5vh;
+	border-radius: calc(var(--vh) * 2.5);
+	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
+}
+
+#roomManager #leaveRoomButton {
+	width: 30vw;
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	font-size: 3vh;
+	font-size: calc(var(--vh) * 3);
+	border-radius: 2.5vh;
+	border-radius: calc(var(--vh) * 2.5);
+	background: linear-gradient(45deg, #ffff39, #5bff5b, #609fff);
+}
+
 #topHand {
 	position: absolute;
 	top: 0;

@@ -57,6 +57,12 @@ class StateManager {
 			else if (obj.type === "clientList") {
 				onClientListChange(obj)
 			}
+			else if (obj.type === "roomActionKickFromRoom") {
+				//We kicked somebody else. Should probably show an error message or success.
+			}
+			else if (obj.type === "roomActionLeaveRoom") {
+				onLeaveRoom(obj)
+			}
 			else {
 				console.log("Unknown Type " + obj.type)
 			}
@@ -67,8 +73,8 @@ class StateManager {
 
 		this.joinRoom = function(roomId, nickname) {
 			this.sendMessage(JSON.stringify({
-				"type": "joinRoom",
-				clientId,
+				type: "joinRoom",
+				clientId: window.clientId,
 				roomId,
 				nickname
 			}))
@@ -76,31 +82,64 @@ class StateManager {
 
 		this.createRoom = function(roomId, nickname) {
 			this.sendMessage(JSON.stringify({
-				"type": "createRoom",
-				clientId,
+				type: "createRoom",
+				clientId: window.clientId,
 				roomId,
 				nickname
 			}))
 		}
 
+		this.kickUser = function(roomId, userId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionKickFromRoom",
+				clientId: window.clientId,
+				roomId,
+				id: userId ///id of user to kick.
+			}))
+		}
+
+		this.leaveRoom = function(roomId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionLeaveRoom",
+				clientId: window.clientId,
+				roomId,
+			}))
+		}
+
 
 		let onCreateRoom = (function onCreateRoom(obj) {
-			if (this.onCreateRoom instanceof Function) {this.onCreateRoom(obj)}
 			if (obj.status === "success") {
-				this.inRoom = true
+				this.inRoom = obj.message
 				this.isHost = true
 			}
+			if (this.onCreateRoom instanceof Function) {this.onCreateRoom(obj)}
 		}).bind(this)
 
 		let onJoinRoom = (function onJoinRoom(obj) {
-			if (this.onJoinRoom instanceof Function) {this.onJoinRoom(obj)}
 			if (obj.status === "success") {
-				this.inRoom = true
+				this.inRoom = obj.message
 			}
+			if (this.onJoinRoom instanceof Function) {this.onJoinRoom(obj)}
 		}).bind(this)
+
+		let onLeaveRoom = (function onLeaveRoom(obj) {
+			if (obj.status === "success") {
+				this.inRoom = false
+				this.isHost = false
+			}
+			if (this.onLeaveRoom instanceof Function) {this.onLeaveRoom(obj)}
+		}).bind(this)
+
 
 		let onClientListChange = (function onClientListChange(obj) {
 			console.log("Client List Changed")
+
+			obj.message.forEach((obj) => {
+				if (obj.id === window.clientId) {
+					this.isHost = obj.isHost
+				}
+			})
+
 			if (this.onClientListChange instanceof Function) {this.onClientListChange(obj)}
 		}).bind(this)
 
@@ -112,7 +151,7 @@ class StateManager {
 			//Sync everything with the server.
 			/*this.sendMessage(JSON.stringify({
 				"type": "gameStateRequest",
-				clientId
+				clientId: window.clientId
 			}))*/
 		}).bind(this)
 	}

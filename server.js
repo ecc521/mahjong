@@ -64,6 +64,7 @@ websocketServer.on('connection', function connection(websocket) {
 			else {
 				global.stateManager.getClient(clientId).setNickname(obj.nickname)
 				global.stateManager.createRoom(obj.roomId).addClient(clientId)
+				global.stateManager.getClient(clientId).setRoomId(obj.roomId)
 				return websocket.send(getMessage("createRoom", obj.roomId, "success"))
 			}
 		}
@@ -74,6 +75,7 @@ websocketServer.on('connection', function connection(websocket) {
 			global.stateManager.getClient(clientId).setNickname(obj.nickname)
 			let status = global.stateManager.getRoom(obj.roomId).addClient(clientId)
 			if (status === true) {
+				global.stateManager.getClient(clientId).setRoomId(obj.roomId)
 				return websocket.send(getMessage("joinRoom", obj.roomId, "success"))
 			}
 			else {
@@ -82,11 +84,14 @@ websocketServer.on('connection', function connection(websocket) {
 		}
 		else if (obj.type.includes("roomAction")) {
 			//The user is in a room, and this action will be handled by the room.
-			let room = global.stateManager.getRoom(obj.roomId)
+			let room = global.stateManager.getRoom(obj.roomId) || global.stateManager.getClient(clientId).getRoom()
 			if (!room) {
+				//The user did not specify a valid room to use, and was not in a room.
 				return websocket.send(getMessage(obj.type, "Room Does Not Exist", "error"))
 			}
-			room.incomingMessage(clientId, obj)
+			console.log(room)
+			console.log(room.onIncomingMessage)
+			room.onIncomingMessage(clientId, obj)
 		}
 
 		console.log("Nothing happened. ")

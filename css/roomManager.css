@@ -107,3 +107,19 @@
 	padding-bottom: 1vh;
 	cursor: pointer;
 }
+
+#roomManager #startGameButton {
+	width: 30vw;
+	height: 5vh;
+	font-size: 3vh;
+	border-radius: 2.5vh;
+	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
+}
+
+#roomManager #leaveRoomButton {
+	width: 30vw;
+	height: 5vh;
+	font-size: 3vh;
+	border-radius: 2.5vh;
+	background: linear-gradient(45deg, #ffff39, #5bff5b, #609fff);
+}

@@ -28,6 +28,19 @@ class Client {
 			websocket.close(1000) //Status code: Normal close.
 			global.stateManager.deleteClient(clientId)
 		}).bind(this)
+
+		//TODO: roomId should be removed once this client is removed from a room.
+		this.setRoomId = function(roomId) {
+			this.roomId = roomId
+		}
+
+		this.getRoomId = function() {
+			return this.roomId
+		}
+
+		this.getRoom = function() {
+			return global.stateManager.getRoom(this.roomId)
+		}
 	}
 }
 

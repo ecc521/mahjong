@@ -72,7 +72,7 @@ class Room {
 			global.stateManager.deleteRoom(roomId)
 		}).bind(this)
 
-		this.incomingMessage = (function(clientId, obj) {
+		this.onIncomingMessage = (function(clientId, obj) {
 			console.log("Received message")
 			console.log(clientId)
 			console.log(JSON.stringify(obj))
@@ -93,8 +93,9 @@ class Room {
 				if (this.inGame) {
 					return client.message(obj.type, "Can't Kick During Game", "error")
 				}
-				//The host can only click if the game has not started.
-				this.removeClient(clientId)
+				//The host can only kick if the game has not started.
+				//TODO: Inform the other client that they have been kicked so they don't end up out of state.
+				this.removeClient(obj.id) //obj.id is the id of the user to kick.
 				return client.message(obj.type, "Kicked Client", "success")
 			}
 			else if (obj.type === "roomActionStartGame") {

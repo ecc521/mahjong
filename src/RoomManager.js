@@ -90,14 +90,28 @@ let playerView = document.createElement("div")
 playerView.id = "playerView"
 inRoomContainer.appendChild(playerView)
 
-function renderPlayerView(clientList = [], userId, kickUserCallback) {
+
+let leaveRoomButton = document.createElement("button")
+leaveRoomButton.innerHTML = "Leave Room"
+leaveRoomButton.id = "leaveRoomButton"
+inRoomContainer.appendChild(leaveRoomButton)
+
+leaveRoomButton.addEventListener("click", function() {
+	if (confirm("Are you sure you want to leave this room?")) {
+		window.stateManager.leaveRoom(window.stateManager.roomId)
+	}
+})
+
+
+let startGameButton = document.createElement("button")
+startGameButton.innerHTML = "Start Game"
+startGameButton.id = "startGameButton"
+startGameButton.style.display = "none"
+inRoomContainer.appendChild(startGameButton)
+
+function renderPlayerView(clientList = [], kickUserCallback) {
 	while (playerView.firstChild) {playerView.firstChild.remove()}
-	let userIsHost;
-	clientList.forEach((obj) => {
-		if (obj.id === userId) {
-			userIsHost = obj.isHost
-		}
-	})
+
 	clientList.forEach((obj) => {
 		let row = document.createElement("div")
 		row.className = "playerViewRow"
@@ -116,8 +130,8 @@ function renderPlayerView(clientList = [], userId, kickUserCallback) {
 		idSpan.innerHTML = "User ID: " + obj.id
 		row.appendChild(idSpan)
 
-		if (obj.id === userId) {
-			if (userIsHost) {
+		if (obj.id === window.clientId) {
+			if (window.stateManager.isHost) {
 				card.innerHTML = "You (Host)"
 			}
 			else {
@@ -127,12 +141,12 @@ function renderPlayerView(clientList = [], userId, kickUserCallback) {
 		else if (obj.isHost) {
 			card.innerHTML = "Host"
 		}
-		else if (userIsHost) {
+		else if (window.stateManager.isHost) {
 			card.innerHTML = "Kick " + obj.nickname
 			card.classList.add("playerViewKickButton")
 			card.addEventListener("click", function() {
 				if (confirm("Are you sure you want to kick " + obj.nickname)) {
-					kickUserCallback(obj)
+					kickUserCallback(obj.id)
 				}
 			})
 		}
@@ -173,10 +187,25 @@ window.stateManager.onCreateRoom = function(obj) {
 	}
 }
 
+window.stateManager.onLeaveRoom = function() {
+	exitRoom()
+}
+
 window.stateManager.onClientListChange = function(obj) {
 	console.log(obj)
+
 	playerCount.innerHTML = obj.message.length + "/4 Players are Present"
-	renderPlayerView(obj.message, window.clientId)
+
+	if (obj.message.length === 4 && window.stateManager.isHost) {
+		startGameButton.style.display = ""
+	}
+	else {
+		startGameButton.style.display = "none"
+	}
+
+	renderPlayerView(obj.message, function kickUserCallback(userId) {
+		window.stateManager.kickUser(window.stateManager.roomId, userId)
+	})
 }
 
 
