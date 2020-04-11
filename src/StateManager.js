@@ -63,6 +63,9 @@ class StateManager {
 			else if (obj.type === "roomActionLeaveRoom") {
 				onLeaveRoom(obj)
 			}
+			else if (obj.type === "getCurrentRoom") {
+				onGetCurrentRoom(obj)
+			}
 			else {
 				console.log("Unknown Type " + obj.type)
 			}
@@ -143,16 +146,18 @@ class StateManager {
 			if (this.onClientListChange instanceof Function) {this.onClientListChange(obj)}
 		}).bind(this)
 
-		function onStateReceived() {
-
+		function onGetCurrentRoom(obj) {
+			this.inRoom = obj.message || false
+			//Now, if we are in a room, we should sync state with the room.
 		}
 
 		this.syncState = (function() {
 			//Sync everything with the server.
-			/*this.sendMessage(JSON.stringify({
-				"type": "gameStateRequest",
+			//First, get our room.
+			this.sendMessage(JSON.stringify({
+				"type": "getCurrentRoom",
 				clientId: window.clientId
-			}))*/
+			}))
 		}).bind(this)
 	}
 }

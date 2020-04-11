@@ -33,7 +33,7 @@ class Room {
 			return true
 		}).bind(this)
 
-		this.removeClient = (function(clientId) {
+		this.removeClient = (function(clientId, explaination = "You have left the room. ") {
 			let clientIdIndex = this.clientIds.findIndex((currentClientId) => {return currentClientId === clientId})
 			if (clientIdIndex === -1) {
 				return "Client Not Found"
@@ -45,6 +45,11 @@ class Room {
 					this.hostClientId = this.clientIds[0]
 				}
 				sendClientList()
+
+				let clientBeingKicked = global.stateManager.getClient(clientId)
+				if (clientBeingKicked) {
+					clientBeingKicked.message("roomActionLeaveRoom", explaination, "success")
+				}
 			}
 		}).bind(this)
 
@@ -81,8 +86,7 @@ class Room {
 			let isHost = (clientId === this.hostClientId)
 
 			if (obj.type === "roomActionLeaveRoom") {
-				this.removeClient(clientId)
-				return client.message(obj.type, "Left Room", "success")
+				return this.removeClient(clientId)
 			}
 			else if (obj.type === "roomActionKickFromRoom") {
 				if (!isHost) {
@@ -95,7 +99,7 @@ class Room {
 				}
 				//The host can only kick if the game has not started.
 				//TODO: Inform the other client that they have been kicked so they don't end up out of state.
-				this.removeClient(obj.id) //obj.id is the id of the user to kick.
+				this.removeClient(obj.id, "You have been kicked from the room. ") //obj.id is the id of the user to kick.
 				return client.message(obj.type, "Kicked Client", "success")
 			}
 			else if (obj.type === "roomActionStartGame") {

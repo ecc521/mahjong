@@ -187,8 +187,9 @@ window.stateManager.onCreateRoom = function(obj) {
 	}
 }
 
-window.stateManager.onLeaveRoom = function() {
+window.stateManager.onLeaveRoom = function(obj) {
 	exitRoom()
+	new ErrorPopup("Out of Room", obj.message).show()
 }
 
 window.stateManager.onClientListChange = function(obj) {

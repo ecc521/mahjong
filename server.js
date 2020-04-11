@@ -82,6 +82,10 @@ websocketServer.on('connection', function connection(websocket) {
 				return websocket.send(getMessage("joinRoom", status, "error"))
 			}
 		}
+		else if (obj.type === "getCurrentRoom") {
+			let roomId = global.stateManager.getClient(clientId).getRoomId()
+			return websocket.send(obj.type, roomId, "success")
+		}
 		else if (obj.type.includes("roomAction")) {
 			//The user is in a room, and this action will be handled by the room.
 			let room = global.stateManager.getRoom(obj.roomId) || global.stateManager.getClient(clientId).getRoom()
@@ -91,7 +95,7 @@ websocketServer.on('connection', function connection(websocket) {
 			}
 			console.log(room)
 			console.log(room.onIncomingMessage)
-			room.onIncomingMessage(clientId, obj)
+			return room.onIncomingMessage(clientId, obj)
 		}
 
 		console.log("Nothing happened. ")
