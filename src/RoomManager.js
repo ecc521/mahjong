@@ -103,6 +103,18 @@ leaveRoomButton.addEventListener("click", function() {
 })
 
 
+let closeRoomButton = document.createElement("button")
+closeRoomButton.innerHTML = "Close Room"
+closeRoomButton.id = "closeRoomButton"
+closeRoomButton.style.display = "none"
+inRoomContainer.appendChild(closeRoomButton)
+
+closeRoomButton.addEventListener("click", function() {
+	if (confirm("Are you sure you want to close this room?")) {
+		window.stateManager.closeRoom(window.stateManager.roomId)
+	}
+})
+
 let startGameButton = document.createElement("button")
 startGameButton.innerHTML = "Start Game"
 startGameButton.id = "startGameButton"
@@ -189,6 +201,9 @@ window.stateManager.onCreateRoom = function(obj) {
 
 window.stateManager.onLeaveRoom = function(obj) {
 	exitRoom()
+	//We left the room. Change clientId.
+	const StateManager = require("./StateManager.js")
+	StateManager.setClientId(StateManager.createNewClientId())
 	new ErrorPopup("Out of Room", obj.message).show()
 }
 
@@ -202,6 +217,13 @@ window.stateManager.onClientListChange = function(obj) {
 	}
 	else {
 		startGameButton.style.display = "none"
+	}
+
+	if (window.stateManager.isHost) {
+		closeRoomButton.style.display = ""
+	}
+	else {
+		closeRoomButton.style.display = "none"
 	}
 
 	renderPlayerView(obj.message, function kickUserCallback(userId) {

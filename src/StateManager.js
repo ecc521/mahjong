@@ -1,15 +1,7 @@
-//Get the users clientId, or create a new one.
-window.clientId = localStorage.getItem("clientId")
-if (window.clientId === null) {
-	window.clientId = "mahjongWithFriendsClient" + (Math.random() * 2**53)
-	localStorage.setItem("clientId", window.clientId)
-}
-
 class StateManager {
 	constructor(websocketURL) {
 
 		this.createWebsocket = (async function createWebsocket() {
-			//TODO: Improve reconnection code. We don't want to fail reconnecting 100 times a second.
 			this.websocket = new WebSocket(websocketURL)
 			this.websocket.onmessage = onmessage
 			this.websocket.onerror = (async function(e) {
@@ -23,10 +15,10 @@ class StateManager {
 				if (e.code !== 1000) {
 					//If not a normal closure, reestablish and sync.
 					setTimeout((function() {
-						//1 second delay to reduce thrashing
+						//2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
 						this.createWebsocket()
 						this.syncState()
-					}).bind(this), 1000)
+					}).bind(this), 2000)
 				}
 			}).bind(this)
 
@@ -109,6 +101,14 @@ class StateManager {
 			}))
 		}
 
+		this.closeRoom = function(roomId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionCloseRoom",
+				clientId: window.clientId,
+				roomId,
+			}))
+		}
+
 
 		let onCreateRoom = (function onCreateRoom(obj) {
 			if (obj.status === "success") {
@@ -160,6 +160,26 @@ class StateManager {
 			}))
 		}).bind(this)
 	}
+
+	static setClientId(newId) {
+		window.clientId = newId
+		localStorage.setItem("clientId", window.clientId)
+	}
+
+	static createNewClientId() {
+		return "user" + (Math.random() * 2**53)
+	}
+
+	static getClientId() {
+		//Get the users clientId, or create a new one.
+		let clientId = localStorage.getItem("clientId")
+		if (clientId === null) {
+			clientId = createNewClientId()
+		}
+		return clientId
+	}
 }
+
+StateManager.setClientId(StateManager.getClientId())
 
 module.exports = StateManager

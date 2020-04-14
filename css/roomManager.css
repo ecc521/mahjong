@@ -113,7 +113,17 @@
 	height: 5vh;
 	font-size: 3vh;
 	border-radius: 2.5vh;
+	margin-left: 1vw;
 	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
+}
+
+#roomManager #closeRoomButton {
+	width: 30vw;
+	height: 5vh;
+	font-size: 3vh;
+	border-radius: 2.5vh;
+	margin-left: 1vw;
+	background: linear-gradient(45deg, orange, yellow, lightgreen);
 }
 
 #roomManager #leaveRoomButton {

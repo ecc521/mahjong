@@ -43,14 +43,9 @@ websocketServer.on('connection', function connection(websocket) {
 			return websocket.send(getMessage("error", "No clientId specified"))
 		}
 		else {
-			if (!clientId) {
-				clientId = obj.clientId
-				if (!global.stateManager.getClient(clientId)) {
-					global.stateManager.createClient(clientId, websocket)
-				}
-			}
-			else if (clientId !== obj.clientId) {
-				return websocket.send(getMessage("error", "clientId changed"))
+			clientId = obj.clientId
+			if (!global.stateManager.getClient(clientId)) {
+				global.stateManager.createClient(clientId, websocket)
 			}
 		}
 

@@ -49,6 +49,8 @@ class Room {
 				let clientBeingKicked = global.stateManager.getClient(clientId)
 				if (clientBeingKicked) {
 					clientBeingKicked.message("roomActionLeaveRoom", explaination, "success")
+					//The client is going to change their client Id. We can now delete the old client.
+					global.stateManager.deleteClient(clientId)
 				}
 			}
 		}).bind(this)
@@ -69,12 +71,8 @@ class Room {
 			})
 		}).bind(this)
 
-		this.close = (function(reason) {
-			this.clientIds.forEach((clientId) => {
-				let client = global.stateManager.getClient(clientId)
-				client.close()
-			})
-			global.stateManager.deleteRoom(roomId)
+		this.startGame = (function startGame() {
+
 		}).bind(this)
 
 		this.onIncomingMessage = (function(clientId, obj) {
@@ -110,20 +108,25 @@ class Room {
 					return client.message(obj.type, "Already In Game", "error")
 				}
 
-
+				//Time to start the game.
+				this.startGame()
 			}
 			else if (obj.type === "roomActionEndGame") {
 				//If the game is started, anybody can end the game. Otherwise, only the host can.
 				if (!this.inGame) {
 					return client.message(obj.type, "No Game In Progress", "error")
 				}
-
+				//TODO: End the game.
 
 			}
 			else if (obj.type === "roomActionCloseRoom") {
 				if (!isHost) {
 					return client.message(obj.type, "Only Host Can Close Room", "error")
 				}
+				this.clientIds.slice(0).forEach((clientId) => {
+					this.removeClient(clientId, "The room has been closed. ")
+				})
+				global.stateManager.deleteRoom(this.roomId)
 			}
 		}).bind(this)
 	}
