@@ -207,10 +207,10 @@ window.stateManager.onLeaveRoom = function(obj) {
 	new ErrorPopup("Out of Room", obj.message).show()
 }
 
-window.stateManager.onClientListChange = function(obj) {
+window.stateManager.onStateUpdate = function(obj) {
 	console.log(obj)
 
-	playerCount.innerHTML = obj.message.length + "/4 Players are Present"
+	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
 
 	if (obj.message.length === 4 && window.stateManager.isHost) {
 		startGameButton.style.display = ""
@@ -226,10 +226,11 @@ window.stateManager.onClientListChange = function(obj) {
 		closeRoomButton.style.display = "none"
 	}
 
-	renderPlayerView(obj.message, function kickUserCallback(userId) {
+	renderPlayerView(obj.message.clients, function kickUserCallback(userId) {
 		window.stateManager.kickUser(window.stateManager.roomId, userId)
 	})
 }
 
+window.stateManager.getCurrentRoom() //If we are already in a room, this will issue the correct callbacks to enter us into it. 
 
 module.exports = roomManager

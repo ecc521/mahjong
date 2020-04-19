@@ -47,6 +47,9 @@ websocketServer.on('connection', function connection(websocket) {
 			if (!global.stateManager.getClient(clientId)) {
 				global.stateManager.createClient(clientId, websocket)
 			}
+			else {
+				global.stateManager.getClient(clientId).setWebsocket(websocket)
+			}
 		}
 
 		if (obj.type === "createRoom") {
@@ -79,7 +82,7 @@ websocketServer.on('connection', function connection(websocket) {
 		}
 		else if (obj.type === "getCurrentRoom") {
 			let roomId = global.stateManager.getClient(clientId).getRoomId()
-			return websocket.send(obj.type, roomId, "success")
+			return websocket.send(getMessage(obj.type, roomId, "success"))
 		}
 		else if (obj.type.includes("roomAction")) {
 			//The user is in a room, and this action will be handled by the room.

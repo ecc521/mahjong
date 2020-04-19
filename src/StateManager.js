@@ -37,7 +37,7 @@ class StateManager {
 		this.createWebsocket()
 
 		function onmessage(message) {
-			console.log(message)
+			console.log(message.data)
 			let obj = JSON.parse(message.data)
 			console.log(obj)
 			if (obj.type === "joinRoom") {
@@ -46,8 +46,8 @@ class StateManager {
 			else if (obj.type === "createRoom") {
 				onCreateRoom(obj)
 			}
-			else if (obj.type === "clientList") {
-				onClientListChange(obj)
+			else if (obj.type === "roomActionState") {
+				onStateUpdate(obj)
 			}
 			else if (obj.type === "roomActionKickFromRoom") {
 				//We kicked somebody else. Should probably show an error message or success.
@@ -109,6 +109,23 @@ class StateManager {
 			}))
 		}
 
+		this.getCurrentRoom = (function() {
+			//Get our room.
+			this.sendMessage(JSON.stringify({
+				"type": "getCurrentRoom",
+				clientId: window.clientId
+			}))
+		}).bind(this)
+
+		this.getState = function(roomId) {
+			console.log("Getting state...")
+			this.sendMessage(JSON.stringify({
+				type: "roomActionState",
+				clientId: window.clientId,
+				roomId,
+			}))
+		}
+
 
 		let onCreateRoom = (function onCreateRoom(obj) {
 			if (obj.status === "success") {
@@ -134,30 +151,18 @@ class StateManager {
 		}).bind(this)
 
 
-		let onClientListChange = (function onClientListChange(obj) {
-			console.log("Client List Changed")
-
-			obj.message.forEach((obj) => {
-				if (obj.id === window.clientId) {
-					this.isHost = obj.isHost
-				}
-			})
-
-			if (this.onClientListChange instanceof Function) {this.onClientListChange(obj)}
+		let onStateUpdate = (function onStateUpdate(obj) {
+			this.isHost = obj.message.isHost
+			if (this.onStateUpdate instanceof Function) {this.onStateUpdate(obj)}
 		}).bind(this)
 
-		function onGetCurrentRoom(obj) {
+		let onGetCurrentRoom = (function onGetCurrentRoom(obj) {
 			this.inRoom = obj.message || false
 			//Now, if we are in a room, we should sync state with the room.
-		}
-
-		this.syncState = (function() {
-			//Sync everything with the server.
-			//First, get our room.
-			this.sendMessage(JSON.stringify({
-				"type": "getCurrentRoom",
-				clientId: window.clientId
-			}))
+			if (this.inRoom) {
+				onJoinRoom(obj)
+				this.getState(this.inRoom)
+			}
 		}).bind(this)
 	}
 
@@ -174,7 +179,7 @@ class StateManager {
 		//Get the users clientId, or create a new one.
 		let clientId = localStorage.getItem("clientId")
 		if (clientId === null) {
-			clientId = createNewClientId()
+			clientId = StateManager.createNewClientId()
 		}
 		return clientId
 	}

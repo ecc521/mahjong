@@ -7,19 +7,30 @@ class Room {
 		this.roomCreated = Date.now()
 		this.gameData = {}
 
-		let sendClientList = (function sendClientList() {
-			console.log("sending client list")
-			let clientList = []
+		let getState = (function getState(clientId) {
+			//Generate the game state visible to clientId
+			let state = {}
+			state.isHost = (clientId === this.hostClientId);
+
+			state.clients = []
 			this.clientIds.forEach((clientId) => {
-				clientList.push({
+				state.clients.push({
 					id: clientId,
 					nickname: global.stateManager.getClient(clientId).getNickname(),
 					isHost: (clientId === this.hostClientId)
+					//Add visibleHand and wind.
 				})
 			})
-			console.log(this.clientIds.length)
-			console.log(clientList.length)
-			this.messageAll("clientList", clientList)
+
+			return state
+		}).bind(this)
+
+		let sendStateToClients = (function sendStateToClients() {
+			this.clientIds.forEach((clientId) => {
+				let client = global.stateManager.getClient(clientId)
+				let state = getState(clientId)
+				client.message("roomActionState", state, "success")
+			})
 		}).bind(this)
 
 		this.addClient = (function(clientId) {
@@ -29,7 +40,7 @@ class Room {
 			if (this.clientIds.includes(clientId)) {return "Already In Room"}
 			if (!this.hostClientId) {this.hostClientId = clientId}
 			this.clientIds.push(clientId)
-			sendClientList()
+			sendStateToClients()
 			return true
 		}).bind(this)
 
@@ -44,7 +55,7 @@ class Room {
 					//Choose a new host client.
 					this.hostClientId = this.clientIds[0]
 				}
-				sendClientList()
+				sendStateToClients()
 
 				let clientBeingKicked = global.stateManager.getClient(clientId)
 				if (clientBeingKicked) {
@@ -109,7 +120,7 @@ class Room {
 				}
 
 				//Time to start the game.
-				this.startGame()
+				return this.startGame()
 			}
 			else if (obj.type === "roomActionEndGame") {
 				//If the game is started, anybody can end the game. Otherwise, only the host can.
@@ -117,6 +128,7 @@ class Room {
 					return client.message(obj.type, "No Game In Progress", "error")
 				}
 				//TODO: End the game.
+				return
 
 			}
 			else if (obj.type === "roomActionCloseRoom") {
@@ -127,6 +139,9 @@ class Room {
 					this.removeClient(clientId, "The room has been closed. ")
 				})
 				global.stateManager.deleteRoom(this.roomId)
+			}
+			else if (obj.type === "roomActionState") {
+				return client.message(obj.type, getState(clientId), "success")
 			}
 		}).bind(this)
 	}
