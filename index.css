@@ -1,6 +1,6 @@
 @import "css/roomManager.css";
 @import "css/gameBoard.css";
-@import "css/errorPopup.css";
+@import "css/popups.css";
 
 :root {
 	--vh: 1vh;

@@ -63,6 +63,12 @@ class Room {
 					//The client is going to change their client Id. We can now delete the old client.
 					global.stateManager.deleteClient(clientId)
 				}
+				if (this.clientIds.length === 0) {
+					//We have no clients. Delete this room.
+					//Note that this code shouldn't be called, unless there is a bug or lag. The client will not show the Leave Room button if they are the
+					//only player and host (which they should be if they are the only player), and therefore roomActionCloseRoom will be sent instead. 
+					global.stateManager.deleteRoom(this.roomId)
+				}
 			}
 		}).bind(this)
 

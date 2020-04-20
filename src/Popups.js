@@ -1,4 +1,4 @@
-class ErrorPopup {
+class Notification {
 	constructor(errorText, messageText) {
 		let cover = document.createElement("div")
 		cover.id = "errorPopupCover"
@@ -43,4 +43,25 @@ class ErrorPopup {
 	}
 }
 
-module.exports = ErrorPopup
+class MessageBar {
+	constructor(text) {
+		let bar = document.createElement("div")
+		bar.id = "notificationBar"
+
+		let textHolder = document.createElement("p")
+		textHolder.innerHTML = text
+		bar.appendChild(textHolder)
+
+		this.show = function(duration) {
+			document.body.appendChild(bar)
+			setTimeout(function() {
+				bar.remove()
+			}, duration)
+		}
+	}
+}
+
+module.exports = {
+	Notification,
+	MessageBar
+}

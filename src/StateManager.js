@@ -169,6 +169,13 @@ class StateManager {
 	static setClientId(newId) {
 		window.clientId = newId
 		localStorage.setItem("clientId", window.clientId)
+
+		//Development use only. Warnings should be shown.
+		//This will only change the clientId for the session. It will not change localStorage.
+		let params = new URLSearchParams(window.location.search)
+		if (params.has("clientId")) {
+			window.clientId = params.get("clientId")
+		}
 	}
 
 	static createNewClientId() {
@@ -181,6 +188,7 @@ class StateManager {
 		if (clientId === null) {
 			clientId = StateManager.createNewClientId()
 		}
+
 		return clientId
 	}
 }

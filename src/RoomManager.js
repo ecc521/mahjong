@@ -1,5 +1,4 @@
-const ErrorPopup = require("./ErrorPopup.js")
-
+const Popups = require("./Popups.js")
 
 //Allow the user to join and create rooms.
 let roomManager = document.createElement("div")
@@ -55,7 +54,7 @@ joinRoom.id = "joinRoom"
 joinRoom.innerHTML = "Join Room"
 joinRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length < 5) {
-		return new ErrorPopup("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show()
+		return new Popups.Notification("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show()
 	}
 	window.stateManager.joinRoom(roomIdInput.value, nicknameInput.value)
 })
@@ -66,7 +65,7 @@ createRoom.id = "createRoom"
 createRoom.innerHTML = "Create Room"
 createRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length < 5) {
-		return new ErrorPopup("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
+		return new Popups.Notification("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
 	window.stateManager.createRoom(roomIdInput.value, nicknameInput.value)
 })
@@ -181,7 +180,7 @@ function exitRoom() {
 
 window.stateManager.onJoinRoom = function(obj) {
 	if (obj.status === "error") {
-		return new ErrorPopup("Unable to Join Room", obj.message).show()
+		return new Popups.Notification("Unable to Join Room", obj.message).show()
 	}
 	else {
 		currentRoom.innerHTML = "You are in room " + obj.message
@@ -191,7 +190,7 @@ window.stateManager.onJoinRoom = function(obj) {
 
 window.stateManager.onCreateRoom = function(obj) {
 	if (obj.status === "error") {
-		return new ErrorPopup("Unable to Create Room", obj.message).show()
+		return new Popups.Notification("Unable to Create Room", obj.message).show()
 	}
 	else {
 		currentRoom.innerHTML = "You are hosting room " + obj.message
@@ -204,7 +203,7 @@ window.stateManager.onLeaveRoom = function(obj) {
 	//We left the room. Change clientId.
 	const StateManager = require("./StateManager.js")
 	StateManager.setClientId(StateManager.createNewClientId())
-	new ErrorPopup("Out of Room", obj.message).show()
+	new Popups.Notification("Out of Room", obj.message).show()
 }
 
 window.stateManager.onStateUpdate = function(obj) {
@@ -212,7 +211,7 @@ window.stateManager.onStateUpdate = function(obj) {
 
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
 
-	if (obj.message.length === 4 && window.stateManager.isHost) {
+	if (obj.message.clients.length === 4 && window.stateManager.isHost) {
 		startGameButton.style.display = ""
 	}
 	else {
@@ -226,11 +225,36 @@ window.stateManager.onStateUpdate = function(obj) {
 		closeRoomButton.style.display = "none"
 	}
 
+	if (obj.message.clients.length === 1 && window.stateManager.isHost) {
+		//This player is the only one in the room. (So if they aren't host, there's a bug)
+		//If they leave, the room closes. Hide the leave room button.
+		leaveRoomButton.style.display = "none"
+	}
+	else {
+		leaveRoomButton.style.display = ""
+	}
+
 	renderPlayerView(obj.message.clients, function kickUserCallback(userId) {
 		window.stateManager.kickUser(window.stateManager.roomId, userId)
 	})
 }
 
-window.stateManager.getCurrentRoom() //If we are already in a room, this will issue the correct callbacks to enter us into it. 
+window.stateManager.getCurrentRoom() //If we are already in a room, this will issue the correct callbacks to enter us into it.
+
+
+//Allow query params.
+let params = new URLSearchParams(window.location.search)
+if (params.has("roomId")) {
+	roomIdInput.value = params.get("roomId")
+}
+if (params.has("name")) {
+	nicknameInput.value = params.get("name")
+}
+
+//This feature is for development use only. Show a warning.
+if (params.has("clientId")) {
+	new Popups.MessageBar("This page is in development mode due to the clientId parameter. ").show(8000)
+}
+
 
 module.exports = roomManager

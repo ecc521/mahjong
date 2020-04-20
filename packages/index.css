@@ -426,6 +426,18 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 
+#notificationBar {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	z-index: 99; /*Below errorPopupCover*/
+	background-color: #ffbd17;
+	text-align: center;
+	font-size: 16px;
+}
+
+
 
 
 
