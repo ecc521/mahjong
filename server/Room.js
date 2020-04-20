@@ -1,11 +1,11 @@
 class Room {
-	constructor(roomId) {
+	constructor(roomId, options = {}) {
 		this.roomId = roomId
 
-		this.clientIds = []
-		this.inGame = false
-		this.roomCreated = Date.now()
-		this.gameData = {}
+		this.clientIds = options.clientIds || []
+		this.inGame = options.inGame || false
+		this.roomCreated = options.roomCreated || Date.now()
+		this.gameData = options.gameData || {}
 
 		let getState = (function getState(clientId) {
 			//Generate the game state visible to clientId
@@ -66,7 +66,7 @@ class Room {
 				if (this.clientIds.length === 0) {
 					//We have no clients. Delete this room.
 					//Note that this code shouldn't be called, unless there is a bug or lag. The client will not show the Leave Room button if they are the
-					//only player and host (which they should be if they are the only player), and therefore roomActionCloseRoom will be sent instead. 
+					//only player and host (which they should be if they are the only player), and therefore roomActionCloseRoom will be sent instead.
 					global.stateManager.deleteRoom(this.roomId)
 				}
 			}
@@ -150,6 +150,31 @@ class Room {
 				return client.message(obj.type, getState(clientId), "success")
 			}
 		}).bind(this)
+
+		this.toString = (function() {
+			let obj = {
+				roomId: this.roomId,
+				options: {
+					gameData: this.gameData,
+					roomCreated: this.roomCreated,
+					inGame: this.inGame,
+					clientIds: this.clientIds
+				}
+			}
+
+			return JSON.stringify(obj)
+		}).bind(this)
+	}
+
+	static fromString(str, options = {}) {
+		let obj = JSON.parse(str)
+
+		if (!options.preverseRoomCreated) {
+			//Default is to not preserve the game created time.
+			delete obj.options.roomCreated
+		}
+
+		return new Room(obj.roomId, obj.options)
 	}
 }
 

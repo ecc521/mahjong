@@ -18,6 +18,9 @@ class Client {
 		this.getNickname = function() {return this.nickname}
 
 		this.message = (function message(type, message, status) {
+			if (!this.websocket) {console.error("Error in Client.message - Client.websocket is undefined")} //This should only happen if we loaded from state, as we would for testing.
+			//TODO: Handle errors where the websocket connection has closed.
+			//We can probably do this simply by not sending the message, as the client should sync state if they disconnected.
 			return this.websocket.send(JSON.stringify({
 				type, message, status
 			}))
@@ -41,6 +44,23 @@ class Client {
 		this.getRoom = function() {
 			return global.stateManager.getRoom(this.roomId)
 		}
+
+		this.toString = (function() {
+			let obj = {
+				clientId: this.clientId,
+				nickname: this.nickname
+			}
+			return obj
+		}).bind(this)
+	}
+
+	static fromString(str) {
+		//Create client from a string.
+
+		let obj = JSON.parse(str)
+		let client = new Client(obj.clientId)
+		client.setNickname(obj.nickname)
+		return client
 	}
 }
 
