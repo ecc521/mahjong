@@ -20,7 +20,7 @@ class Tile {
 		this.isDouble = function(userWind) {return 0}
 		this.getPoints = function() {return 0}
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			let obj = {}
 			obj.class = "Tile"
 			obj.type = this.type
@@ -35,9 +35,9 @@ class Tile {
 		this.isPair = false
 	}
 
-	static fromString(str) {
+	static fromJSON(str) {
 		let obj = JSON.parse(str)
-		if (obj.class !== "Tile") {throw "String was not created by Tile.toString()"}
+		if (obj.class !== "Tile") {throw "String was not created by Tile.toJSON()"}
 		return new Tile(obj)
 	}
 }

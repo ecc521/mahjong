@@ -17,7 +17,7 @@ class StateManager {
 					setTimeout((function() {
 						//2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
 						this.createWebsocket()
-						this.syncState()
+						this.getCurrentRoom() //Syncs state. 
 					}).bind(this), 2000)
 				}
 			}).bind(this)
@@ -152,11 +152,13 @@ class StateManager {
 
 
 		let onStateUpdate = (function onStateUpdate(obj) {
+			console.log(obj)
 			this.isHost = obj.message.isHost
 			if (this.onStateUpdate instanceof Function) {this.onStateUpdate(obj)}
 		}).bind(this)
 
 		let onGetCurrentRoom = (function onGetCurrentRoom(obj) {
+			console.log(obj)
 			this.inRoom = obj.message || false
 			//Now, if we are in a room, we should sync state with the room.
 			if (this.inRoom) {

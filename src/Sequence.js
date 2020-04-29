@@ -20,7 +20,7 @@ class Sequence {
 		this.isPongOrKong = false
 		this.isPair = false
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			let obj = {}
 			obj.class = "Sequence"
 			obj.exposed = this.exposed
@@ -52,12 +52,12 @@ class Sequence {
 		return true
 	}
 
-	static fromString(str) {
+	static fromJSON(str) {
 		let obj = JSON.parse(str)
-		if (obj.class !== "Sequence") {throw "String was not created by Sequence.toString()"}
+		if (obj.class !== "Sequence") {throw "String was not created by Sequence.toJSON()"}
 
 		obj.tiles = obj.tiles.map((tileString) => {
-			return Tile.fromString(tileString)
+			return Tile.fromJSON(tileString)
 		})
 
 		return new Sequence(obj)

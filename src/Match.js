@@ -72,7 +72,7 @@ class Match {
 			}
 		})
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			let obj = {}
 			obj.class = "Match"
 			obj.type = this.type
@@ -96,9 +96,9 @@ class Match {
 		return true
 	}
 
-	static fromString(str) {
+	static fromJSON(str) {
 		let obj = JSON.parse(str)
-		if (obj.class !== "Match") {throw "String was not created by Match.toString()"}
+		if (obj.class !== "Match") {throw "String was not created by Match.toJSON()"}
 		return new Match(obj)
 	}
 }

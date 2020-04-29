@@ -2,10 +2,13 @@ class Room {
 	constructor(roomId, options = {}) {
 		this.roomId = roomId
 
+		//TODO: Currently, clientId of other users is shown to users in the same room, allowing for impersonation. This needs to be fixed by using different identifiers.
+
 		this.clientIds = options.clientIds || []
 		this.inGame = options.inGame || false
 		this.roomCreated = options.roomCreated || Date.now()
 		this.gameData = options.gameData || {}
+		this.hostClientId = options.hostClientId
 
 		let getState = (function getState(clientId) {
 			//Generate the game state visible to clientId
@@ -151,22 +154,24 @@ class Room {
 			}
 		}).bind(this)
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			let obj = {
 				roomId: this.roomId,
 				options: {
 					gameData: this.gameData,
 					roomCreated: this.roomCreated,
 					inGame: this.inGame,
-					clientIds: this.clientIds
+					clientIds: this.clientIds,
+					hostClientId: this.hostClientId
 				}
 			}
-
+			console.log("Called")
+			console.log(JSON.stringify(obj))
 			return JSON.stringify(obj)
 		}).bind(this)
 	}
 
-	static fromString(str, options = {}) {
+	static fromJSON(str, options = {}) {
 		let obj = JSON.parse(str)
 
 		if (!options.preverseRoomCreated) {

@@ -19,11 +19,16 @@ class Client {
 
 		this.message = (function message(type, message, status) {
 			if (!this.websocket) {console.error("Error in Client.message - Client.websocket is undefined")} //This should only happen if we loaded from state, as we would for testing.
-			//TODO: Handle errors where the websocket connection has closed.
-			//We can probably do this simply by not sending the message, as the client should sync state if they disconnected.
-			return this.websocket.send(JSON.stringify({
-				type, message, status
-			}))
+			try {
+				//Handle errors where the websocket connection has closed.
+				//We can probably do this simply by not sending the message, as the client should sync state if they disconnected.
+				return this.websocket.send(JSON.stringify({
+					type, message, status
+				}))
+			}
+			catch (e) {
+				console.error(e)
+			}
 		}).bind(this)
 
 
@@ -32,34 +37,44 @@ class Client {
 			global.stateManager.deleteClient(clientId)
 		}).bind(this)
 
-		//TODO: roomId should be removed once this client is removed from a room.
+		//roomId should be removed once this client is removed from a room. Probably moot due to getRoomId checks though.
 		this.setRoomId = function(roomId) {
 			this.roomId = roomId
 		}
 
 		this.getRoomId = function() {
-			return this.roomId
+			//Validate that the client is actually in the room...
+			let room = global.stateManager.getRoom(this.roomId)
+			if (room && room.clientIds.includes(this.clientId)) {
+				return this.roomId
+			}
 		}
 
 		this.getRoom = function() {
-			return global.stateManager.getRoom(this.roomId)
+			return global.stateManager.getRoom(this.getRoomId())
 		}
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			let obj = {
 				clientId: this.clientId,
-				nickname: this.nickname
+				nickname: this.nickname,
+				roomId: this.roomId
 			}
-			return obj
+			console.log("Called")
+			console.log(JSON.stringify(obj))
+			return JSON.stringify(obj)
 		}).bind(this)
 	}
 
-	static fromString(str) {
+	static fromJSON(str) {
 		//Create client from a string.
 
 		let obj = JSON.parse(str)
 		let client = new Client(obj.clientId)
 		client.setNickname(obj.nickname)
+
+		client.setRoomId(obj.roomId)
+
 		return client
 	}
 }

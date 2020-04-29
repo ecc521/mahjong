@@ -17,7 +17,19 @@ const Tile = require("./src/Tile.js")
 const Room = require("./server/Room.js")
 const Client = require("./server/Client.js")
 const StateManager = require("./server/StateManager.js")
-global.stateManager = new StateManager()
+
+
+if (process.argv.includes("--loadState")) {
+	let filePath = process.argv[process.argv.indexOf("--loadState") + 1]
+	if (filePath) {
+		let inputPath = path.join(serverDataDirectory, filePath) + ".mahjongServerState"
+		console.log("Loading state from " + inputPath)
+		global.stateManager = StateManager.fromJSON(fs.readFileSync(inputPath))
+	}
+}
+else {
+	global.stateManager = new StateManager()
+}
 
 function getMessage(type, message, status) {
 	return JSON.stringify({
@@ -99,6 +111,18 @@ websocketServer.on('connection', function connection(websocket) {
 		console.log("Nothing happened. ")
 	});
 });
+
+
+process.stdin.on("data", function(data) {
+	let command = data.toString()
+	if (command.startsWith("save ")) {
+		let filePath = command.trim().slice(5) + ".mahjongServerState"
+		let outputPath = path.join(serverDataDirectory, filePath)
+		fs.writeFileSync(outputPath, stateManager.toJSON())
+		console.log("State saved to " + outputPath)
+	}
+})
+
 
 
 try {

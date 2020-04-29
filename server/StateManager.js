@@ -50,7 +50,7 @@ class StateManager {
 			delete clients[clientId]
 		}
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			//Convert our state to a string.
 			//Since both room and client objects have a toString method, we can do this quite easily with JSON.stringify
 			return JSON.stringify({
@@ -60,7 +60,7 @@ class StateManager {
 		}).bind(this)
 	}
 
-	static fromString(str) {
+	static fromJSON(str) {
 		//Create stateManager from a saved state.
 
 		let obj = JSON.parse(str)
@@ -68,11 +68,11 @@ class StateManager {
 		let clients = obj.clients
 
 		for (let roomId in rooms) {
-			rooms[roomId] = Room.fromString(rooms[roomId])
+			rooms[roomId] = Room.fromJSON(rooms[roomId])
 		}
 
 		for (let clientId in clients) {
-			clients[clientId] = Client.fromString(clients[clientId])
+			clients[clientId] = Client.fromJSON(clients[clientId])
 		}
 
 		return new StateManager(rooms, clients)

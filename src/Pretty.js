@@ -23,7 +23,7 @@ class Pretty {
 
 		this.imageUrl = "assets/tiles/" + config.seasonOrFlower + "s" + "/" + config.value + ".png"
 
-		this.toString = (function() {
+		this.toJSON = (function() {
 			let obj = {}
 			obj.class = "Pretty"
 			obj.value = this.value
@@ -37,9 +37,9 @@ class Pretty {
 		this.isPair = false
 	}
 
-	static fromString(str) {
+	static fromJSON(str) {
 		let obj = JSON.parse(str)
-		if (obj.class !== "Pretty") {throw "String was not created by Pretty.toString()"}
+		if (obj.class !== "Pretty") {throw "String was not created by Pretty.toJSON()"}
 		return new Pretty(obj)
 	}
 }
