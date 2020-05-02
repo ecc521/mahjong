@@ -67,6 +67,16 @@ class Hand {
 			return exposedTiles
 		}).bind(this)
 
+		this.syncContents = (function(contents) {
+			//We allow the user to sort their hand by themselves, however it is possible that, due to lag or other reasons, the users hand ends up not matching the server.
+			//This function will sync the contents of the users hand with contents, preserving the users ordering where possible.
+
+			//TODO: Right now, we do this a cheapo and not guarenteed effective method.
+			if (contents.length !== this.contents.length) {this.contents = contents}
+
+
+		}).bind(this)
+
 		function allowDrop(ev) {
 			ev.preventDefault();
 		}
@@ -337,10 +347,9 @@ class Hand {
 		return false
 	}
 
-	static getContentsFromString(str) {
-		let obj = JSON.parse(str)
-		//obj is an array, with the contents of the hand.
-		let contents = obj.map((itemStr) => {
+	static convertStringsToTiles(arr) {
+		//arr is an array, with the stringified contents of the hand.
+		let contents = arr.map((itemStr) => {
 			let obj = JSON.parse(itemStr)
 			if (obj.class === "Pretty") {
 				return Pretty.fromJSON(itemStr)
@@ -365,7 +374,7 @@ class Hand {
 		let wind = obj.wind
 
 		let hand = new Hand({wind: obj.wind})
-		hand.contents = getContentsFromString(obj.contents)
+		hand.contents = Hand.convertStringsToTiles(obj.contents)
 		return hand
 	}
 }

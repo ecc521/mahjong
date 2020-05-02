@@ -30,6 +30,7 @@ class Room {
 		let getState = (function getState(requestingClientId) {
 			//Generate the game state visible to requestingClientId
 			let state = {}
+			state.inGame = this.inGame
 			state.isHost = (requestingClientId === this.hostClientId);
 			if (this.gameData.wall) {
 				state.wallTiles = this.gameData.wall.tiles.length
@@ -125,10 +126,8 @@ class Room {
 
 				//Build the player hands.
 				let drawTile = (function drawTile(clientId, last = false) {
-					console.log("Called to draw tile")
 					let tile;
 					while (!(tile instanceof Tile)) {
-						console.log("Drawing tile")
 						if (last) {
 							tile = this.gameData.wall.drawLast()
 						}

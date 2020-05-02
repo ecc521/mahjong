@@ -45,8 +45,6 @@ function Compass(config = {}) {
 }
 
 let compass = new Compass({id: "compass"})
-compass.setDirectionForUserWind("east")
-
 
 function FullscreenControls(elementId) {
 
@@ -113,14 +111,11 @@ let tilePlacemat = createTilePlacemat()
 gameBoard.appendChild(tilePlacemat)
 
 
-/*
+
 let wallRendering = document.createElement("div")
-Wall.renderWall(wallRendering, 91)
 wallRendering.id = "wall"
 gameBoard.appendChild(wallRendering)
 
-
-let handTiles = tiles.slice(-14)
 
 let userHandElem = createTopOrBottomHand("userHand")
 let userHandElemExposed = createTopOrBottomHand("userHandExposed")
@@ -130,173 +125,66 @@ let userHand = new Hand({
 	interactive: true,
 	tilePlacemat: tilePlacemat
 })
-console.log(userHand)
-
 window.userHand = userHand
 
-//userHand.sortTiles(handTiles)
-handTiles.forEach((value) => {
-	userHand.add(value)
+let rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer")
+let rightHand = new Hand({
+	handToRender: rightHandContainer
 })
-userHand.renderTiles()
 
+let topHandElem = createTopOrBottomHand("topHand")
+let topHand = new Hand({
+	handToRender: topHandElem
+})
 
-
-let leftHandTiles = tiles.slice(-28, -14)
 let leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer")
-
 let leftHand = new Hand({
 	handToRender: leftHandContainer
 })
 
-leftHandTiles.forEach((value) => {leftHand.add(value)})
-leftHand.renderTiles()
 
+window.stateManager.addEventListener("onStateUpdate", function(obj) {
+	let message = obj.message
 
-let rightHandTiles = tiles.slice(-42, -28)
+	if (!message.inGame) {return};
 
+	if (message.wallTiles) {
+		Wall.renderWall(wallRendering, message.wallTiles)
+	}
 
-let rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer")
+	let clients = message.clients
+	let winds = ["north", "east", "south", "west"]
+	let hands = [userHand, rightHand, topHand, leftHand]
 
-function drawRightTile(tile) {
-	let elem = document.createElement("img")
-	elem.src = tile.imageUrl
-	rightHandContainer.appendChild(elem)
-}
+	let userWind;
+	clients.forEach((client) => {
+		if (client.hand) {
+			console.log("User hand stuff")
+			let tempHand = Hand.fromString(client.hand)
+			userHand.syncContents(tempHand.contents)
+			userWind = tempHand.wind
+		}
+	})
 
-for (let i=0;i<rightHandTiles.length;i++) {
-	let rightHandTile = rightHandTiles[i]
-	drawRightTile(rightHandTile)
-}
+	let userWindIndex = winds.indexOf(userWind)
 
+	compass.setDirectionForUserWind(userWind)
+	let windOrder = winds.slice(userWindIndex).concat(winds.slice(0, userWindIndex))
 
+	clients.forEach((client) => {
+		if (client.visibleHand && client.wind) {
+			console.log("Client hand stuff")
+			console.log(client)
+			console.log(client.wind)
+			let hand = hands[windOrder.indexOf(client.wind)]
+			hand.syncContents(Hand.convertStringsToTiles(client.visibleHand))
+			hand.wind = client.wind
+		}
+	})
 
-
-let topHandTiles = tiles.slice(-56, -42)
-
-
-let topHand = createTopOrBottomHand("topHand")
-
-
-function drawTopTile(tile) {
-	let elem = document.createElement("img")
-	elem.src = tile.imageUrl
-	topHand.appendChild(elem)
-}
-
-for (let i=0;i<topHandTiles.length;i++) {
-	let topHandTile = topHandTiles[i]
-	//drawTopTile(topHandTile)
-	drawTopTile(new Tile({faceDown: true}))
-}
-
-
-
-
-
-
-
-
-
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//For testing.
-
-let tiles = new (require("./Wall.js"))().tiles
-console.log(tiles)
-
-let wallRendering = document.createElement("div")
-window.wallRendering = wallRendering
-window.Wall = require("./Wall.js")
-Wall.renderWall(wallRendering, 91)
-wallRendering.id = "wall"
-gameBoard.appendChild(wallRendering)
-
-
-let handTiles = tiles.slice(-14)
-
-let userHandElem = createTopOrBottomHand("userHand")
-let userHandElemExposed = createTopOrBottomHand("userHandExposed")
-let userHand = new Hand({
-	handToRender: userHandElem,
-	handForExposed: userHandExposed,
-	interactive: true,
-	tilePlacemat: tilePlacemat
-})
-console.log(userHand)
-
-window.userHand = userHand
-
-//userHand.sortTiles(handTiles)
-handTiles.forEach((value) => {
-	userHand.add(value)
-})
-userHand.renderTiles()
-
-
-
-let leftHandTiles = tiles.slice(-28, -14)
-let leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer")
-
-let leftHand = new Hand({
-	handToRender: leftHandContainer
+	hands.forEach((hand) => {hand.renderTiles()})
 })
 
-leftHandTiles.forEach((value) => {leftHand.add(value)})
-leftHand.renderTiles()
 
-
-let rightHandTiles = tiles.slice(-42, -28)
-
-
-let rightHandContainer = createLeftOrRightHand("rightHand", "rightHandContainer")
-
-function drawRightTile(tile) {
-	let elem = document.createElement("img")
-	elem.src = tile.imageUrl
-	rightHandContainer.appendChild(elem)
-}
-
-for (let i=0;i<rightHandTiles.length;i++) {
-	let rightHandTile = rightHandTiles[i]
-	drawRightTile(rightHandTile)
-}
-
-
-
-
-let topHandTiles = tiles.slice(-56, -42)
-
-
-let topHand = createTopOrBottomHand("topHand")
-
-
-function drawTopTile(tile) {
-	let elem = document.createElement("img")
-	elem.src = tile.imageUrl
-	topHand.appendChild(elem)
-}
-
-for (let i=0;i<topHandTiles.length;i++) {
-	let topHandTile = topHandTiles[i]
-	//drawTopTile(topHandTile)
-	drawTopTile(new Tile({faceDown: true}))
-}
 
 module.exports = gameBoard

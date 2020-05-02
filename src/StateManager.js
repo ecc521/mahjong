@@ -58,6 +58,12 @@ class StateManager {
 			else if (obj.type === "getCurrentRoom") {
 				onGetCurrentRoom(obj)
 			}
+			else if (obj.type === "roomActionStartGame") {
+				onStartGame(obj)
+			}
+			else if (obj.type === "roomActionEndGame") {
+				onEndGame(obj)
+			}
 			else {
 				console.log("Unknown Type " + obj.type)
 			}
@@ -210,10 +216,10 @@ class StateManager {
 			console.log(obj)
 			this.isHost = obj.message.isHost
 
-			if (this.inGame === false && obj.inGame === true) {
+			if (this.inGame === false && obj.message.inGame === true) {
 				onStartGame({status: "success", message: "State Sync"})
 			}
-			else if (this.inGame === true && obj.inGame === false) {
+			else if (this.inGame === true && obj.message.inGame === false) {
 				onEndGame({status: "success", message: "State Sync"})
 			}
 

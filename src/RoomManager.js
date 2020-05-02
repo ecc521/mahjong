@@ -252,9 +252,14 @@ window.stateManager.addEventListener("onStartGame", function() {
 
 window.stateManager.addEventListener("onEndGame", function(obj) {
 	roomManager.style.display = ""
-	new Popups.Notification("Game Ended", obj.message).show()
+	if (!isDevMode || obj.message !== "State Sync") {
+		//If we are in dev mode, and the message is "State Sync", suppress this warning.
+		new Popups.Notification("Game Ended", obj.message).show()
+	}
+	else {console.log("Game Ended due to state sync. Popup suppressed in dev mode. ")}
 })
 
+let isDevMode = false;
 
 //Allow query params.
 let params = new URLSearchParams(window.location.search)
@@ -267,6 +272,7 @@ if (params.has("name")) {
 
 //This feature is for development use only. Show a warning.
 if (params.has("clientId")) {
+	isDevMode = true
 	new Popups.MessageBar("This page is in development mode due to the clientId parameter. ").show(8000)
 }
 
