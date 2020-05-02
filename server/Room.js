@@ -1,3 +1,7 @@
+const Wall = require("../src/Wall.js")
+const Hand = require("../src/Hand.js")
+const Tile = require("../src/Tile.js")
+
 class Room {
 	constructor(roomId, options = {}) {
 		this.roomId = roomId
@@ -10,19 +14,46 @@ class Room {
 		this.gameData = options.gameData || {}
 		this.hostClientId = options.hostClientId
 
-		let getState = (function getState(clientId) {
-			//Generate the game state visible to clientId
+		//If these are passed, they will be in a stringified form. Convert them back to normal.
+		if (this.gameData.wall) {
+			this.gameData.wall = Wall.fromString(this.gameData.wall)
+		}
+
+		if (this.gameData.playerHands) {
+			for (let clientId in this.gameData.playerHands) {
+				this.gameData.playerHands[clientId] = Hand.fromJSON(this.gameData.playerHands[clientId])
+			}
+		}
+		else {this.gameData.playerHands = {}}
+
+
+		let getState = (function getState(requestingClientId) {
+			//Generate the game state visible to requestingClientId
 			let state = {}
-			state.isHost = (clientId === this.hostClientId);
+			state.isHost = (requestingClientId === this.hostClientId);
+			if (this.gameData.wall) {
+				state.wallTiles = this.gameData.wall.tiles.length
+			}
 
 			state.clients = []
-			this.clientIds.forEach((clientId) => {
-				state.clients.push({
-					id: clientId,
-					nickname: global.stateManager.getClient(clientId).getNickname(),
-					isHost: (clientId === this.hostClientId)
-					//Add visibleHand and wind.
-				})
+			this.clientIds.forEach((currentClientId) => {
+				let visibleClientState = {
+					id: currentClientId,
+					nickname: global.stateManager.getClient(currentClientId).getNickname(),
+					isHost: (currentClientId === this.hostClientId)
+				}
+				if (this.inGame) {
+					if (requestingClientId === currentClientId) {
+						//One can see all of their own tiles.
+						visibleClientState.hand = this.gameData.playerHands[currentClientId]
+					}
+					else {
+						//One can only see exposed tiles of other players. True says to include other tiles as face down.
+						visibleClientState.visibleHand = this.gameData.playerHands[currentClientId].getExposedTiles(true)
+						visibleClientState.wind = this.gameData.playerHands[currentClientId].wind
+					}
+				}
+				state.clients.push(visibleClientState)
 			})
 
 			return state
@@ -75,13 +106,6 @@ class Room {
 			}
 		}).bind(this)
 
-		this.startGame = (function() {
-			if (this.clientIds.length !== 4) {return "Not Enough Clients"}
-			else {
-				this.inGame = true
-			}
-		}).bind(this)
-
 		this.messageAll = (function(...args) {
 			console.log(this.clientIds.length)
 			this.clientIds.forEach((clientId) => {
@@ -91,9 +115,62 @@ class Room {
 			})
 		}).bind(this)
 
-		this.startGame = (function startGame() {
+		this.startGame = (function(messageKey) {
+			if (this.clientIds.length !== 4) {return "Not Enough Clients"}
+			else {
+				this.inGame = true
+				this.messageAll(messageKey, "Game Started", "success")
+				//Build the wall.
+				this.gameData.wall = new Wall()
 
+				//Build the player hands.
+				let drawTile = (function drawTile(clientId, last = false) {
+					console.log("Called to draw tile")
+					let tile;
+					while (!(tile instanceof Tile)) {
+						console.log("Drawing tile")
+						if (last) {
+							tile = this.gameData.wall.drawLast()
+						}
+						else {
+							tile = this.gameData.wall.drawFirst()
+						}
+						if (!tile) {console.log("Wall Empty");return} //TODO: Game over. Wall empty.
+						this.gameData.playerHands[clientId].add(tile)
+					}
+				}).bind(this)
+
+				//For now, we will randomly assign winds.
+				let winds = ["north", "east", "south", "west"]
+
+				for (let i=0;i<this.clientIds.length;i++) {
+					let clientId = this.clientIds[i]
+
+					let wind = winds.splice(Math.floor(Math.random() * winds.length), 1)[0]
+					let hand = new Hand({wind})
+					this.gameData.playerHands[clientId] = hand
+
+					let tileCount = (wind === "east")?14:13
+					for (let i=0;i<tileCount;i++) {
+						drawTile(clientId)
+					}
+				}
+
+				sendStateToClients()
+			}
 		}).bind(this)
+
+		this.endGame = (function startGame(messageKey, clientId) {
+			let gameEndMessage = "The Game Has Ended";
+			if (clientId) {
+				let client = global.stateManager.getClient(clientId)
+				//Tell players who ended the game, so blame can be applied.
+				gameEndMessage = "The game has been ended by " + clientId + ", who goes by the name of " + client.getNickname() + "."
+			}
+			this.gameData = {}
+			this.messageAll(messageKey, gameEndMessage, "success")
+		}).bind(this)
+
 
 		this.onIncomingMessage = (function(clientId, obj) {
 			console.log("Received message")
@@ -107,6 +184,7 @@ class Room {
 				return this.removeClient(clientId)
 			}
 			else if (obj.type === "roomActionKickFromRoom") {
+				//Only the host can kick, and only if the game has not started.
 				if (!isHost) {
 					console.log(client)
 					console.log(client.message)
@@ -115,8 +193,6 @@ class Room {
 				if (this.inGame) {
 					return client.message(obj.type, "Can't Kick During Game", "error")
 				}
-				//The host can only kick if the game has not started.
-				//TODO: Inform the other client that they have been kicked so they don't end up out of state.
 				this.removeClient(obj.id, "You have been kicked from the room. ") //obj.id is the id of the user to kick.
 				return client.message(obj.type, "Kicked Client", "success")
 			}
@@ -129,16 +205,14 @@ class Room {
 				}
 
 				//Time to start the game.
-				return this.startGame()
+				return this.startGame(obj.type)
 			}
 			else if (obj.type === "roomActionEndGame") {
-				//If the game is started, anybody can end the game. Otherwise, only the host can.
+				//Anybody can end the game, as they could do the same going AFK.
 				if (!this.inGame) {
 					return client.message(obj.type, "No Game In Progress", "error")
 				}
-				//TODO: End the game.
-				return
-
+				this.endGame(obj.type, clientId) //Clientid is an optional parameter.
 			}
 			else if (obj.type === "roomActionCloseRoom") {
 				if (!isHost) {

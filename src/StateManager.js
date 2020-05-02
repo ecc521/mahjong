@@ -17,7 +17,7 @@ class StateManager {
 					setTimeout((function() {
 						//2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
 						this.createWebsocket()
-						this.getCurrentRoom() //Syncs state. 
+						this.getCurrentRoom() //Syncs state.
 					}).bind(this), 2000)
 				}
 			}).bind(this)
@@ -65,6 +65,7 @@ class StateManager {
 
 		this.inRoom = false
 		this.isHost = false
+		this.inGame = false
 
 		this.joinRoom = function(roomId, nickname) {
 			this.sendMessage(JSON.stringify({
@@ -104,6 +105,22 @@ class StateManager {
 		this.closeRoom = function(roomId) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionCloseRoom",
+				clientId: window.clientId,
+				roomId,
+			}))
+		}
+
+		this.startGame = function(roomId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionStartGame",
+				clientId: window.clientId,
+				roomId,
+			}))
+		}
+
+		this.endGame = function(roomId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionEndGame",
 				clientId: window.clientId,
 				roomId,
 			}))
@@ -150,11 +167,60 @@ class StateManager {
 			if (this.onLeaveRoom instanceof Function) {this.onLeaveRoom(obj)}
 		}).bind(this)
 
+		//We'll allow multiple listeners for some events.
+		let listeners = {
+			onStartGame: [],
+			onEndGame: [],
+			onStateUpdate: []
+		}
+
+		this.addEventListener = (function addEventListener(type, listener) {
+			if (!listeners[type]) {throw type + " is not supported by this addEventListener"}
+			listeners[type].push(listener)
+		}).bind(this)
+
+		this.removeEventListener = (function addEventListener(type, listener) {
+			if (!listeners[type]) {throw type + " is not supported by this addEventListener"}
+			if (listeners.indexOf(listener) === -1) {throw "Unable to find listener"}
+			listeners[type].splice(listeners.indexOf(listener), 1)
+		}).bind(this)
+
+
+		let onStartGame = (function onStartGame(obj) {
+			if (obj.status === "success") {
+				this.inGame = true
+			}
+			if (this.onStartGame instanceof Function) {this.onStartGame(obj)}
+			listeners.onStartGame.forEach((listener) => {
+				listener(obj)
+			})
+		}).bind(this)
+
+		let onEndGame = (function onEndGame(obj) {
+			if (obj.status === "success") {
+				this.inGame = false
+			}
+			if (this.onEndGame instanceof Function) {this.onEndGame(obj)}
+			listeners.onEndGame.forEach((listener) => {
+				listener(obj)
+			})
+		}).bind(this)
 
 		let onStateUpdate = (function onStateUpdate(obj) {
 			console.log(obj)
 			this.isHost = obj.message.isHost
+
+			if (this.inGame === false && obj.inGame === true) {
+				onStartGame({status: "success", message: "State Sync"})
+			}
+			else if (this.inGame === true && obj.inGame === false) {
+				onEndGame({status: "success", message: "State Sync"})
+			}
+
 			if (this.onStateUpdate instanceof Function) {this.onStateUpdate(obj)}
+			listeners.onStateUpdate.forEach((listener) => {
+				listener(obj)
+			})
 		}).bind(this)
 
 		let onGetCurrentRoom = (function onGetCurrentRoom(obj) {

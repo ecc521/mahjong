@@ -12,7 +12,7 @@ class Hand {
 		this.handForExposed = config.handForExposed
 		this.tilePlacemat = config.tilePlacemat
 		this.interactive = config.interactive || false
-
+		this.wind = config.wind
 
 		this.contents = [] //Contents of hand.
 		this.inPlacemat = [] //Additional contents of hand. In placemat.
@@ -54,6 +54,18 @@ class Hand {
 			else {throw obj + " does not exist in hand. "}
 		}).bind(this)
 
+		this.getExposedTiles = (function(includeFaceDown = false) {
+			let exposedTiles = []
+			this.contents.forEach((item) => {
+				if (item.exposed) {
+					exposedTiles.push(item)
+				}
+				else if (includeFaceDown) {
+					exposedTiles.push(new Tile({faceDown: true}))
+				}
+			})
+			return exposedTiles
+		}).bind(this)
 
 		function allowDrop(ev) {
 			ev.preventDefault();
@@ -244,6 +256,13 @@ class Hand {
 				this.renderPlacemat()
 			}
 		}).bind(this)
+
+		this.toJSON = (function() {
+			return JSON.stringify({
+				wind: this.wind,
+				contents: this.contents
+			})
+		}).bind(this)
 	}
 
 	static getTileValue(tile) {
@@ -316,6 +335,38 @@ class Hand {
 		}
 
 		return false
+	}
+
+	static getContentsFromString(str) {
+		let obj = JSON.parse(str)
+		//obj is an array, with the contents of the hand.
+		let contents = obj.map((itemStr) => {
+			let obj = JSON.parse(itemStr)
+			if (obj.class === "Pretty") {
+				return Pretty.fromJSON(itemStr)
+			}
+			else if (obj.class === "Tile") {
+				return Tile.fromJSON(itemStr)
+			}
+			else if (obj.class === "Sequence") {
+				return Sequence.fromJSON(itemStr)
+			}
+			else if (obj.class === "Match") {
+				return Match.fromJSON(itemStr)
+			}
+			else {throw "Unable to identify itemString " + itemStr}
+		})
+		return contents
+	}
+
+	static fromString(str) {
+		//Hand.fromString is only meant to be used on the server side. Therefore, it will not attempt to carry over any functionality that would be client side.
+		let obj = JSON.parse(str)
+		let wind = obj.wind
+
+		let hand = new Hand({wind: obj.wind})
+		hand.contents = getContentsFromString(obj.contents)
+		return hand
 	}
 }
 

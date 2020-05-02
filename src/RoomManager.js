@@ -120,6 +120,10 @@ startGameButton.id = "startGameButton"
 startGameButton.style.display = "none"
 inRoomContainer.appendChild(startGameButton)
 
+startGameButton.addEventListener("click", function() {
+	window.stateManager.startGame()
+})
+
 function renderPlayerView(clientList = [], kickUserCallback) {
 	while (playerView.firstChild) {playerView.firstChild.remove()}
 
@@ -206,7 +210,7 @@ window.stateManager.onLeaveRoom = function(obj) {
 	new Popups.Notification("Out of Room", obj.message).show()
 }
 
-window.stateManager.onStateUpdate = function(obj) {
+window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	console.log(obj)
 
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
@@ -237,9 +241,19 @@ window.stateManager.onStateUpdate = function(obj) {
 	renderPlayerView(obj.message.clients, function kickUserCallback(userId) {
 		window.stateManager.kickUser(window.stateManager.roomId, userId)
 	})
-}
+})
 
 window.stateManager.getCurrentRoom() //If we are already in a room, this will issue the correct callbacks to enter us into it.
+
+
+window.stateManager.addEventListener("onStartGame", function() {
+	roomManager.style.display = "none"
+})
+
+window.stateManager.addEventListener("onEndGame", function(obj) {
+	roomManager.style.display = ""
+	new Popups.Notification("Game Ended", obj.message).show()
+})
 
 
 //Allow query params.
