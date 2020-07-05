@@ -16,12 +16,12 @@ class Room {
 
 		//If these are passed, they will be in a stringified form. Convert them back to normal.
 		if (this.gameData.wall) {
-			this.gameData.wall = Wall.fromString(this.gameData.wall)
+			this.gameData.wall = Wall.fromJSON(this.gameData.wall)
 		}
 
 		if (this.gameData.playerHands) {
 			for (let clientId in this.gameData.playerHands) {
-				this.gameData.playerHands[clientId] = Hand.fromJSON(this.gameData.playerHands[clientId])
+				this.gameData.playerHands[clientId] = Hand.fromString(this.gameData.playerHands[clientId])
 			}
 		}
 		else {this.gameData.playerHands = {}}
@@ -35,6 +35,8 @@ class Room {
 			if (this.gameData.wall) {
 				state.wallTiles = this.gameData.wall.tiles.length
 			}
+
+			state.currentTurn = this.gameData.currentTurn
 
 			state.clients = []
 			this.clientIds.forEach((currentClientId) => {
@@ -116,6 +118,7 @@ class Room {
 			})
 		}).bind(this)
 
+		//TODO: We'll eventually need to do charleston.
 		this.startGame = (function(messageKey) {
 			if (this.clientIds.length !== 4) {return "Not Enough Clients"}
 			else {
@@ -141,6 +144,7 @@ class Room {
 
 				//For now, we will randomly assign winds.
 				let winds = ["north", "east", "south", "west"]
+				let eastWindPlayerId;
 
 				for (let i=0;i<this.clientIds.length;i++) {
 					let clientId = this.clientIds[i]
@@ -149,10 +153,19 @@ class Room {
 					let hand = new Hand({wind})
 					this.gameData.playerHands[clientId] = hand
 
-					let tileCount = (wind === "east")?14:13
+					let tileCount = 13
+					if (wind === "east") {
+						eastWindPlayerId = clientId
+						tileCount = 14
+					}
 					for (let i=0;i<tileCount;i++) {
 						drawTile(clientId)
 					}
+				}
+
+				this.gameData.currentTurn = {
+					thrown: false,
+					userTurn: eastWindPlayerId
 				}
 
 				sendStateToClients()
@@ -170,6 +183,18 @@ class Room {
 			this.messageAll(messageKey, gameEndMessage, "success")
 		}).bind(this)
 
+		this.onPlace = (function(obj, clientId) {
+			if (this.currentTurn.userTurn !== clientId) {
+				return global.stateManager.getClient(clientId).message(obj.type, "Can Only Place on Turn", "error")
+			}
+			//The users wishes to place down tiles.
+			//If it is not their turn, we will hold until all other players have either attempted to place or nexted.
+			//Then we will apply priority.
+		}).bind(this)
+
+		this.onNext = (function(obj, clientId) {
+
+		}).bind(this)
 
 		this.onIncomingMessage = (function(clientId, obj) {
 			console.log("Received message")
@@ -221,6 +246,15 @@ class Room {
 					this.removeClient(clientId, "The room has been closed. ")
 				})
 				global.stateManager.deleteRoom(this.roomId)
+			}
+			else if (obj.type === "roomActionPlace") {
+				//Action to place tiles.
+				//Only current turn user can place.
+				return this.onPlace(obj, clientId)
+			}
+			else if (obj.type === "roomActionNext") {
+				//Action to state next turn.
+				return this.onNext(obj, clientId)
 			}
 			else if (obj.type === "roomActionState") {
 				return client.message(obj.type, getState(clientId), "success")

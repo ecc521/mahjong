@@ -111,6 +111,23 @@ let tilePlacemat = createTilePlacemat()
 gameBoard.appendChild(tilePlacemat)
 
 
+let placeTilesButton = document.createElement("button")
+placeTilesButton.id = "placeTilesButton"
+placeTilesButton.innerHTML = "Place Tiles"
+gameBoard.appendChild(placeTilesButton)
+
+placeTilesButton.addEventListener("click", function() {
+
+})
+
+
+let nextTurnButton = document.createElement("button")
+nextTurnButton.id = "nextTurnButton"
+gameBoard.appendChild(nextTurnButton)
+
+nextTurnButton.addEventListener("click", function() {
+
+})
 
 let wallRendering = document.createElement("div")
 wallRendering.id = "wall"
@@ -154,7 +171,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 	let clients = message.clients
 	let winds = ["north", "east", "south", "west"]
-	let hands = [userHand, rightHand, topHand, leftHand]
+	let hands = [userHand, leftHand, topHand, rightHand]
 
 	let userWind;
 	clients.forEach((client) => {
@@ -170,6 +187,8 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 	compass.setDirectionForUserWind(userWind)
 	let windOrder = winds.slice(userWindIndex).concat(winds.slice(0, userWindIndex))
+	console.log(windOrder)
+	console.log(hands)
 
 	clients.forEach((client) => {
 		if (client.visibleHand && client.wind) {
@@ -183,6 +202,20 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	})
 
 	hands.forEach((hand) => {hand.renderTiles()})
+
+	userHand.renderPlacemat()
+	if (message.currentTurn && message.currentTurn.thrown) {
+		//The person has thrown their tile. Waiting on players to ready.
+		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady + "/4)"
+		nextTurnButton.disabled = message.currentTurn.usersReady.includes(window.clientId)?"disabled":""
+	}
+	else {
+		nextTurnButton.disabled = "disabled"
+		//The person has not yet thrown a tile.
+		if (message.currentTurn.userTurn === window.clientId) {
+			userHand.renderPlacemat("pending")
+		}
+	}
 })
 
 

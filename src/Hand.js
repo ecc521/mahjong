@@ -14,9 +14,10 @@ class Hand {
 		this.interactive = config.interactive || false
 		this.wind = config.wind
 
+		//We will also have one events: this.onPlacematChange
+
 		this.contents = [] //Contents of hand.
 		this.inPlacemat = [] //Additional contents of hand. In placemat.
-
 
 		this.add = (function(obj) {
 			//We will insert the tile where our sorting algorithm would find it most appropriate.
@@ -51,6 +52,11 @@ class Hand {
 			if (index) {
 				this.contents.splice(index, 1)
 			}
+
+			let placematIndex = this.inPlacemat.findIndex((value) => {return value === obj})
+			if (placematIndex) {
+				this.inPlacemat.splice(placematIndex, 1)
+			}
 			else {throw obj + " does not exist in hand. "}
 		}).bind(this)
 
@@ -67,14 +73,53 @@ class Hand {
 			return exposedTiles
 		}).bind(this)
 
-		this.syncContents = (function(contents) {
+		this.syncContents = (function(syncContents) {
 			//We allow the user to sort their hand by themselves, however it is possible that, due to lag or other reasons, the users hand ends up not matching the server.
-			//This function will sync the contents of the users hand with contents, preserving the users ordering where possible.
+			//This function will sync the contents of the users hand with contents, preserving some user ordering.
 
-			//TODO: Right now, we do this a cheapo and not guarenteed effective method.
-			if (contents.length !== this.contents.length) {this.contents = contents}
+			let currentContentsStrings = [];
+			let syncContentsStrings = [];
 
+			this.contents.forEach((item) => {
+				currentContentsStrings.push(item.toJSON())
+			})
 
+			this.inPlacemat.forEach((item) => {
+				currentContentsStrings.push(item.toJSON())
+			})
+
+			syncContents.forEach((item) => {
+				syncContentsStrings.push(item.toJSON())
+			})
+
+			//Let's go through both arrays, and see what needs to change.
+			//We'll stringify, because these are not identical instances, and therefore == will not work.
+			for (let i=0;i<currentContentsStrings.length;i++) {
+				let str = currentContentsStrings[i]
+				if (str && syncContentsStrings.includes(str)) {
+					currentContentsStrings[i] = null
+					syncContentsStrings[syncContentsStrings.indexOf(str)] = null
+				}
+			}
+
+			//Everything that matches is now nulled out.
+			//Add the things in syncContents but not in currentContents
+			for (let i=0;i<syncContentsStrings.length;i++) {
+				let item = syncContentsStrings[i]
+				if (item) {
+					this.add(syncContents[i])
+				}
+			}
+
+			//Remove the things in currentContents but not in syncContents
+			let tempContents = this.contents.slice(0) //We are cloning the array, however the referenced objects remain the same.
+			//This prevents us from having to adjust indexes for items when we remove other items.
+			for (let i=0;i<currentContentsStrings.length;i++) {
+				let item = currentContentsStrings[i]
+				if (item) {
+					this.remove(tempContents[i])
+				}
+			}
 		}).bind(this)
 
 		function allowDrop(ev) {
@@ -114,7 +159,6 @@ class Hand {
 				//Reordering hand.
 				currentTile = this.contents.splice(elem.tileIndex, 1)[0]
 			}
-			console.log(currentTile)
 
 			if (targetIndex <= this.contents.length) {
 				let newTargetIndex = this.contents.findIndex((tile) => {return targetTile === tile})
@@ -172,12 +216,15 @@ class Hand {
 			}
 		}
 
-		this.renderPlacemat = (function() {
+		this.renderPlacemat = (function(classForFirst) {
 			while (this.tilePlacemat.firstChild) {this.tilePlacemat.firstChild.remove()} //Delete everything currently rendered in the hand.
 
 			for (let i=0;i<4;i++) {
 				let tile = this.inPlacemat[i]
 				let elem = document.createElement("img")
+				if (i === 0 && classForFirst) {
+					elem.className = classForFirst
+				}
 				if (tile) {
 					elem.src = tile.imageUrl
 					//Both work. Using i is faster and simpler.
@@ -267,6 +314,10 @@ class Hand {
 			}
 		}).bind(this)
 
+		this.getStringContents = (function() {
+			return JSON.parse(this.toJSON()).contents //Could be more effecient.
+		}).bind(this)
+
 		this.toJSON = (function() {
 			return JSON.stringify({
 				wind: this.wind,
@@ -288,7 +339,7 @@ class Hand {
 		else if (tile.type === "dragon") {
 			tileValue += 10 * ["red", "green", "white"].findIndex((value) => {return tile.value === value})
 		}
-		else {console.error("Couldn't fully calculate value for " + tile)}
+		else if (!tile.faceDown) {console.error("Couldn't fully calculate value for " + tile)}
 		return tileValue
 	}
 

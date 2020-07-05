@@ -255,8 +255,10 @@ This means that something using bottom is off the page - hence we must use top. 
 
 /*TODO: If tiles aren't at max size and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
 #gameBoard #topHand img {
-	max-width: calc(calc(100vw - 19.04vh) / 14);
-	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14);
+	max-width: calc(calc(100vw - 19.04vh) / 16); /*Raised from 14 in order to allow for more tiles to fit. */
+	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 16); /*Raised from 14 in order to allow for more tiles to fit. */
+	margin-left: calc(calc(100vw - 19.04vh) / 17 / -10); /*Negative margin of 10%. Allows even more tiles to fit. */
+	margin-left: calc(calc(100vw - calc(var(--vh) * 19.04)) / 17 / -10); /*Negative margin of 10%. Allows even more tiles to fit. */
 	max-height: 12vh;
 	max-height: calc(var(--vh) * 12);
 	/*transform: rotate(180deg);*/ /*Rotate tiles 180 degrees away from the viewer (they would be across from this person)*/
@@ -298,6 +300,23 @@ This means that something using bottom is off the page - hence we must use top. 
 
 #gameBoard #tilePlacemat img {
 	margin-right: 20px;
+	border-radius: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14 / 12); /*border radius 1/12th the width of a tile. TODO: This should be analyzed later to make sure it works right*/
+}
+
+@keyframes pulse {
+  0% {
+    background-color: #3D003F99;
+  }
+  50% {
+    background-color: #FF4136B0;
+  }
+  100% {
+	background-color: #3D003F99;
+  }
+}
+
+#gameBoard #tilePlacemat img.pending {
+	animation: pulse 5s infinite;
 }
 
 #gameBoard #compass {
@@ -359,6 +378,41 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-height: calc(var(--vh) * 5);
 	max-width: 5vw;
 	z-index: 1;
+}
+
+#gameBoard #placeTilesButton {
+	position: absolute;
+	right: calc(9.52vh + 12vw);
+	right: calc(calc(var(--vh) * 9.52) + 12vw);
+	top: 64vh;
+	top: calc(var(--vh) * 64);
+	width: 10vw;
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	border-radius: 50vh;
+	border-radius: calc(var(--vh) * 50);
+	font-size: 1.6vh;
+	font-size: calc(var(--vh) * 1.6);
+}
+
+#gameBoard #nextTurnButton {
+	position: absolute;
+	right: calc(9.52vh + 12vw);
+	right: calc(calc(var(--vh) * 9.52) + 12vw);
+	top: 70vh;
+	top: calc(var(--vh) * 70);
+	width: 10vw;
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	border-radius: 50vh;
+	border-radius: calc(var(--vh) * 50);
+	font-size: 1.6vh;
+	font-size: calc(var(--vh) * 1.6);
+}
+
+#gameBoard #placeTilesButton:disabled, #gameBoard #nextTurnButton:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 #gameBoard {

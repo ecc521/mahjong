@@ -36,7 +36,7 @@ class StateManager {
 		}).bind(this)
 		this.createWebsocket()
 
-		function onmessage(message) {
+		let onmessage = (function onmessage(message) {
 			console.log(message.data)
 			let obj = JSON.parse(message.data)
 			console.log(obj)
@@ -64,10 +64,13 @@ class StateManager {
 			else if (obj.type === "roomActionEndGame") {
 				onEndGame(obj)
 			}
+			else if (obj.type === "roomActionPlaceTiles") {
+				if (this.onPlaceTiles instanceof Function) {this.onPlaceTiles(obj)}
+			}
 			else {
 				console.log("Unknown Type " + obj.type)
 			}
-		}
+		}).bind(this)
 
 		this.inRoom = false
 		this.isHost = false
@@ -127,6 +130,14 @@ class StateManager {
 		this.endGame = function(roomId) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionEndGame",
+				clientId: window.clientId,
+				roomId,
+			}))
+		}
+
+		this.placeTiles = function(roomId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionPlaceTiles",
 				clientId: window.clientId,
 				roomId,
 			}))
@@ -222,6 +233,8 @@ class StateManager {
 			else if (this.inGame === true && obj.message.inGame === false) {
 				onEndGame({status: "success", message: "State Sync"})
 			}
+
+			this.currentTurn = obj.message.currentTurn
 
 			if (this.onStateUpdate instanceof Function) {this.onStateUpdate(obj)}
 			listeners.onStateUpdate.forEach((listener) => {
