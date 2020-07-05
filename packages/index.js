@@ -1697,6 +1697,36 @@ var StateManager = /*#__PURE__*/function () {
   function StateManager(websocketURL) {
     _classCallCheck(this, StateManager);
 
+    //This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting. 
+    var onmessage = function onmessage(message) {
+      console.log(message.data);
+      var obj = JSON.parse(message.data);
+      console.log(obj);
+
+      if (obj.type === "joinRoom") {
+        onJoinRoom(obj);
+      } else if (obj.type === "createRoom") {
+        onCreateRoom(obj);
+      } else if (obj.type === "roomActionState") {
+        onStateUpdate(obj);
+      } else if (obj.type === "roomActionKickFromRoom") {//We kicked somebody else. Should probably show an error message or success.
+      } else if (obj.type === "roomActionLeaveRoom") {
+        onLeaveRoom(obj);
+      } else if (obj.type === "getCurrentRoom") {
+        onGetCurrentRoom(obj);
+      } else if (obj.type === "roomActionStartGame") {
+        onStartGame(obj);
+      } else if (obj.type === "roomActionEndGame") {
+        onEndGame(obj);
+      } else if (obj.type === "roomActionPlaceTiles") {
+        if (this.onPlaceTiles instanceof Function) {
+          this.onPlaceTiles(obj);
+        }
+      } else {
+        console.log("Unknown Type " + obj.type);
+      }
+    }.bind(this);
+
     this.createWebsocket = /*#__PURE__*/function () {
       var _createWebsocket = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
@@ -1704,9 +1734,8 @@ var StateManager = /*#__PURE__*/function () {
             switch (_context4.prev = _context4.next) {
               case 0:
                 this.websocket = new WebSocket(websocketURL);
-                this.websocket.onmessage = onmessage;
-
-                this.websocket.onerror = /*#__PURE__*/function () {
+                this.websocket.addEventListener("message", onmessage);
+                this.websocket.addEventListener("error", /*#__PURE__*/function () {
                   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(e) {
                     return regeneratorRuntime.wrap(function _callee$(_context) {
                       while (1) {
@@ -1714,7 +1743,7 @@ var StateManager = /*#__PURE__*/function () {
                           case 0:
                             console.error(e);
                             this.createWebsocket();
-                            this.syncState();
+                            this.getCurrentRoom(); //Syncs state.
 
                           case 3:
                           case "end":
@@ -1727,9 +1756,8 @@ var StateManager = /*#__PURE__*/function () {
                   return function (_x) {
                     return _ref.apply(this, arguments);
                   };
-                }().bind(this);
-
-                this.websocket.onclose = /*#__PURE__*/function () {
+                }().bind(this));
+                this.websocket.addEventListener("close", /*#__PURE__*/function () {
                   var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(e) {
                     return regeneratorRuntime.wrap(function _callee2$(_context2) {
                       while (1) {
@@ -1737,16 +1765,22 @@ var StateManager = /*#__PURE__*/function () {
                           case 0:
                             console.warn(e);
 
-                            if (e.code !== 1000) {
-                              //If not a normal closure, reestablish and sync.
-                              setTimeout(function () {
-                                //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
-                                this.createWebsocket();
-                                this.getCurrentRoom(); //Syncs state.
-                              }.bind(this), 2000);
+                            if (!(e.code !== 1000)) {
+                              _context2.next = 6;
+                              break;
                             }
 
-                          case 2:
+                            _context2.next = 4;
+                            return new Promise(function (resolve, reject) {
+                              setTimeout(resolve, 2000);
+                            });
+
+                          case 4:
+                            //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
+                            this.createWebsocket();
+                            this.getCurrentRoom(); //Syncs state.
+
+                          case 6:
                           case "end":
                             return _context2.stop();
                         }
@@ -1757,7 +1791,7 @@ var StateManager = /*#__PURE__*/function () {
                   return function (_x2) {
                     return _ref2.apply(this, arguments);
                   };
-                }().bind(this);
+                }().bind(this));
 
                 this.sendMessage = /*#__PURE__*/function () {
                   var _ref3 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(message) {
@@ -1811,36 +1845,6 @@ var StateManager = /*#__PURE__*/function () {
     }().bind(this);
 
     this.createWebsocket();
-
-    var onmessage = function onmessage(message) {
-      console.log(message.data);
-      var obj = JSON.parse(message.data);
-      console.log(obj);
-
-      if (obj.type === "joinRoom") {
-        onJoinRoom(obj);
-      } else if (obj.type === "createRoom") {
-        onCreateRoom(obj);
-      } else if (obj.type === "roomActionState") {
-        onStateUpdate(obj);
-      } else if (obj.type === "roomActionKickFromRoom") {//We kicked somebody else. Should probably show an error message or success.
-      } else if (obj.type === "roomActionLeaveRoom") {
-        onLeaveRoom(obj);
-      } else if (obj.type === "getCurrentRoom") {
-        onGetCurrentRoom(obj);
-      } else if (obj.type === "roomActionStartGame") {
-        onStartGame(obj);
-      } else if (obj.type === "roomActionEndGame") {
-        onEndGame(obj);
-      } else if (obj.type === "roomActionPlaceTiles") {
-        if (this.onPlaceTiles instanceof Function) {
-          this.onPlaceTiles(obj);
-        }
-      } else {
-        console.log("Unknown Type " + obj.type);
-      }
-    }.bind(this);
-
     this.inRoom = false;
     this.isHost = false;
     this.inGame = false;
@@ -2152,7 +2156,7 @@ var store = __webpack_require__(65);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.6.4',
+  version: '3.6.5',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2020 Denis Pushkarev (zloirock.ru)'
 });
@@ -2741,7 +2745,13 @@ if (!set || !clear) {
     defer = bind(port.postMessage, port, 1);
   // Browsers with postMessage, skip WebWorkers
   // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
-  } else if (global.addEventListener && typeof postMessage == 'function' && !global.importScripts && !fails(post)) {
+  } else if (
+    global.addEventListener &&
+    typeof postMessage == 'function' &&
+    !global.importScripts &&
+    !fails(post) &&
+    location.protocol !== 'file:'
+  ) {
     defer = post;
     global.addEventListener('message', listener, false);
   // IE8-
@@ -3119,7 +3129,7 @@ var INVALID_HOST = 'Invalid host';
 var INVALID_PORT = 'Invalid port';
 
 var ALPHA = /[A-Za-z]/;
-var ALPHANUMERIC = /[\d+\-.A-Za-z]/;
+var ALPHANUMERIC = /[\d+-.A-Za-z]/;
 var DIGIT = /\d/;
 var HEX_START = /^(0x|0X)/;
 var OCT = /^[0-7]+$/;

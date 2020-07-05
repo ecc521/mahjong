@@ -1,41 +1,7 @@
 class StateManager {
 	constructor(websocketURL) {
 
-		this.createWebsocket = (async function createWebsocket() {
-			this.websocket = new WebSocket(websocketURL)
-			this.websocket.onmessage = onmessage
-			this.websocket.onerror = (async function(e) {
-				console.error(e)
-				this.createWebsocket()
-				this.syncState()
-			}).bind(this)
-
-			this.websocket.onclose = (async function(e) {
-				console.warn(e)
-				if (e.code !== 1000) {
-					//If not a normal closure, reestablish and sync.
-					setTimeout((function() {
-						//2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
-						this.createWebsocket()
-						this.getCurrentRoom() //Syncs state.
-					}).bind(this), 2000)
-				}
-			}).bind(this)
-
-			this.sendMessage = async function(message) {
-				//Send message once socket opens.
-				if (this.websocket.readyState === 0) {
-					await new Promise((resolve, reject) => {
-						this.websocket.onopen = resolve
-						this.websocket.onerror = reject //TODO: Handle error.
-					})
-				}
-				console.log(message)
-				this.websocket.send(message)
-			}
-		}).bind(this)
-		this.createWebsocket()
-
+		//This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting. 
 		let onmessage = (function onmessage(message) {
 			console.log(message.data)
 			let obj = JSON.parse(message.data)
@@ -71,6 +37,39 @@ class StateManager {
 				console.log("Unknown Type " + obj.type)
 			}
 		}).bind(this)
+
+		this.createWebsocket = (async function createWebsocket() {
+			this.websocket = new WebSocket(websocketURL)
+			this.websocket.addEventListener("message", onmessage)
+			this.websocket.addEventListener("error", (async function(e) {
+				console.error(e)
+				this.createWebsocket()
+				this.getCurrentRoom() //Syncs state.
+			}).bind(this))
+
+			this.websocket.addEventListener("close", (async function(e) {
+				console.warn(e)
+				if (e.code !== 1000) {
+					//If not a normal closure, reestablish and sync.
+					await new Promise((resolve, reject) => {setTimeout(resolve, 2000)}) //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
+					this.createWebsocket()
+					this.getCurrentRoom() //Syncs state.
+				}
+			}).bind(this))
+
+			this.sendMessage = async function(message) {
+				//Send message once socket opens.
+				if (this.websocket.readyState === 0) {
+					await new Promise((resolve, reject) => {
+						this.websocket.onopen = resolve
+						this.websocket.onerror = reject //TODO: Handle error.
+					})
+				}
+				console.log(message)
+				this.websocket.send(message)
+			}
+		}).bind(this)
+		this.createWebsocket()
 
 		this.inRoom = false
 		this.isHost = false
