@@ -1,6 +1,9 @@
 const Tile = require("./Tile.js")
 const Hand = require("./Hand.js")
 const Wall = require("./Wall.js")
+const Popups = require("./Popups.js")
+const Sequence = require("./Sequence.js")
+const Match = require("./Match.js")
 
 let gameBoard = document.createElement("div")
 gameBoard.id = "gameBoard"
@@ -117,8 +120,39 @@ placeTilesButton.innerHTML = "Place Tiles"
 gameBoard.appendChild(placeTilesButton)
 
 placeTilesButton.addEventListener("click", function() {
+	let placement = userHand.inPlacemat
+	console.log(placement)
+	if (placement.length === 0) {
+		new Popups.Notification("Place Nothing???", "We suggest glasses. ").show()
+		return;
+	}
 
+	//Now we need to create a Sequence, Match, or just Tile
+	if (placement.length > 1) {
+		try {
+			let sequence = new Sequence({exposed: true, tiles: placement})
+			placement = sequence
+		}
+		catch (e) {
+			if (Match.isValidMatch(placement)) {
+				placement = new Match({exposed: true, amount: placement.length, type: placement[0].type, value: placement[0].value})
+			}
+			else {
+				new Popups.Notification("Placement Error", "Unable to create a sequence, or match. Please check your tiles. ").show()
+				return;
+			}
+		}
+	}
+
+	console.log(placement)
+	window.stateManager.placeTiles(placement)
 })
+
+window.stateManager.onPlaceTiles = function(obj) {
+	if (obj.status === "error") {
+		new Popups.Notification("Error Placing Tiles", obj.message).show()
+	}
+}
 
 
 let nextTurnButton = document.createElement("button")

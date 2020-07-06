@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 107);
+/******/ 	return __webpack_require__(__webpack_require__.s = 108);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -89,11 +89,11 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
-var shared = __webpack_require__(66);
+var shared = __webpack_require__(68);
 var has = __webpack_require__(6);
-var uid = __webpack_require__(67);
-var NATIVE_SYMBOL = __webpack_require__(72);
-var USE_SYMBOL_AS_UID = __webpack_require__(114);
+var uid = __webpack_require__(69);
+var NATIVE_SYMBOL = __webpack_require__(74);
+var USE_SYMBOL_AS_UID = __webpack_require__(115);
 
 var WellKnownSymbolsStore = shared('wks');
 var Symbol = global.Symbol;
@@ -125,7 +125,7 @@ module.exports =
   // eslint-disable-next-line no-new-func
   Function('return this')();
 
-/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(108)))
+/* WEBPACK VAR INJECTION */}.call(this, __webpack_require__(109)))
 
 /***/ }),
 /* 2 */
@@ -149,8 +149,8 @@ var getOwnPropertyDescriptor = __webpack_require__(39).f;
 var createNonEnumerableProperty = __webpack_require__(8);
 var redefine = __webpack_require__(10);
 var setGlobal = __webpack_require__(42);
-var copyConstructorProperties = __webpack_require__(110);
-var isForced = __webpack_require__(70);
+var copyConstructorProperties = __webpack_require__(111);
+var isForced = __webpack_require__(72);
 
 /*
   options.target      - name of the target object
@@ -357,7 +357,7 @@ module.exports = function (it) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var DESCRIPTORS = __webpack_require__(7);
-var IE8_DOM_DEFINE = __webpack_require__(64);
+var IE8_DOM_DEFINE = __webpack_require__(66);
 var anObject = __webpack_require__(4);
 var toPrimitive = __webpack_require__(31);
 
@@ -415,7 +415,7 @@ module.exports = function (METHOD_NAME, options) {
 /* 16 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var NATIVE_WEAK_MAP = __webpack_require__(109);
+var NATIVE_WEAK_MAP = __webpack_require__(110);
 var global = __webpack_require__(1);
 var isObject = __webpack_require__(5);
 var createNonEnumerableProperty = __webpack_require__(8);
@@ -482,7 +482,7 @@ module.exports = {
 /* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var path = __webpack_require__(112);
+var path = __webpack_require__(113);
 var global = __webpack_require__(1);
 
 var aFunction = function (variable) {
@@ -547,7 +547,7 @@ $({ target: 'URL', proto: true, enumerable: true }, {
 "use strict";
 
 var $ = __webpack_require__(3);
-var forEach = __webpack_require__(71);
+var forEach = __webpack_require__(73);
 
 // `Array.prototype.forEach` method
 // https://tc39.github.io/ecma262/#sec-array.prototype.foreach
@@ -660,8 +660,8 @@ module.exports = function (it, TAG, STATIC) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
-var DOMIterables = __webpack_require__(93);
-var forEach = __webpack_require__(71);
+var DOMIterables = __webpack_require__(95);
+var forEach = __webpack_require__(73);
 var createNonEnumerableProperty = __webpack_require__(8);
 
 for (var COLLECTION_NAME in DOMIterables) {
@@ -834,7 +834,7 @@ var toIndexedObject = __webpack_require__(22);
 var addToUnscopables = __webpack_require__(53);
 var Iterators = __webpack_require__(26);
 var InternalStateModule = __webpack_require__(16);
-var defineIterator = __webpack_require__(76);
+var defineIterator = __webpack_require__(78);
 
 var ARRAY_ITERATOR = 'Array Iterator';
 var setInternalState = InternalStateModule.set;
@@ -963,8 +963,8 @@ $({ target: 'RegExp', proto: true, forced: /./.exec !== exec }, {
 
 "use strict";
 
-var regexpFlags = __webpack_require__(128);
-var stickyHelpers = __webpack_require__(129);
+var regexpFlags = __webpack_require__(129);
+var stickyHelpers = __webpack_require__(130);
 
 var nativeExec = RegExp.prototype.exec;
 // This always refers to the native implementation, because the
@@ -1056,12 +1056,12 @@ module.exports = patchedExec;
 /***/ (function(module, exports, __webpack_require__) {
 
 var DESCRIPTORS = __webpack_require__(7);
-var propertyIsEnumerableModule = __webpack_require__(63);
+var propertyIsEnumerableModule = __webpack_require__(65);
 var createPropertyDescriptor = __webpack_require__(21);
 var toIndexedObject = __webpack_require__(22);
 var toPrimitive = __webpack_require__(31);
 var has = __webpack_require__(6);
-var IE8_DOM_DEFINE = __webpack_require__(64);
+var IE8_DOM_DEFINE = __webpack_require__(66);
 
 var nativeGetOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
 
@@ -1132,7 +1132,7 @@ module.exports = function (key, value) {
 /* 43 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var store = __webpack_require__(65);
+var store = __webpack_require__(67);
 
 var functionToString = Function.toString;
 
@@ -1150,8 +1150,8 @@ module.exports = store.inspectSource;
 /* 44 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var shared = __webpack_require__(66);
-var uid = __webpack_require__(67);
+var shared = __webpack_require__(68);
+var uid = __webpack_require__(69);
 
 var keys = shared('keys');
 
@@ -1397,10 +1397,10 @@ module.exports = function (key) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
-var defineProperties = __webpack_require__(73);
+var defineProperties = __webpack_require__(75);
 var enumBugKeys = __webpack_require__(48);
 var hiddenKeys = __webpack_require__(45);
-var html = __webpack_require__(75);
+var html = __webpack_require__(77);
 var documentCreateElement = __webpack_require__(41);
 var sharedKey = __webpack_require__(44);
 
@@ -1481,7 +1481,7 @@ module.exports = Object.create || function create(O, Properties) {
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
-var userAgent = __webpack_require__(81);
+var userAgent = __webpack_require__(83);
 
 var process = global.process;
 var versions = process && process.versions;
@@ -1567,7 +1567,7 @@ module.exports = function (it, Constructor, name) {
 
 var charAt = __webpack_require__(60).charAt;
 var InternalStateModule = __webpack_require__(16);
-var defineIterator = __webpack_require__(76);
+var defineIterator = __webpack_require__(78);
 
 var STRING_ITERATOR = 'String Iterator';
 var setInternalState = InternalStateModule.set;
@@ -1657,29 +1657,335 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGT
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(29);
+
+__webpack_require__(18);
+
+__webpack_require__(19);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Tile = __webpack_require__(30);
+
+var Match = /*#__PURE__*/function () {
+  "use strict";
+
+  function Match() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Match);
+
+    if (config.exposed === undefined) {
+      throw "Must specify either true or false for config.exposed. ";
+    }
+
+    if (config.amount < 2 || config.amount > 4) {
+      throw "config.mount must be either 2, 3, or 4. ";
+    }
+
+    this.type = config.type;
+    this.value = config.value;
+    this.amount = config.amount;
+    this.exposed = config.exposed;
+
+    this.getComponentTile = function () {
+      return new Tile({
+        type: this.type,
+        value: this.value
+      });
+    };
+
+    this.getPoints = function (userWind) {
+      var points = 0;
+
+      if (["bamboo", "character", "circle"].includes(this.type)) {
+        points = 2;
+
+        if (this.value === 1 || this.value === 9) {
+          points *= 2;
+
+          if (this.amount === 2) {
+            return 2;
+          } //This is a pair. It's worth 2 points
+
+        }
+
+        if (this.amount === 2) {
+          return 0;
+        } //Worthless pair
+
+      } else {
+        points = 4; //Either wind or dragon. 4 points for pong.
+
+        if (this.amount === 2) {
+          if (this.type === "wind" && this.value !== userWind) {
+            return 0;
+          } //Not own wind. Worthless pair.
+
+
+          return 2; //2 points for pair.
+        }
+      }
+
+      if (this.amount === 4) {
+        points *= 4;
+      } //Kongs worth 4 times as much as pongs.
+
+
+      if (!exposed) {
+        points *= 2;
+      } //In hand worth 4 times as much.
+
+
+      return points;
+    };
+
+    this.isDouble = function (userWind) {
+      if (this.amount === 2) {
+        return false;
+      } //Pairs never give doubles.
+
+
+      if (this.type === "dragon") {
+        return true;
+      }
+
+      if (this.type === "wind" && this.value === userWind) {
+        return true;
+      }
+
+      return false;
+    };
+
+    Object.defineProperty(this, "tiles", {
+      get: function getTiles() {
+        var arr = [];
+
+        for (var i = 0; i < this.amount; i++) {
+          arr.push(new Tile({
+            value: this.value,
+            amount: this.amount
+          }));
+        }
+
+        return arr;
+      }
+    });
+    Object.defineProperty(this, "isPair", {
+      get: function isPair() {
+        if (this.amount === 2) {
+          return true;
+        }
+
+        return false;
+      }
+    });
+    Object.defineProperty(this, "isPongOrKong", {
+      get: function isPongOrKong() {
+        if (this.amount >= 3) {
+          return true;
+        }
+
+        return false;
+      }
+    });
+
+    this.toJSON = function () {
+      var obj = {};
+      obj.class = "Match";
+      obj.type = this.type;
+      obj.value = this.value;
+      obj.amount = this.amount;
+      obj.exposed = this.exposed;
+      return JSON.stringify(obj);
+    }.bind(this);
+
+    this.isSequence = false;
+  }
+
+  _createClass(Match, null, [{
+    key: "isValidMatch",
+    value: function isValidMatch(tiles) {
+      //Confirm that the tiles all match.
+      //Note that if two tiles are equal, that means they are the same tile, just referenced twice. That is not a valid match, however we currently do not check for that.
+      for (var i = 0; i < tiles.length; i++) {
+        if (!tiles[0].matches(tiles[i])) {
+          return false;
+        }
+      }
+
+      return true;
+    }
+  }, {
+    key: "fromJSON",
+    value: function fromJSON(str) {
+      var obj = JSON.parse(str);
+
+      if (obj.class !== "Match") {
+        throw "String was not created by Match.toJSON()";
+      }
+
+      return new Match(obj);
+    }
+  }]);
+
+  return Match;
+}();
+
+module.exports = Match;
+
+/***/ }),
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(29);
+
+__webpack_require__(61);
+
+__webpack_require__(105);
+
+__webpack_require__(18);
+
+__webpack_require__(19);
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var Tile = __webpack_require__(30);
+
+var Sequence = /*#__PURE__*/function () {
+  "use strict";
+
+  function Sequence() {
+    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, Sequence);
+
+    if (config.exposed === undefined) {
+      throw "config.exposed must not be undefined. ";
+    }
+
+    this.isDouble = function (userWind) {
+      return false;
+    };
+
+    this.getPoints = function () {
+      return 0;
+    };
+
+    if (!config.tiles instanceof Array) {
+      throw "config.tiles must be an array of Tiles";
+    }
+
+    if (!isValidSequence(tiles)) {
+      throw "config.tiles is not a valid sequence. ";
+    }
+
+    this.tiles = config.tiles; //Sort the sequence.
+
+    this.tiles = this.tiles.sort(function (tile1, tile2) {
+      return tile1.value - tile2.value;
+    });
+    this.exposed = exposed;
+    this.isSequence = true;
+    this.isPongOrKong = false;
+    this.isPair = false;
+
+    this.toJSON = function () {
+      var obj = {};
+      obj.class = "Sequence";
+      obj.exposed = this.exposed;
+      obj.tiles = this.tiles;
+      return JSON.stringify(obj);
+    }.bind(this);
+  }
+
+  _createClass(Sequence, null, [{
+    key: "isValidSequence",
+    value: function isValidSequence(tiles) {
+      var type = tiles[0].type;
+      var values = [];
+
+      if (!["bamboo", "character", "circle"].includes(type)) {
+        return false;
+      } //Sort the sequence.
+
+
+      tiles = tiles.sort(function (tile1, tile2) {
+        return tile1.value - tile2.value;
+      });
+
+      for (var i = 1; i < tiles.length; i++) {
+        var tile = tiles[i];
+
+        if (tile.type !== type) {
+          return false;
+        } //Tiles are not the same suit.
+
+
+        if (Math.abs(tiles[i - 1].value - tile.value) !== 1) {
+          return false;
+        } //Tiles are not in a sequence. There is a difference between the values that is not 1.
+
+      }
+
+      return true;
+    }
+  }, {
+    key: "fromJSON",
+    value: function fromJSON(str) {
+      var obj = JSON.parse(str);
+
+      if (obj.class !== "Sequence") {
+        throw "String was not created by Sequence.toJSON()";
+      }
+
+      obj.tiles = obj.tiles.map(function (tileString) {
+        return Tile.fromJSON(tileString);
+      });
+      return new Sequence(obj);
+    }
+  }]);
+
+  return Sequence;
+}();
+
+module.exports = Sequence;
+
+/***/ }),
+/* 64 */
+/***/ (function(module, exports, __webpack_require__) {
+
 __webpack_require__(20);
 
 __webpack_require__(33);
 
-__webpack_require__(80);
-
 __webpack_require__(82);
 
-__webpack_require__(119);
+__webpack_require__(84);
+
+__webpack_require__(120);
 
 __webpack_require__(37);
 
 __webpack_require__(59);
 
-__webpack_require__(90);
+__webpack_require__(92);
 
 __webpack_require__(28);
 
-__webpack_require__(94);
+__webpack_require__(96);
 
-__webpack_require__(95);
+__webpack_require__(97);
 
-__webpack_require__(136);
+__webpack_require__(137);
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -1697,7 +2003,7 @@ var StateManager = /*#__PURE__*/function () {
   function StateManager(websocketURL) {
     _classCallCheck(this, StateManager);
 
-    //This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting. 
+    //This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting.
     var onmessage = function onmessage(message) {
       console.log(message.data);
       var obj = JSON.parse(message.data);
@@ -1909,11 +2215,12 @@ var StateManager = /*#__PURE__*/function () {
       }));
     };
 
-    this.placeTiles = function (roomId) {
+    this.placeTiles = function (tiles) {
       this.sendMessage(JSON.stringify({
         type: "roomActionPlaceTiles",
         clientId: window.clientId,
-        roomId: roomId
+        roomId: window.stateManager.roomId,
+        message: tiles
       }));
     };
 
@@ -2098,7 +2405,7 @@ StateManager.setClientId(StateManager.getClientId());
 module.exports = StateManager;
 
 /***/ }),
-/* 63 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2118,7 +2425,7 @@ exports.f = NASHORN_BUG ? function propertyIsEnumerable(V) {
 
 
 /***/ }),
-/* 64 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var DESCRIPTORS = __webpack_require__(7);
@@ -2134,7 +2441,7 @@ module.exports = !DESCRIPTORS && !fails(function () {
 
 
 /***/ }),
-/* 65 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
@@ -2147,11 +2454,11 @@ module.exports = store;
 
 
 /***/ }),
-/* 66 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var IS_PURE = __webpack_require__(23);
-var store = __webpack_require__(65);
+var store = __webpack_require__(67);
 
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
@@ -2163,7 +2470,7 @@ var store = __webpack_require__(65);
 
 
 /***/ }),
-/* 67 */
+/* 69 */
 /***/ (function(module, exports) {
 
 var id = 0;
@@ -2175,7 +2482,7 @@ module.exports = function (key) {
 
 
 /***/ }),
-/* 68 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var has = __webpack_require__(6);
@@ -2198,14 +2505,14 @@ module.exports = function (object, names) {
 
 
 /***/ }),
-/* 69 */
+/* 71 */
 /***/ (function(module, exports) {
 
 exports.f = Object.getOwnPropertySymbols;
 
 
 /***/ }),
-/* 70 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var fails = __webpack_require__(2);
@@ -2232,7 +2539,7 @@ module.exports = isForced;
 
 
 /***/ }),
-/* 71 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2252,7 +2559,7 @@ module.exports = (!STRICT_METHOD || !USES_TO_LENGTH) ? function forEach(callback
 
 
 /***/ }),
-/* 72 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var fails = __webpack_require__(2);
@@ -2265,13 +2572,13 @@ module.exports = !!Object.getOwnPropertySymbols && !fails(function () {
 
 
 /***/ }),
-/* 73 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var DESCRIPTORS = __webpack_require__(7);
 var definePropertyModule = __webpack_require__(14);
 var anObject = __webpack_require__(4);
-var objectKeys = __webpack_require__(74);
+var objectKeys = __webpack_require__(76);
 
 // `Object.defineProperties` method
 // https://tc39.github.io/ecma262/#sec-object.defineproperties
@@ -2287,10 +2594,10 @@ module.exports = DESCRIPTORS ? Object.defineProperties : function defineProperti
 
 
 /***/ }),
-/* 74 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var internalObjectKeys = __webpack_require__(68);
+var internalObjectKeys = __webpack_require__(70);
 var enumBugKeys = __webpack_require__(48);
 
 // `Object.keys` method
@@ -2301,7 +2608,7 @@ module.exports = Object.keys || function keys(O) {
 
 
 /***/ }),
-/* 75 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getBuiltIn = __webpack_require__(17);
@@ -2310,22 +2617,22 @@ module.exports = getBuiltIn('document', 'documentElement');
 
 
 /***/ }),
-/* 76 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $ = __webpack_require__(3);
-var createIteratorConstructor = __webpack_require__(77);
-var getPrototypeOf = __webpack_require__(79);
-var setPrototypeOf = __webpack_require__(116);
+var createIteratorConstructor = __webpack_require__(79);
+var getPrototypeOf = __webpack_require__(81);
+var setPrototypeOf = __webpack_require__(117);
 var setToStringTag = __webpack_require__(27);
 var createNonEnumerableProperty = __webpack_require__(8);
 var redefine = __webpack_require__(10);
 var wellKnownSymbol = __webpack_require__(0);
 var IS_PURE = __webpack_require__(23);
 var Iterators = __webpack_require__(26);
-var IteratorsCore = __webpack_require__(78);
+var IteratorsCore = __webpack_require__(80);
 
 var IteratorPrototype = IteratorsCore.IteratorPrototype;
 var BUGGY_SAFARI_ITERATORS = IteratorsCore.BUGGY_SAFARI_ITERATORS;
@@ -2407,12 +2714,12 @@ module.exports = function (Iterable, NAME, IteratorConstructor, next, DEFAULT, I
 
 
 /***/ }),
-/* 77 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var IteratorPrototype = __webpack_require__(78).IteratorPrototype;
+var IteratorPrototype = __webpack_require__(80).IteratorPrototype;
 var create = __webpack_require__(54);
 var createPropertyDescriptor = __webpack_require__(21);
 var setToStringTag = __webpack_require__(27);
@@ -2430,12 +2737,12 @@ module.exports = function (IteratorConstructor, NAME, next) {
 
 
 /***/ }),
-/* 78 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var getPrototypeOf = __webpack_require__(79);
+var getPrototypeOf = __webpack_require__(81);
 var createNonEnumerableProperty = __webpack_require__(8);
 var has = __webpack_require__(6);
 var wellKnownSymbol = __webpack_require__(0);
@@ -2474,13 +2781,13 @@ module.exports = {
 
 
 /***/ }),
-/* 79 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var has = __webpack_require__(6);
 var toObject = __webpack_require__(12);
 var sharedKey = __webpack_require__(44);
-var CORRECT_PROTOTYPE_GETTER = __webpack_require__(115);
+var CORRECT_PROTOTYPE_GETTER = __webpack_require__(116);
 
 var IE_PROTO = sharedKey('IE_PROTO');
 var ObjectPrototype = Object.prototype;
@@ -2497,7 +2804,7 @@ module.exports = CORRECT_PROTOTYPE_GETTER ? Object.getPrototypeOf : function (O)
 
 
 /***/ }),
-/* 80 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2574,7 +2881,7 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGT
 
 
 /***/ }),
-/* 81 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getBuiltIn = __webpack_require__(17);
@@ -2583,12 +2890,12 @@ module.exports = getBuiltIn('navigator', 'userAgent') || '';
 
 
 /***/ }),
-/* 82 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var TO_STRING_TAG_SUPPORT = __webpack_require__(56);
 var redefine = __webpack_require__(10);
-var toString = __webpack_require__(118);
+var toString = __webpack_require__(119);
 
 // `Object.prototype.toString` method
 // https://tc39.github.io/ecma262/#sec-object.prototype.tostring
@@ -2598,7 +2905,7 @@ if (!TO_STRING_TAG_SUPPORT) {
 
 
 /***/ }),
-/* 83 */
+/* 85 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var redefine = __webpack_require__(10);
@@ -2610,7 +2917,7 @@ module.exports = function (target, src, options) {
 
 
 /***/ }),
-/* 84 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var wellKnownSymbol = __webpack_require__(0);
@@ -2626,7 +2933,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 85 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
@@ -2645,7 +2952,7 @@ module.exports = function (iterator, fn, value, ENTRIES) {
 
 
 /***/ }),
-/* 86 */
+/* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
@@ -2664,16 +2971,16 @@ module.exports = function (O, defaultConstructor) {
 
 
 /***/ }),
-/* 87 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
 var fails = __webpack_require__(2);
 var classof = __webpack_require__(9);
 var bind = __webpack_require__(24);
-var html = __webpack_require__(75);
+var html = __webpack_require__(77);
 var createElement = __webpack_require__(41);
-var IS_IOS = __webpack_require__(88);
+var IS_IOS = __webpack_require__(90);
 
 var location = global.location;
 var set = global.setImmediate;
@@ -2777,16 +3084,16 @@ module.exports = {
 
 
 /***/ }),
-/* 88 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var userAgent = __webpack_require__(81);
+var userAgent = __webpack_require__(83);
 
 module.exports = /(iphone|ipod|ipad).*applewebkit/i.test(userAgent);
 
 
 /***/ }),
-/* 89 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2811,16 +3118,16 @@ module.exports.f = function (C) {
 
 
 /***/ }),
-/* 90 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
-var fixRegExpWellKnownSymbolLogic = __webpack_require__(91);
+var fixRegExpWellKnownSymbolLogic = __webpack_require__(93);
 var anObject = __webpack_require__(4);
 var requireObjectCoercible = __webpack_require__(13);
-var sameValue = __webpack_require__(130);
-var regExpExec = __webpack_require__(92);
+var sameValue = __webpack_require__(131);
+var regExpExec = __webpack_require__(94);
 
 // @@search logic
 fixRegExpWellKnownSymbolLogic('search', 1, function (SEARCH, nativeSearch, maybeCallNative) {
@@ -2852,7 +3159,7 @@ fixRegExpWellKnownSymbolLogic('search', 1, function (SEARCH, nativeSearch, maybe
 
 
 /***/ }),
-/* 91 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2984,7 +3291,7 @@ module.exports = function (KEY, length, exec, sham) {
 
 
 /***/ }),
-/* 92 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var classof = __webpack_require__(9);
@@ -3012,7 +3319,7 @@ module.exports = function (R, S) {
 
 
 /***/ }),
-/* 93 */
+/* 95 */
 /***/ (function(module, exports) {
 
 // iterable DOM collections
@@ -3053,11 +3360,11 @@ module.exports = {
 
 
 /***/ }),
-/* 94 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
-var DOMIterables = __webpack_require__(93);
+var DOMIterables = __webpack_require__(95);
 var ArrayIteratorMethods = __webpack_require__(33);
 var createNonEnumerableProperty = __webpack_require__(8);
 var wellKnownSymbol = __webpack_require__(0);
@@ -3092,7 +3399,7 @@ for (var COLLECTION_NAME in DOMIterables) {
 
 
 /***/ }),
-/* 95 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3101,18 +3408,18 @@ for (var COLLECTION_NAME in DOMIterables) {
 __webpack_require__(59);
 var $ = __webpack_require__(3);
 var DESCRIPTORS = __webpack_require__(7);
-var USE_NATIVE_URL = __webpack_require__(96);
+var USE_NATIVE_URL = __webpack_require__(98);
 var global = __webpack_require__(1);
-var defineProperties = __webpack_require__(73);
+var defineProperties = __webpack_require__(75);
 var redefine = __webpack_require__(10);
 var anInstance = __webpack_require__(58);
 var has = __webpack_require__(6);
-var assign = __webpack_require__(131);
-var arrayFrom = __webpack_require__(132);
+var assign = __webpack_require__(132);
+var arrayFrom = __webpack_require__(133);
 var codeAt = __webpack_require__(60).codeAt;
-var toASCII = __webpack_require__(133);
+var toASCII = __webpack_require__(134);
 var setToStringTag = __webpack_require__(27);
-var URLSearchParamsModule = __webpack_require__(134);
+var URLSearchParamsModule = __webpack_require__(135);
 var InternalStateModule = __webpack_require__(16);
 
 var NativeURL = global.URL;
@@ -4106,7 +4413,7 @@ $({ global: true, forced: !USE_NATIVE_URL, sham: !DESCRIPTORS }, {
 
 
 /***/ }),
-/* 96 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var fails = __webpack_require__(2);
@@ -4145,7 +4452,7 @@ module.exports = !fails(function () {
 
 
 /***/ }),
-/* 97 */
+/* 99 */
 /***/ (function(module, exports) {
 
 // a string of all valid unicode whitespaces
@@ -4154,7 +4461,85 @@ module.exports = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u
 
 
 /***/ }),
-/* 98 */
+/* 100 */
+/***/ (function(module, exports) {
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Notification = function Notification(errorText, messageText) {
+  "use strict";
+
+  _classCallCheck(this, Notification);
+
+  var cover = document.createElement("div");
+  cover.id = "errorPopupCover";
+  cover.style.display = "none";
+  document.body.appendChild(cover);
+  var popup = document.createElement("div");
+  popup.id = "errorPopup";
+  cover.appendChild(popup);
+  var error = document.createElement("p");
+  error.innerHTML = errorText;
+  error.id = "errorText";
+  popup.appendChild(error);
+  var message = document.createElement("p");
+  message.innerHTML = messageText;
+  message.id = "messageText";
+  popup.appendChild(message);
+  var dismissButton = document.createElement("button");
+  dismissButton.id = "dismissButton";
+  dismissButton.innerHTML = "Dismiss";
+  popup.appendChild(dismissButton);
+
+  var dismiss = function dismiss(ev) {
+    if (this.ondismissed) {
+      this.ondismissed();
+    }
+
+    cover.remove();
+  }.bind(this); //Prevent people from accidentally closing the message before they can read it.
+
+
+  setTimeout(function () {
+    dismissButton.addEventListener("click", dismiss);
+    cover.addEventListener("click", function (event) {
+      if (event.target === cover) {
+        dismiss();
+      }
+    });
+  }, 500);
+
+  this.show = function () {
+    cover.style.display = "";
+  };
+};
+
+var MessageBar = function MessageBar(text) {
+  "use strict";
+
+  _classCallCheck(this, MessageBar);
+
+  var bar = document.createElement("div");
+  bar.id = "notificationBar";
+  var textHolder = document.createElement("p");
+  textHolder.innerHTML = text;
+  bar.appendChild(textHolder);
+
+  this.show = function (duration) {
+    document.body.appendChild(bar);
+    setTimeout(function () {
+      bar.remove();
+    }, duration);
+  };
+};
+
+module.exports = {
+  Notification: Notification,
+  MessageBar: MessageBar
+};
+
+/***/ }),
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4221,7 +4606,7 @@ $({ target: 'Array', proto: true, forced: FORCED }, {
 
 
 /***/ }),
-/* 99 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4250,7 +4635,7 @@ $({ target: 'Array', proto: true, forced: NEGATIVE_ZERO || !STRICT_METHOD || !US
 
 
 /***/ }),
-/* 100 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4306,7 +4691,7 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGT
 
 
 /***/ }),
-/* 101 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(5);
@@ -4324,7 +4709,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 102 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -4363,302 +4748,7 @@ $({ target: 'Array', proto: true, forced: FORCED }, {
 
 
 /***/ }),
-/* 103 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(29);
-
-__webpack_require__(18);
-
-__webpack_require__(19);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var Tile = __webpack_require__(30);
-
-var Match = /*#__PURE__*/function () {
-  "use strict";
-
-  function Match() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Match);
-
-    if (config.exposed === undefined) {
-      throw "Must specify either true or false for config.exposed. ";
-    }
-
-    if (config.amount < 2 || config.amount > 4) {
-      throw "config.mount must be either 2, 3, or 4. ";
-    }
-
-    this.type = config.type;
-    this.value = config.value;
-    this.amount = config.amount;
-    this.exposed = config.exposed;
-
-    this.getPoints = function (userWind) {
-      var points = 0;
-
-      if (["bamboo", "character", "circle"].includes(this.type)) {
-        points = 2;
-
-        if (this.value === 1 || this.value === 9) {
-          points *= 2;
-
-          if (this.amount === 2) {
-            return 2;
-          } //This is a pair. It's worth 2 points
-
-        }
-
-        if (this.amount === 2) {
-          return 0;
-        } //Worthless pair
-
-      } else {
-        points = 4; //Either wind or dragon. 4 points for pong.
-
-        if (this.amount === 2) {
-          if (this.type === "wind" && this.value !== userWind) {
-            return 0;
-          } //Not own wind. Worthless pair.
-
-
-          return 2; //2 points for pair.
-        }
-      }
-
-      if (this.amount === 4) {
-        points *= 4;
-      } //Kongs worth 4 times as much as pongs.
-
-
-      if (!exposed) {
-        points *= 2;
-      } //In hand worth 4 times as much.
-
-
-      return points;
-    };
-
-    this.isDouble = function (userWind) {
-      if (this.amount === 2) {
-        return false;
-      } //Pairs never give doubles.
-
-
-      if (this.type === "dragon") {
-        return true;
-      }
-
-      if (this.type === "wind" && this.value === userWind) {
-        return true;
-      }
-
-      return false;
-    };
-
-    Object.defineProperty(this, "tiles", {
-      get: function getTiles() {
-        var arr = [];
-
-        for (var i = 0; i < this.amount; i++) {
-          arr.push(new Tile({
-            value: this.value,
-            amount: this.amount
-          }));
-        }
-
-        return arr;
-      }
-    });
-    Object.defineProperty(this, "isPair", {
-      get: function isPair() {
-        if (this.amount === 2) {
-          return true;
-        }
-
-        return false;
-      }
-    });
-    Object.defineProperty(this, "isPongOrKong", {
-      get: function isPongOrKong() {
-        if (this.amount >= 3) {
-          return true;
-        }
-
-        return false;
-      }
-    });
-
-    this.toJSON = function () {
-      var obj = {};
-      obj.class = "Match";
-      obj.type = this.type;
-      obj.value = this.value;
-      obj.amount = this.amount;
-      obj.exposed = this.exposed;
-      return JSON.stringify(obj);
-    }.bind(this);
-
-    this.isSequence = false;
-  }
-
-  _createClass(Match, null, [{
-    key: "isValidMatch",
-    value: function isValidMatch(tiles) {
-      //Confirm that the tiles all match.
-      //Note that if two tiles are equal, that means they are the same tile, just referenced twice. That is not a valid match, however we currently do not check for that.
-      for (var i = 0; i < tiles.length; i++) {
-        if (!tiles[0].matches(tiles[i])) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-  }, {
-    key: "fromJSON",
-    value: function fromJSON(str) {
-      var obj = JSON.parse(str);
-
-      if (obj.class !== "Match") {
-        throw "String was not created by Match.toJSON()";
-      }
-
-      return new Match(obj);
-    }
-  }]);
-
-  return Match;
-}();
-
-module.exports = Match;
-
-/***/ }),
-/* 104 */
-/***/ (function(module, exports, __webpack_require__) {
-
-__webpack_require__(29);
-
-__webpack_require__(61);
-
-__webpack_require__(102);
-
-__webpack_require__(18);
-
-__webpack_require__(19);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-var Tile = __webpack_require__(30);
-
-var Sequence = /*#__PURE__*/function () {
-  "use strict";
-
-  function Sequence() {
-    var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
-
-    _classCallCheck(this, Sequence);
-
-    if (config.exposed === undefined) {
-      throw "config.exposed must not be undefined. ";
-    }
-
-    this.isDouble = function (userWind) {
-      return false;
-    };
-
-    this.getPoints = function () {
-      return 0;
-    };
-
-    if (!config.tiles instanceof Array) {
-      throw "config.tiles must be an array of Tiles";
-    }
-
-    this.tiles = config.tiles; //Sort the sequence.
-
-    this.tiles = this.tiles.sort(function (tile1, tile2) {
-      return tile1.value - tile2.value;
-    });
-    this.exposed = exposed;
-    this.isSequence = true;
-    this.isPongOrKong = false;
-    this.isPair = false;
-
-    this.toJSON = function () {
-      var obj = {};
-      obj.class = "Sequence";
-      obj.exposed = this.exposed;
-      obj.tiles = this.tiles;
-      return JSON.stringify(obj);
-    }.bind(this);
-  }
-
-  _createClass(Sequence, null, [{
-    key: "isValidSequence",
-    value: function isValidSequence(tiles) {
-      var type = tiles[0].type;
-      var values = [];
-
-      if (!["bamboo", "character", "circle"].includes(type)) {
-        return false;
-      } //Sort the sequence.
-
-
-      tiles = tiles.sort(function (tile1, tile2) {
-        return tile1.value - tile2.value;
-      });
-
-      for (var i = 1; i < tiles.length; i++) {
-        var tile = tiles[i];
-
-        if (tile.type !== type) {
-          return false;
-        } //Tiles are not the same suit.
-
-
-        if (Math.abs(tiles[i - 1].value - tile.value) !== 1) {
-          return false;
-        } //Tiles are not in a sequence. There is a difference between the values that is not 1.
-
-      }
-
-      return true;
-    }
-  }, {
-    key: "fromJSON",
-    value: function fromJSON(str) {
-      var obj = JSON.parse(str);
-
-      if (obj.class !== "Sequence") {
-        throw "String was not created by Sequence.toJSON()";
-      }
-
-      obj.tiles = obj.tiles.map(function (tileString) {
-        return Tile.fromJSON(tileString);
-      });
-      return new Sequence(obj);
-    }
-  }]);
-
-  return Sequence;
-}();
-
-module.exports = Sequence;
-
-/***/ }),
-/* 105 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(29);
@@ -4737,7 +4827,7 @@ var Pretty = /*#__PURE__*/function () {
 module.exports = Pretty;
 
 /***/ }),
-/* 106 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 (function (global, factory) {
@@ -4949,17 +5039,17 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 
 /***/ }),
-/* 107 */
+/* 108 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(106);
+/* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(107);
 /* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_0__);
-var StateManager = __webpack_require__(62); //Mobile browsers use the touch API - desktop is drag and drop. We'll use a polyfill so we don't have to implement both.
+var StateManager = __webpack_require__(64); //Mobile browsers use the touch API - desktop is drag and drop. We'll use a polyfill so we don't have to implement both.
 
 
-var mobile_drag_drop_polyfill = __webpack_require__(137).polyfill; // optional import of scroll behaviour
+var mobile_drag_drop_polyfill = __webpack_require__(138).polyfill; // optional import of scroll behaviour
 
 
  // options are optional ;)
@@ -4971,7 +5061,7 @@ mobile_drag_drop_polyfill({
 var websocketURL = "ws:127.0.0.1:3000";
 window.stateManager = new StateManager(websocketURL);
 
-var roomManager = __webpack_require__(138);
+var roomManager = __webpack_require__(139);
 
 var gameBoard = __webpack_require__(143); //While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
 //See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
@@ -4991,7 +5081,7 @@ window.addEventListener('touchmove', function () {}, {
 });
 
 /***/ }),
-/* 108 */
+/* 109 */
 /***/ (function(module, exports) {
 
 var g;
@@ -5017,7 +5107,7 @@ module.exports = g;
 
 
 /***/ }),
-/* 109 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
@@ -5029,11 +5119,11 @@ module.exports = typeof WeakMap === 'function' && /native code/.test(inspectSour
 
 
 /***/ }),
-/* 110 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var has = __webpack_require__(6);
-var ownKeys = __webpack_require__(111);
+var ownKeys = __webpack_require__(112);
 var getOwnPropertyDescriptorModule = __webpack_require__(39);
 var definePropertyModule = __webpack_require__(14);
 
@@ -5049,12 +5139,12 @@ module.exports = function (target, source) {
 
 
 /***/ }),
-/* 111 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var getBuiltIn = __webpack_require__(17);
-var getOwnPropertyNamesModule = __webpack_require__(113);
-var getOwnPropertySymbolsModule = __webpack_require__(69);
+var getOwnPropertyNamesModule = __webpack_require__(114);
+var getOwnPropertySymbolsModule = __webpack_require__(71);
 var anObject = __webpack_require__(4);
 
 // all object keys, includes non-enumerable and symbols
@@ -5066,7 +5156,7 @@ module.exports = getBuiltIn('Reflect', 'ownKeys') || function ownKeys(it) {
 
 
 /***/ }),
-/* 112 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
@@ -5075,10 +5165,10 @@ module.exports = global;
 
 
 /***/ }),
-/* 113 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var internalObjectKeys = __webpack_require__(68);
+var internalObjectKeys = __webpack_require__(70);
 var enumBugKeys = __webpack_require__(48);
 
 var hiddenKeys = enumBugKeys.concat('length', 'prototype');
@@ -5091,10 +5181,10 @@ exports.f = Object.getOwnPropertyNames || function getOwnPropertyNames(O) {
 
 
 /***/ }),
-/* 114 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var NATIVE_SYMBOL = __webpack_require__(72);
+var NATIVE_SYMBOL = __webpack_require__(74);
 
 module.exports = NATIVE_SYMBOL
   // eslint-disable-next-line no-undef
@@ -5104,7 +5194,7 @@ module.exports = NATIVE_SYMBOL
 
 
 /***/ }),
-/* 115 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var fails = __webpack_require__(2);
@@ -5117,11 +5207,11 @@ module.exports = !fails(function () {
 
 
 /***/ }),
-/* 116 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
-var aPossiblePrototype = __webpack_require__(117);
+var aPossiblePrototype = __webpack_require__(118);
 
 // `Object.setPrototypeOf` method
 // https://tc39.github.io/ecma262/#sec-object.setprototypeof
@@ -5147,7 +5237,7 @@ module.exports = Object.setPrototypeOf || ('__proto__' in {} ? function () {
 
 
 /***/ }),
-/* 117 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var isObject = __webpack_require__(5);
@@ -5160,7 +5250,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 118 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5176,7 +5266,7 @@ module.exports = TO_STRING_TAG_SUPPORT ? {}.toString : function toString() {
 
 
 /***/ }),
-/* 119 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5185,27 +5275,27 @@ var $ = __webpack_require__(3);
 var IS_PURE = __webpack_require__(23);
 var global = __webpack_require__(1);
 var getBuiltIn = __webpack_require__(17);
-var NativePromise = __webpack_require__(120);
+var NativePromise = __webpack_require__(121);
 var redefine = __webpack_require__(10);
-var redefineAll = __webpack_require__(83);
+var redefineAll = __webpack_require__(85);
 var setToStringTag = __webpack_require__(27);
-var setSpecies = __webpack_require__(121);
+var setSpecies = __webpack_require__(122);
 var isObject = __webpack_require__(5);
 var aFunction = __webpack_require__(25);
 var anInstance = __webpack_require__(58);
 var classof = __webpack_require__(9);
 var inspectSource = __webpack_require__(43);
-var iterate = __webpack_require__(122);
-var checkCorrectnessOfIteration = __webpack_require__(123);
-var speciesConstructor = __webpack_require__(86);
-var task = __webpack_require__(87).set;
-var microtask = __webpack_require__(124);
-var promiseResolve = __webpack_require__(125);
-var hostReportErrors = __webpack_require__(126);
-var newPromiseCapabilityModule = __webpack_require__(89);
-var perform = __webpack_require__(127);
+var iterate = __webpack_require__(123);
+var checkCorrectnessOfIteration = __webpack_require__(124);
+var speciesConstructor = __webpack_require__(88);
+var task = __webpack_require__(89).set;
+var microtask = __webpack_require__(125);
+var promiseResolve = __webpack_require__(126);
+var hostReportErrors = __webpack_require__(127);
+var newPromiseCapabilityModule = __webpack_require__(91);
+var perform = __webpack_require__(128);
 var InternalStateModule = __webpack_require__(16);
-var isForced = __webpack_require__(70);
+var isForced = __webpack_require__(72);
 var wellKnownSymbol = __webpack_require__(0);
 var V8_VERSION = __webpack_require__(55);
 
@@ -5562,7 +5652,7 @@ $({ target: PROMISE, stat: true, forced: INCORRECT_ITERATION }, {
 
 
 /***/ }),
-/* 120 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
@@ -5571,7 +5661,7 @@ module.exports = global.Promise;
 
 
 /***/ }),
-/* 121 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5597,15 +5687,15 @@ module.exports = function (CONSTRUCTOR_NAME) {
 
 
 /***/ }),
-/* 122 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
-var isArrayIteratorMethod = __webpack_require__(84);
+var isArrayIteratorMethod = __webpack_require__(86);
 var toLength = __webpack_require__(11);
 var bind = __webpack_require__(24);
 var getIteratorMethod = __webpack_require__(36);
-var callWithSafeIterationClosing = __webpack_require__(85);
+var callWithSafeIterationClosing = __webpack_require__(87);
 
 var Result = function (stopped, result) {
   this.stopped = stopped;
@@ -5646,7 +5736,7 @@ iterate.stop = function (result) {
 
 
 /***/ }),
-/* 123 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var wellKnownSymbol = __webpack_require__(0);
@@ -5690,14 +5780,14 @@ module.exports = function (exec, SKIP_CLOSING) {
 
 
 /***/ }),
-/* 124 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
 var getOwnPropertyDescriptor = __webpack_require__(39).f;
 var classof = __webpack_require__(9);
-var macrotask = __webpack_require__(87).set;
-var IS_IOS = __webpack_require__(88);
+var macrotask = __webpack_require__(89).set;
+var IS_IOS = __webpack_require__(90);
 
 var MutationObserver = global.MutationObserver || global.WebKitMutationObserver;
 var process = global.process;
@@ -5774,12 +5864,12 @@ module.exports = queueMicrotask || function (fn) {
 
 
 /***/ }),
-/* 125 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
 var isObject = __webpack_require__(5);
-var newPromiseCapability = __webpack_require__(89);
+var newPromiseCapability = __webpack_require__(91);
 
 module.exports = function (C, x) {
   anObject(C);
@@ -5792,7 +5882,7 @@ module.exports = function (C, x) {
 
 
 /***/ }),
-/* 126 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var global = __webpack_require__(1);
@@ -5806,7 +5896,7 @@ module.exports = function (a, b) {
 
 
 /***/ }),
-/* 127 */
+/* 128 */
 /***/ (function(module, exports) {
 
 module.exports = function (exec) {
@@ -5819,7 +5909,7 @@ module.exports = function (exec) {
 
 
 /***/ }),
-/* 128 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5842,7 +5932,7 @@ module.exports = function () {
 
 
 /***/ }),
-/* 129 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -5872,7 +5962,7 @@ exports.BROKEN_CARET = fails(function () {
 
 
 /***/ }),
-/* 130 */
+/* 131 */
 /***/ (function(module, exports) {
 
 // `SameValue` abstract operation
@@ -5884,16 +5974,16 @@ module.exports = Object.is || function is(x, y) {
 
 
 /***/ }),
-/* 131 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var DESCRIPTORS = __webpack_require__(7);
 var fails = __webpack_require__(2);
-var objectKeys = __webpack_require__(74);
-var getOwnPropertySymbolsModule = __webpack_require__(69);
-var propertyIsEnumerableModule = __webpack_require__(63);
+var objectKeys = __webpack_require__(76);
+var getOwnPropertySymbolsModule = __webpack_require__(71);
+var propertyIsEnumerableModule = __webpack_require__(65);
 var toObject = __webpack_require__(12);
 var IndexedObject = __webpack_require__(40);
 
@@ -5943,15 +6033,15 @@ module.exports = !nativeAssign || fails(function () {
 
 
 /***/ }),
-/* 132 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var bind = __webpack_require__(24);
 var toObject = __webpack_require__(12);
-var callWithSafeIterationClosing = __webpack_require__(85);
-var isArrayIteratorMethod = __webpack_require__(84);
+var callWithSafeIterationClosing = __webpack_require__(87);
+var isArrayIteratorMethod = __webpack_require__(86);
 var toLength = __webpack_require__(11);
 var createProperty = __webpack_require__(34);
 var getIteratorMethod = __webpack_require__(36);
@@ -5991,7 +6081,7 @@ module.exports = function from(arrayLike /* , mapfn = undefined, thisArg = undef
 
 
 /***/ }),
-/* 133 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6166,7 +6256,7 @@ module.exports = function (input) {
 
 
 /***/ }),
-/* 134 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6175,11 +6265,11 @@ module.exports = function (input) {
 __webpack_require__(33);
 var $ = __webpack_require__(3);
 var getBuiltIn = __webpack_require__(17);
-var USE_NATIVE_URL = __webpack_require__(96);
+var USE_NATIVE_URL = __webpack_require__(98);
 var redefine = __webpack_require__(10);
-var redefineAll = __webpack_require__(83);
+var redefineAll = __webpack_require__(85);
 var setToStringTag = __webpack_require__(27);
-var createIteratorConstructor = __webpack_require__(77);
+var createIteratorConstructor = __webpack_require__(79);
 var InternalStateModule = __webpack_require__(16);
 var anInstance = __webpack_require__(58);
 var hasOwn = __webpack_require__(6);
@@ -6189,7 +6279,7 @@ var anObject = __webpack_require__(4);
 var isObject = __webpack_require__(5);
 var create = __webpack_require__(54);
 var createPropertyDescriptor = __webpack_require__(21);
-var getIterator = __webpack_require__(135);
+var getIterator = __webpack_require__(136);
 var getIteratorMethod = __webpack_require__(36);
 var wellKnownSymbol = __webpack_require__(0);
 
@@ -6520,7 +6610,7 @@ module.exports = {
 
 
 /***/ }),
-/* 135 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var anObject = __webpack_require__(4);
@@ -6535,7 +6625,7 @@ module.exports = function (it) {
 
 
 /***/ }),
-/* 136 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /**
@@ -7270,7 +7360,7 @@ try {
 
 
 /***/ }),
-/* 137 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*! mobile-drag-drop 2.3.0-rc.1 | Copyright (c) 2019 Tim Ruffles | MIT License */
@@ -7278,30 +7368,30 @@ try {
 //# sourceMappingURL=index.min.js.map
 
 /***/ }),
-/* 138 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(20);
 
 __webpack_require__(33);
 
-__webpack_require__(82);
+__webpack_require__(84);
 
 __webpack_require__(37);
 
 __webpack_require__(59);
 
-__webpack_require__(90);
+__webpack_require__(92);
 
-__webpack_require__(139);
+__webpack_require__(140);
 
 __webpack_require__(28);
 
-__webpack_require__(94);
+__webpack_require__(96);
 
-__webpack_require__(95);
+__webpack_require__(97);
 
-var Popups = __webpack_require__(142); //Allow the user to join and create rooms.
+var Popups = __webpack_require__(100); //Allow the user to join and create rooms.
 
 
 var roomManager = document.createElement("div");
@@ -7482,7 +7572,7 @@ window.stateManager.onCreateRoom = function (obj) {
 window.stateManager.onLeaveRoom = function (obj) {
   exitRoom(); //We left the room. Change clientId.
 
-  var StateManager = __webpack_require__(62);
+  var StateManager = __webpack_require__(64);
 
   StateManager.setClientId(StateManager.createNewClientId());
   new Popups.Notification("Out of Room", obj.message).show();
@@ -7552,14 +7642,14 @@ if (params.has("clientId")) {
 module.exports = roomManager;
 
 /***/ }),
-/* 139 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 var $ = __webpack_require__(3);
-var $trim = __webpack_require__(140).trim;
-var forcedStringTrimMethod = __webpack_require__(141);
+var $trim = __webpack_require__(141).trim;
+var forcedStringTrimMethod = __webpack_require__(142);
 
 // `String.prototype.trim` method
 // https://tc39.github.io/ecma262/#sec-string.prototype.trim
@@ -7571,11 +7661,11 @@ $({ target: 'String', proto: true, forced: forcedStringTrimMethod('trim') }, {
 
 
 /***/ }),
-/* 140 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var requireObjectCoercible = __webpack_require__(13);
-var whitespaces = __webpack_require__(97);
+var whitespaces = __webpack_require__(99);
 
 var whitespace = '[' + whitespaces + ']';
 var ltrim = RegExp('^' + whitespace + whitespace + '*');
@@ -7605,11 +7695,11 @@ module.exports = {
 
 
 /***/ }),
-/* 141 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var fails = __webpack_require__(2);
-var whitespaces = __webpack_require__(97);
+var whitespaces = __webpack_require__(99);
 
 var non = '\u200B\u0085\u180E';
 
@@ -7623,96 +7713,18 @@ module.exports = function (METHOD_NAME) {
 
 
 /***/ }),
-/* 142 */
-/***/ (function(module, exports) {
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var Notification = function Notification(errorText, messageText) {
-  "use strict";
-
-  _classCallCheck(this, Notification);
-
-  var cover = document.createElement("div");
-  cover.id = "errorPopupCover";
-  cover.style.display = "none";
-  document.body.appendChild(cover);
-  var popup = document.createElement("div");
-  popup.id = "errorPopup";
-  cover.appendChild(popup);
-  var error = document.createElement("p");
-  error.innerHTML = errorText;
-  error.id = "errorText";
-  popup.appendChild(error);
-  var message = document.createElement("p");
-  message.innerHTML = messageText;
-  message.id = "messageText";
-  popup.appendChild(message);
-  var dismissButton = document.createElement("button");
-  dismissButton.id = "dismissButton";
-  dismissButton.innerHTML = "Dismiss";
-  popup.appendChild(dismissButton);
-
-  var dismiss = function dismiss(ev) {
-    if (this.ondismissed) {
-      this.ondismissed();
-    }
-
-    cover.remove();
-  }.bind(this); //Prevent people from accidentally closing the message before they can read it.
-
-
-  setTimeout(function () {
-    dismissButton.addEventListener("click", dismiss);
-    cover.addEventListener("click", function (event) {
-      if (event.target === cover) {
-        dismiss();
-      }
-    });
-  }, 500);
-
-  this.show = function () {
-    cover.style.display = "";
-  };
-};
-
-var MessageBar = function MessageBar(text) {
-  "use strict";
-
-  _classCallCheck(this, MessageBar);
-
-  var bar = document.createElement("div");
-  bar.id = "notificationBar";
-  var textHolder = document.createElement("p");
-  textHolder.innerHTML = text;
-  bar.appendChild(textHolder);
-
-  this.show = function (duration) {
-    document.body.appendChild(bar);
-    setTimeout(function () {
-      bar.remove();
-    }, duration);
-  };
-};
-
-module.exports = {
-  Notification: Notification,
-  MessageBar: MessageBar
-};
-
-/***/ }),
 /* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(98);
+__webpack_require__(101);
 
 __webpack_require__(20);
 
 __webpack_require__(29);
 
-__webpack_require__(99);
+__webpack_require__(102);
 
-__webpack_require__(100);
+__webpack_require__(103);
 
 __webpack_require__(144);
 
@@ -7723,6 +7735,12 @@ var Tile = __webpack_require__(30);
 var Hand = __webpack_require__(147);
 
 var Wall = __webpack_require__(149);
+
+var Popups = __webpack_require__(100);
+
+var Sequence = __webpack_require__(63);
+
+var Match = __webpack_require__(62);
 
 var gameBoard = document.createElement("div");
 gameBoard.id = "gameBoard";
@@ -7826,8 +7844,8 @@ if (fullscreenControls.toggleElement) {
 }
 
 window.Tile = Tile;
-window.Sequence = __webpack_require__(104);
-window.Match = __webpack_require__(103);
+window.Sequence = __webpack_require__(63);
+window.Match = __webpack_require__(62);
 
 function createTilePlacemat() {
   var tilePlacemat = document.createElement("div");
@@ -7841,7 +7859,48 @@ var placeTilesButton = document.createElement("button");
 placeTilesButton.id = "placeTilesButton";
 placeTilesButton.innerHTML = "Place Tiles";
 gameBoard.appendChild(placeTilesButton);
-placeTilesButton.addEventListener("click", function () {});
+placeTilesButton.addEventListener("click", function () {
+  var placement = userHand.inPlacemat;
+  console.log(placement);
+
+  if (placement.length === 0) {
+    new Popups.Notification("Place Nothing???", "We suggest glasses. ").show();
+    return;
+  } //Now we need to create a Sequence, Match, or just Tile
+
+
+  if (placement.length > 1) {
+    try {
+      var sequence = new Sequence({
+        exposed: true,
+        tiles: placement
+      });
+      placement = sequence;
+    } catch (e) {
+      if (Match.isValidMatch(placement)) {
+        placement = new Match({
+          exposed: true,
+          amount: placement.length,
+          type: placement[0].type,
+          value: placement[0].value
+        });
+      } else {
+        new Popups.Notification("Placement Error", "Unable to create a sequence, or match. Please check your tiles. ").show();
+        return;
+      }
+    }
+  }
+
+  console.log(placement);
+  window.stateManager.placeTiles(placement);
+});
+
+window.stateManager.onPlaceTiles = function (obj) {
+  if (obj.status === "error") {
+    new Popups.Notification("Error Placing Tiles", obj.message).show();
+  }
+};
+
 var nextTurnButton = document.createElement("button");
 nextTurnButton.id = "nextTurnButton";
 gameBoard.appendChild(nextTurnButton);
@@ -7954,7 +8013,7 @@ $({ target: 'String', proto: true, forced: !correctIsRegExpLogic('includes') }, 
 /* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var isRegExp = __webpack_require__(101);
+var isRegExp = __webpack_require__(104);
 
 module.exports = function (it) {
   if (isRegExp(it)) {
@@ -7988,7 +8047,7 @@ module.exports = function (METHOD_NAME) {
 /* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(98);
+__webpack_require__(101);
 
 __webpack_require__(148);
 
@@ -7996,15 +8055,15 @@ __webpack_require__(20);
 
 __webpack_require__(29);
 
-__webpack_require__(99);
+__webpack_require__(102);
 
 __webpack_require__(61);
 
-__webpack_require__(100);
+__webpack_require__(103);
 
-__webpack_require__(102);
+__webpack_require__(105);
 
-__webpack_require__(80);
+__webpack_require__(82);
 
 __webpack_require__(18);
 
@@ -8020,11 +8079,11 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Tile = __webpack_require__(30);
 
-var Match = __webpack_require__(103);
+var Match = __webpack_require__(62);
 
-var Sequence = __webpack_require__(104);
+var Sequence = __webpack_require__(63);
 
-var Pretty = __webpack_require__(105);
+var Pretty = __webpack_require__(106);
 
 var Hand = /*#__PURE__*/function () {
   "use strict";
@@ -8103,6 +8162,10 @@ var Hand = /*#__PURE__*/function () {
       var exposedTiles = [];
       this.contents.forEach(function (item) {
         if (item.exposed) {
+          exposedTiles.push(item);
+        } else if (item instanceof Match && item.amount === 4) {
+          //If it is stored as a match, but not exposed, is in hand kong.
+          //Is not stored as a match if the user never placed them downw
           exposedTiles.push(item);
         } else if (includeFaceDown) {
           exposedTiles.push(new Tile({
@@ -8375,7 +8438,9 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.getStringContents = function () {
-      return JSON.parse(this.toJSON()).contents; //Could be more effecient.
+      var prop = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "contents";
+      //Can also pass "inPlacemat" for placemat contents.
+      return JSON.parse(JSON.stringify(this[prop]));
     }.bind(this);
 
     this.toJSON = function () {
@@ -8570,7 +8635,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var Tile = __webpack_require__(30);
 
-var Pretty = __webpack_require__(105);
+var Pretty = __webpack_require__(106);
 
 var Wall = /*#__PURE__*/function () {
   "use strict";
@@ -8710,14 +8775,14 @@ module.exports = Wall;
 
 "use strict";
 
-var fixRegExpWellKnownSymbolLogic = __webpack_require__(91);
-var isRegExp = __webpack_require__(101);
+var fixRegExpWellKnownSymbolLogic = __webpack_require__(93);
+var isRegExp = __webpack_require__(104);
 var anObject = __webpack_require__(4);
 var requireObjectCoercible = __webpack_require__(13);
-var speciesConstructor = __webpack_require__(86);
+var speciesConstructor = __webpack_require__(88);
 var advanceStringIndex = __webpack_require__(151);
 var toLength = __webpack_require__(11);
-var callRegExpExec = __webpack_require__(92);
+var callRegExpExec = __webpack_require__(94);
 var regexpExec = __webpack_require__(38);
 var fails = __webpack_require__(2);
 

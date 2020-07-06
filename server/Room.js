@@ -1,6 +1,8 @@
 const Wall = require("../src/Wall.js")
 const Hand = require("../src/Hand.js")
 const Tile = require("../src/Tile.js")
+const Match = require("../src/Match.js")
+const Sequence = require("../src/Sequence.js")
 
 class Room {
 	constructor(roomId, options = {}) {
@@ -46,14 +48,15 @@ class Room {
 					isHost: (currentClientId === this.hostClientId)
 				}
 				if (this.inGame) {
+					let hand = this.gameData.playerHands[currentClientId]
 					if (requestingClientId === currentClientId) {
 						//One can see all of their own tiles.
-						visibleClientState.hand = this.gameData.playerHands[currentClientId]
+						visibleClientState.hand = hand
 					}
 					else {
 						//One can only see exposed tiles of other players. True says to include other tiles as face down.
-						visibleClientState.visibleHand = this.gameData.playerHands[currentClientId].getExposedTiles(true)
-						visibleClientState.wind = this.gameData.playerHands[currentClientId].wind
+						visibleClientState.visibleHand = hand.getExposedTiles(true)
+						visibleClientState.wind = hand.wind
 					}
 				}
 				state.clients.push(visibleClientState)
@@ -118,6 +121,20 @@ class Room {
 			})
 		}).bind(this)
 
+		let drawTile = (function drawTile(clientId, last = false) {
+			let tile;
+			while (!(tile instanceof Tile)) {
+				if (last) {
+					tile = this.gameData.wall.drawLast()
+				}
+				else {
+					tile = this.gameData.wall.drawFirst()
+				}
+				if (!tile) {console.log("Wall Empty");return} //TODO: Game over. Wall empty.
+				this.gameData.playerHands[clientId].add(tile)
+			}
+		}).bind(this)
+
 		//TODO: We'll eventually need to do charleston.
 		this.startGame = (function(messageKey) {
 			if (this.clientIds.length !== 4) {return "Not Enough Clients"}
@@ -128,20 +145,6 @@ class Room {
 				this.gameData.wall = new Wall()
 
 				//Build the player hands.
-				let drawTile = (function drawTile(clientId, last = false) {
-					let tile;
-					while (!(tile instanceof Tile)) {
-						if (last) {
-							tile = this.gameData.wall.drawLast()
-						}
-						else {
-							tile = this.gameData.wall.drawFirst()
-						}
-						if (!tile) {console.log("Wall Empty");return} //TODO: Game over. Wall empty.
-						this.gameData.playerHands[clientId].add(tile)
-					}
-				}).bind(this)
-
 				//For now, we will randomly assign winds.
 				let winds = ["north", "east", "south", "west"]
 				let eastWindPlayerId;
@@ -183,13 +186,91 @@ class Room {
 			this.messageAll(messageKey, gameEndMessage, "success")
 		}).bind(this)
 
+		function removeTilesFromHand(hand, obj, amount = 1) {
+			//We will verify that the tiles CAN be removed before removing them.
+			//TODO: Need to handle sequences. 
+			let contents = hand.getStringContents()
+			let toRemove = obj.toJSON()
+
+			let indexes = []
+			contents.forEach((str, index) => {
+				if (toRemove === str) {indexes.push(index)}
+			})
+
+			if (indexes.length >= amount) {
+				for (let i=0;i<amount;i++) {
+					hand.contents.splice(indexes[indexes.length - 1 - i], 1) //Remove the item the farthest back in the hand to avoid position shifting.
+				}
+				return true
+			}
+			else {return false}
+		}
+
 		this.onPlace = (function(obj, clientId) {
-			if (this.currentTurn.userTurn !== clientId) {
-				return global.stateManager.getClient(clientId).message(obj.type, "Can Only Place on Turn", "error")
+			//Obj.message - a Tile, Match, or Sequence
+			console.log(obj, clientId)
+
+			let placement;
+			try {
+				console.log(obj.message)
+				placement = Hand.convertStringsToTiles([obj.message])[0]
+			}
+			catch (e) {
+				return global.stateManager.getClient(clientId).message(obj.type, "Error: " + e.message, "error")
 			}
 			//The users wishes to place down tiles.
 			//If it is not their turn, we will hold until all other players have either attempted to place or nexted.
 			//Then we will apply priority.
+
+			if (this.gameData.currentTurn.thrown === false) {
+				if (clientId !== this.gameData.currentTurn.userTurn) {
+					//This player is not allowed to perform any actions at this stage.
+					return global.stateManager.getClient(clientId).message(obj.type, "Can't place after draw before throw", "error")
+				}
+				if (placement instanceof Tile) {
+					//Place tile.
+					if (removeTilesFromHand(this.gameData.playerHands[clientId], placement)) {
+						//Tile thrown
+						this.gameData.currentTurn.thrown = placement
+						sendStateToClients()
+						console.log("Throw")
+					}
+					else {
+						return global.stateManager.getClient(clientId).message(obj.type, "You can't place a tile you do not possess", "error")
+					}
+				}
+				else if (placement instanceof Match) {
+					if (placement.amount === 4) {
+						let hand = this.gameData.playerHands[clientId]
+						if (removeTilesFromHand(hand, placement.getComponentTile(), 4)) {
+							//Place Kong. Turn remains the same, thrown false.
+							hand.contents.push(placement)
+							//This must be an in hand kong, therefore we do not expose, although in hand kongs will be shown.
+							placement.exposed = false
+							//Draw them another tile.
+							drawTile(clientId, true) //Draw from back of wall.
+							sendStateToClients()
+							console.log("Kong")
+						}
+						else {
+							return global.stateManager.getClient(clientId).message(obj.type, "You can't place tiles you do not possess", "error")
+						}
+					}
+					else {
+						//TODO: Check if this placement would make the user mahjong, and if so, allow it.
+						return global.stateManager.getClient(clientId).message(obj.type, "Can't expose in hand pong, sequence, or pair before mahjong", "error")
+					}
+				}
+				else {
+					return global.stateManager.getClient(clientId).message(obj.type, "Invalid placement attempt for current game status", "error")
+				}
+			}
+			else {
+				//Complicated priority management...
+				console.log("Non implemented. ")
+			}
+
+
 		}).bind(this)
 
 		this.onNext = (function(obj, clientId) {
@@ -247,7 +328,7 @@ class Room {
 				})
 				global.stateManager.deleteRoom(this.roomId)
 			}
-			else if (obj.type === "roomActionPlace") {
+			else if (obj.type === "roomActionPlaceTiles") {
 				//Action to place tiles.
 				//Only current turn user can place.
 				return this.onPlace(obj, clientId)

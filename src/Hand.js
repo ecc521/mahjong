@@ -66,6 +66,11 @@ class Hand {
 				if (item.exposed) {
 					exposedTiles.push(item)
 				}
+				else if (item instanceof Match && item.amount === 4) {
+					//If it is stored as a match, but not exposed, is in hand kong.
+					//Is not stored as a match if the user never placed them downw
+					exposedTiles.push(item)
+				}
 				else if (includeFaceDown) {
 					exposedTiles.push(new Tile({faceDown: true}))
 				}
@@ -314,8 +319,9 @@ class Hand {
 			}
 		}).bind(this)
 
-		this.getStringContents = (function() {
-			return JSON.parse(this.toJSON()).contents //Could be more effecient.
+		this.getStringContents = (function(prop = "contents") {
+			//Can also pass "inPlacemat" for placemat contents.
+			return JSON.parse(JSON.stringify(this[prop]))
 		}).bind(this)
 
 		this.toJSON = (function() {

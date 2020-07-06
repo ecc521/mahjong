@@ -1,7 +1,7 @@
 class StateManager {
 	constructor(websocketURL) {
 
-		//This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting. 
+		//This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting.
 		let onmessage = (function onmessage(message) {
 			console.log(message.data)
 			let obj = JSON.parse(message.data)
@@ -134,11 +134,12 @@ class StateManager {
 			}))
 		}
 
-		this.placeTiles = function(roomId) {
+		this.placeTiles = function(tiles) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionPlaceTiles",
 				clientId: window.clientId,
-				roomId,
+				roomId: window.stateManager.roomId,
+				message: tiles,
 			}))
 		}
 

@@ -8,6 +8,10 @@ class Sequence {
 		this.getPoints = function() {return 0}
 
 		if (!config.tiles instanceof Array) {throw "config.tiles must be an array of Tiles"}
+		if (!isValidSequence(tiles)) {
+			throw "config.tiles is not a valid sequence. "
+		}
+
 		this.tiles = config.tiles
 
 		//Sort the sequence.

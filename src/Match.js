@@ -12,6 +12,13 @@ class Match {
 		this.amount = config.amount
 		this.exposed = config.exposed
 
+		this.getComponentTile = function() {
+			return new Tile({
+				type: this.type,
+				value: this.value
+			})
+		}
+
 		this.getPoints = function(userWind) {
 
 			let points = 0;
