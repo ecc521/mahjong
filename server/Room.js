@@ -29,6 +29,134 @@ class Room {
 		else {this.gameData.playerHands = {}}
 
 
+		let turnChoicesProxyHandler = {
+			set: (function(obj, prop, value) {
+				obj[prop] = value
+				//The user can never pick up their own discard tile, hence is always "Next"
+				obj[this.gameData.currentTurn.userTurn] = "Next"
+
+				let windOrder = ["north", "east", "south", "west"]
+				let throwerWind = this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind
+
+				function getBackwardsDistance(placerWind, throwerWind) {
+					//total is the distance backwards from the placer to the thrower.
+					let i = windOrder.indexOf(placerWind)
+					let total = 0;
+					while (windOrder[i] !== throwerWind) {
+						total++;
+						i--;
+						if (i===-1) {
+							i=windOrder.length-1
+						}
+					}
+					return total
+				}
+
+				if (Object.keys(obj).length === 4) {
+					//TODO: Handle this turn, and begin the next one.
+					let priorityList = []
+					for (let key in obj) {
+						if (obj[key] !== "Next") {
+							//TODO: Need mahjong priority, which will also override sequence restrictions.
+							let priority;
+							if (obj[key] instanceof Match) {
+								priority = 104;
+								let placerWind = this.gameData.playerHands[key].wind
+								//Add priority based on position to thrower. The closer to the thrower, the highest priority.
+								let total = getBackwardsDistance(placerWind, throwerWind)
+								console.log(total)
+								priority -= total
+							}
+							else if (obj[key] instanceof Sequence) {
+								//Verify that the user is the one immediently before.
+								if (getBackwardsDistance(placerWind, throwerWind) > 1) {
+									console.log("Greater than one person distance on sequence. Denied. ")
+									continue;
+								}
+								priority = 99
+							}
+							else {
+								//???
+								priority = 98
+							}
+							priorityList.push([priority, key])
+						}
+					}
+
+					//If anybody attempted to place, time to process them.
+					let utilized = false; //Did we use the thrown tile?
+					if (priorityList.length !== 0) {
+						//Sort highest to lowest
+						priorityList.sort((a, b) => {return b[0] - a[0]})
+						for (let i=0;i<priorityList.length;i++) {
+							let clientId = priorityList[i][1]
+							let placement = obj[clientId]
+							//If placement succeeds, switch userTurn
+							if (obj instanceof Sequence) {
+								//Confirm that the sequence uses the thrown tile.
+								let valid = false
+								obj.tiles.forEach((tile) => {
+									if (tile.value === this.gameData.currentTurn.thrown.value && tile.type === this.gameData.currentTurn.thrown.type) {valid = true}
+								})
+								if (valid) {
+									let hand = this.gameData.playerHands[clientId]
+									hand.add(this.gameData.currentTurn.thrown)
+									if (removeSequenceFromHand(hand, obj)) {
+										utilized = true
+										hand.add(obj)
+										this.gameData.currentTurn.userTurn = clientId
+									}
+									else {
+										hand.remove(this.gameData.currentTurn.thrown)
+									}
+								}
+							}
+							else if (obj instanceof Match) {
+								//Confirm that the match uses the thrown tile
+								if (obj.value === this.gameData.currentTurn.thrown.value && obj.type === this.gameData.currentTurn.thrown.type) {
+									let hand = this.gameData.playerHands[clientId]
+									hand.add(this.gameData.currentTurn.thrown)
+									if (removeTilesFromHand(hand, obj)) {
+										utilized = true
+										hand.add(obj)
+										this.gameData.currentTurn.userTurn = clientId
+									}
+									else {
+										hand.remove(this.gameData.currentTurn.thrown)
+									}
+								}
+							}
+						}
+					}
+
+					if (utilized === false) {
+						this.gameData.discardPile.push(this.gameData.currentTurn.thrown)
+						//Shift to next player, draw them a tile.
+						let nextWind = windOrder[windOrder.indexOf(this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind) + 1]
+						if (nextWind === undefined) {nextWind = "north"}
+
+						for (let clientId in this.gameData.playerHands) {
+							let hand = this.gameData.playerHands[clientId]
+							if (hand.wind === nextWind) {
+								this.gameData.currentTurn.userTurn = clientId
+								drawTile(clientId)
+							}
+						}
+					}
+					this.gameData.currentTurn.thrown = false
+
+					//Clear the object.
+					for (let key in obj) {delete obj[key]}
+				}
+
+				return true
+			}).bind(this)
+		}
+
+		if (this.gameData.currentTurn && this.gameData.currentTurn.turnChoices) {
+			this.gameData.currentTurn.turnChoices = new Proxy(this.gameData.currentTurn.turnChoices, turnChoicesProxyHandler)
+		}
+
 		let getState = (function getState(requestingClientId) {
 			//Generate the game state visible to requestingClientId
 			let state = {}
@@ -38,7 +166,15 @@ class Room {
 				state.wallTiles = this.gameData.wall.tiles.length
 			}
 
-			state.currentTurn = this.gameData.currentTurn
+			state.discardPile = this.gameData.discardPile
+
+			if (this.gameData.currentTurn) {
+				state.currentTurn = {
+					thrown: this.gameData.currentTurn.thrown,
+					userTurn: this.gameData.currentTurn.userTurn,
+					playersReady: Object.keys(this.gameData.currentTurn.turnChoices || {})
+				}
+			}
 
 			state.clients = []
 			this.clientIds.forEach((currentClientId) => {
@@ -143,6 +279,7 @@ class Room {
 				this.messageAll(messageKey, "Game Started", "success")
 				//Build the wall.
 				this.gameData.wall = new Wall()
+				this.gameData.discardPile = []
 
 				//Build the player hands.
 				//For now, we will randomly assign winds.
@@ -171,6 +308,7 @@ class Room {
 					userTurn: eastWindPlayerId
 				}
 
+				this.gameData.currentTurn.turnChoices = new Proxy({}, turnChoicesProxyHandler);
 				sendStateToClients()
 			}
 		}).bind(this)
@@ -188,7 +326,6 @@ class Room {
 
 		function removeTilesFromHand(hand, obj, amount = 1) {
 			//We will verify that the tiles CAN be removed before removing them.
-			//TODO: Need to handle sequences. 
 			let contents = hand.getStringContents()
 			let toRemove = obj.toJSON()
 
@@ -206,6 +343,29 @@ class Room {
 			else {return false}
 		}
 
+		function removeSequenceFromHand(hand, sequence) {
+			//We will verify that the tiles CAN be removed before removing them.
+			let contents = hand.getStringContents()
+			let indexes = []
+			JSON.parse(JSON.stringify(sequence.tiles)).forEach((str, index) => {
+				for (let i=contents.length-1;i>=0;i--) {
+					if (contents[i] === str) {
+						indexes[index] = i
+						return
+					}
+				}
+			})
+
+			if (indexes[0] && indexes[1] && indexes[2]) {
+				//Remove the item the farthest back in the hand to avoid position shifting.
+				indexes.sort((a,b) => {return b-a}).forEach((index) => {
+					hand.contents.splice(index, 1)
+				})
+				return true
+			}
+			else {return false}
+		}
+
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
 			console.log(obj, clientId)
@@ -213,7 +373,26 @@ class Room {
 			let placement;
 			try {
 				console.log(obj.message)
-				placement = Hand.convertStringsToTiles([obj.message])[0]
+				placement = Hand.convertStringsToTiles(obj.message)
+
+				//We can skip this section during charleston, as multiple non-matching tiles are allowed.
+				if (placement.length > 1) {
+					try {
+						let sequence = new Sequence({exposed: true, tiles: placement})
+						placement = sequence
+					}
+					catch (e) {
+						if (Match.isValidMatch(placement)) {
+							placement = new Match({exposed: true, amount: placement.length, type: placement[0].type, value: placement[0].value})
+						}
+						else {
+							return global.stateManager.getClient(clientId).message(obj.type, "Unable to create a sequence, or match. Please check your tiles. ", "error")
+						}
+					}
+				}
+				else {
+					placement = placement[0]
+				}
 			}
 			catch (e) {
 				return global.stateManager.getClient(clientId).message(obj.type, "Error: " + e.message, "error")
@@ -228,7 +407,7 @@ class Room {
 					return global.stateManager.getClient(clientId).message(obj.type, "Can't place after draw before throw", "error")
 				}
 				if (placement instanceof Tile) {
-					//Place tile.
+					//This is a discard.
 					if (removeTilesFromHand(this.gameData.playerHands[clientId], placement)) {
 						//Tile thrown
 						this.gameData.currentTurn.thrown = placement
@@ -257,7 +436,7 @@ class Room {
 						}
 					}
 					else {
-						//TODO: Check if this placement would make the user mahjong, and if so, allow it.
+						//TODO: Check if this placement would make the user mahjong, and if so, end the game.
 						return global.stateManager.getClient(clientId).message(obj.type, "Can't expose in hand pong, sequence, or pair before mahjong", "error")
 					}
 				}
@@ -266,15 +445,20 @@ class Room {
 				}
 			}
 			else {
-				//Complicated priority management...
-				console.log("Non implemented. ")
+				//This is not a discard, and it related to a throw, so must either be a pong, kong, sequence, or a pair if the user is going mahjong.
+				if (!(placement instanceof Match || placement instanceof Sequence)) {
+					return global.stateManager.getClient(clientId).message(obj.type, "You can't discard when it is not your turn", "error")
+				}
+				//Schedule the order. It's validity will be checked later.
+				console.log("Scheduling")
+				this.gameData.currentTurn.turnChoices[clientId] = placement
+				sendStateToClients()
 			}
-
-
 		}).bind(this)
 
 		this.onNext = (function(obj, clientId) {
-
+			this.gameData.currentTurn.turnChoices[clientId] = "Next"
+			sendStateToClients()
 		}).bind(this)
 
 		this.onIncomingMessage = (function(clientId, obj) {
@@ -333,7 +517,7 @@ class Room {
 				//Only current turn user can place.
 				return this.onPlace(obj, clientId)
 			}
-			else if (obj.type === "roomActionNext") {
+			else if (obj.type === "roomActionNextTurn") {
 				//Action to state next turn.
 				return this.onNext(obj, clientId)
 			}

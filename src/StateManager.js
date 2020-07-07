@@ -143,6 +143,14 @@ class StateManager {
 			}))
 		}
 
+		this.nextTurn = function() {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionNextTurn",
+				clientId: window.clientId,
+				roomId: window.stateManager.roomId
+			}))
+		}
+
 		this.getCurrentRoom = (function() {
 			//Get our room.
 			this.sendMessage(JSON.stringify({

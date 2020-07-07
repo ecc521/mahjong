@@ -49,12 +49,11 @@ class Hand {
 
 		this.remove = (function(obj) {
 			let index = this.contents.findIndex((value) => {return value === obj})
-			if (index) {
+			let placematIndex = this.inPlacemat.findIndex((value) => {return value === obj})
+			if (index !== -1) {
 				this.contents.splice(index, 1)
 			}
-
-			let placematIndex = this.inPlacemat.findIndex((value) => {return value === obj})
-			if (placematIndex) {
+			else if (placematIndex !== -1) {
 				this.inPlacemat.splice(placematIndex, 1)
 			}
 			else {throw obj + " does not exist in hand. "}
@@ -117,7 +116,7 @@ class Hand {
 			}
 
 			//Remove the things in currentContents but not in syncContents
-			let tempContents = this.contents.slice(0) //We are cloning the array, however the referenced objects remain the same.
+			let tempContents = this.contents.slice(0).concat(this.inPlacemat.slice(0)) //We are cloning the array, however the referenced objects remain the same.
 			//This prevents us from having to adjust indexes for items when we remove other items.
 			for (let i=0;i<currentContentsStrings.length;i++) {
 				let item = currentContentsStrings[i]

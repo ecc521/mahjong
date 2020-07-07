@@ -127,23 +127,6 @@ placeTilesButton.addEventListener("click", function() {
 		return;
 	}
 
-	//Now we need to create a Sequence, Match, or just Tile
-	if (placement.length > 1) {
-		try {
-			let sequence = new Sequence({exposed: true, tiles: placement})
-			placement = sequence
-		}
-		catch (e) {
-			if (Match.isValidMatch(placement)) {
-				placement = new Match({exposed: true, amount: placement.length, type: placement[0].type, value: placement[0].value})
-			}
-			else {
-				new Popups.Notification("Placement Error", "Unable to create a sequence, or match. Please check your tiles. ").show()
-				return;
-			}
-		}
-	}
-
 	console.log(placement)
 	window.stateManager.placeTiles(placement)
 })
@@ -160,7 +143,7 @@ nextTurnButton.id = "nextTurnButton"
 gameBoard.appendChild(nextTurnButton)
 
 nextTurnButton.addEventListener("click", function() {
-
+	window.stateManager.nextTurn()
 })
 
 let wallRendering = document.createElement("div")
@@ -240,11 +223,14 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	userHand.renderPlacemat()
 	if (message.currentTurn && message.currentTurn.thrown) {
 		//The person has thrown their tile. Waiting on players to ready.
-		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady + "/4)"
-		nextTurnButton.disabled = message.currentTurn.usersReady.includes(window.clientId)?"disabled":""
+		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)"
+		nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
+		placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
 	}
 	else {
 		nextTurnButton.disabled = "disabled"
+		nextTurnButton.innerHTML = ""
+		placeTilesButton.disabled = ""
 		//The person has not yet thrown a tile.
 		if (message.currentTurn.userTurn === window.clientId) {
 			userHand.renderPlacemat("pending")

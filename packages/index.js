@@ -2224,6 +2224,14 @@ var StateManager = /*#__PURE__*/function () {
       }));
     };
 
+    this.nextTurn = function () {
+      this.sendMessage(JSON.stringify({
+        type: "roomActionNextTurn",
+        clientId: window.clientId,
+        roomId: window.stateManager.roomId
+      }));
+    };
+
     this.getCurrentRoom = function () {
       //Get our room.
       this.sendMessage(JSON.stringify({
@@ -7866,29 +7874,6 @@ placeTilesButton.addEventListener("click", function () {
   if (placement.length === 0) {
     new Popups.Notification("Place Nothing???", "We suggest glasses. ").show();
     return;
-  } //Now we need to create a Sequence, Match, or just Tile
-
-
-  if (placement.length > 1) {
-    try {
-      var sequence = new Sequence({
-        exposed: true,
-        tiles: placement
-      });
-      placement = sequence;
-    } catch (e) {
-      if (Match.isValidMatch(placement)) {
-        placement = new Match({
-          exposed: true,
-          amount: placement.length,
-          type: placement[0].type,
-          value: placement[0].value
-        });
-      } else {
-        new Popups.Notification("Placement Error", "Unable to create a sequence, or match. Please check your tiles. ").show();
-        return;
-      }
-    }
   }
 
   console.log(placement);
@@ -7904,7 +7889,9 @@ window.stateManager.onPlaceTiles = function (obj) {
 var nextTurnButton = document.createElement("button");
 nextTurnButton.id = "nextTurnButton";
 gameBoard.appendChild(nextTurnButton);
-nextTurnButton.addEventListener("click", function () {});
+nextTurnButton.addEventListener("click", function () {
+  window.stateManager.nextTurn();
+});
 var wallRendering = document.createElement("div");
 wallRendering.id = "wall";
 gameBoard.appendChild(wallRendering);
@@ -7976,10 +7963,13 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
 
   if (message.currentTurn && message.currentTurn.thrown) {
     //The person has thrown their tile. Waiting on players to ready.
-    nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady + "/4)";
-    nextTurnButton.disabled = message.currentTurn.usersReady.includes(window.clientId) ? "disabled" : "";
+    nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)";
+    nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId) ? "disabled" : "";
+    placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId) ? "disabled" : "";
   } else {
-    nextTurnButton.disabled = "disabled"; //The person has not yet thrown a tile.
+    nextTurnButton.disabled = "disabled";
+    nextTurnButton.innerHTML = "";
+    placeTilesButton.disabled = ""; //The person has not yet thrown a tile.
 
     if (message.currentTurn.userTurn === window.clientId) {
       userHand.renderPlacemat("pending");
@@ -8141,16 +8131,13 @@ var Hand = /*#__PURE__*/function () {
       var index = this.contents.findIndex(function (value) {
         return value === obj;
       });
-
-      if (index) {
-        this.contents.splice(index, 1);
-      }
-
       var placematIndex = this.inPlacemat.findIndex(function (value) {
         return value === obj;
       });
 
-      if (placematIndex) {
+      if (index !== -1) {
+        this.contents.splice(index, 1);
+      } else if (placematIndex !== -1) {
         this.inPlacemat.splice(placematIndex, 1);
       } else {
         throw obj + " does not exist in hand. ";
@@ -8212,7 +8199,7 @@ var Hand = /*#__PURE__*/function () {
       } //Remove the things in currentContents but not in syncContents
 
 
-      var tempContents = this.contents.slice(0); //We are cloning the array, however the referenced objects remain the same.
+      var tempContents = this.contents.slice(0).concat(this.inPlacemat.slice(0)); //We are cloning the array, however the referenced objects remain the same.
       //This prevents us from having to adjust indexes for items when we remove other items.
 
       for (var _i2 = 0; _i2 < currentContentsStrings.length; _i2++) {
