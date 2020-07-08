@@ -48,6 +48,7 @@ class Hand {
 		}).bind(this)
 
 		this.remove = (function(obj) {
+			console.log(obj)
 			let index = this.contents.findIndex((value) => {return value === obj})
 			let placematIndex = this.inPlacemat.findIndex((value) => {return value === obj})
 			if (index !== -1) {
@@ -84,11 +85,13 @@ class Hand {
 			let currentContentsStrings = [];
 			let syncContentsStrings = [];
 
+			console.log(this.contents.length)
 			this.contents.forEach((item) => {
 				currentContentsStrings.push(item.toJSON())
 			})
-
+			console.log(this.inPlacemat.length)
 			this.inPlacemat.forEach((item) => {
+				if (item.evicting) {return}
 				currentContentsStrings.push(item.toJSON())
 			})
 
@@ -106,6 +109,15 @@ class Hand {
 				}
 			}
 
+			//Save tempContents now, because we add items to the array later, and they mess up ordering otherwise.
+			let tempContents = this.contents.slice(0) //We are cloning the array, however the referenced objects remain the same. This prevents us from having to adjust indexes for items when we remove other items.
+			if (this.inPlacemat[0] && this.inPlacemat[0].evicting) {
+				tempContents = tempContents.concat(this.inPlacemat.slice(1))
+			}
+			else {
+				tempContents = tempContents.concat(this.inPlacemat.slice(0))
+			}
+
 			//Everything that matches is now nulled out.
 			//Add the things in syncContents but not in currentContents
 			for (let i=0;i<syncContentsStrings.length;i++) {
@@ -115,9 +127,6 @@ class Hand {
 				}
 			}
 
-			//Remove the things in currentContents but not in syncContents
-			let tempContents = this.contents.slice(0).concat(this.inPlacemat.slice(0)) //We are cloning the array, however the referenced objects remain the same.
-			//This prevents us from having to adjust indexes for items when we remove other items.
 			for (let i=0;i<currentContentsStrings.length;i++) {
 				let item = currentContentsStrings[i]
 				if (item) {
@@ -157,6 +166,11 @@ class Hand {
 			let currentTile;
 			if (elem.placematIndex !== undefined) {
 				//We are dragging out of the placemat, into the hand.
+				if (elem.placematIndex === 0 && this.inPlacemat[0].evicting) {
+					console.log("Blocked dragging of evictingThrownTile")
+					alert("You can't bring the thrown tile into your hand. You can only place it down along with other tiles that match it or form a sequence. ")
+					return;
+				}
 				currentTile = this.inPlacemat.splice(elem.placematIndex, 1)[0]
 			}
 			else {
@@ -244,6 +258,23 @@ class Hand {
 
 		}).bind(this)
 
+		this.setEvictingThrownTile = (function(tile) {
+			//Clear the other evicting tile, even if it's position has moved due to some glitch or user hacking.
+			for (let i=this.inPlacemat.length - 1;i>=0;i--) {
+				let item = this.inPlacemat[i]
+				if (item.evicting) {
+					this.inPlacemat.splice(i, 1)
+				}
+			}
+			if (tile) {
+				if (this.inPlacemat.length >= 4) {
+					this.contents.push(this.inPlacemat.pop())
+				}
+				this.inPlacemat.unshift(tile)
+				tile.evicting = true
+			}
+		}).bind(this)
+
 		this.renderTiles = (function() {
 
 			if (!this.handToRender) {throw "Unable to render hand. You must pass config.handToRender to the constructor. "}
@@ -271,7 +302,7 @@ class Hand {
 							//kong. Flip 1 tile.
 							items[0] = new Tile({faceDown: true})
 						}
-						exposedTiles = tiles.concat(items)
+						exposedTiles = exposedTiles.concat(items)
 					}
 					else {
 						if (item instanceof Match && item.amount === 4) {
@@ -349,8 +380,8 @@ class Hand {
 	}
 
 	static sortTiles(tiles) {
-		tiles.sort(function (tile1, tile2) {
-			return getTileValue(tile1) - getTileValue(tile2)
+		return tiles.sort(function (tile1, tile2) {
+			return Hand.getTileValue(tile1) - Hand.getTileValue(tile2)
 		})
 	}
 

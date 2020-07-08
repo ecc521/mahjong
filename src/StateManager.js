@@ -3,7 +3,6 @@ class StateManager {
 
 		//This function is referenced in createWebsocket, so DO NOT move it downwards. You will get burned by a lack of function hoisting.
 		let onmessage = (function onmessage(message) {
-			console.log(message.data)
 			let obj = JSON.parse(message.data)
 			console.log(obj)
 			if (obj.type === "joinRoom") {

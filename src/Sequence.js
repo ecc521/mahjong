@@ -8,7 +8,7 @@ class Sequence {
 		this.getPoints = function() {return 0}
 
 		if (!config.tiles instanceof Array) {throw "config.tiles must be an array of Tiles"}
-		if (!isValidSequence(tiles)) {
+		if (!Sequence.isValidSequence(config.tiles)) {
 			throw "config.tiles is not a valid sequence. "
 		}
 
@@ -19,7 +19,7 @@ class Sequence {
 			return tile1.value - tile2.value
 		})
 
-		this.exposed = exposed
+		this.exposed = config.exposed
 		this.isSequence = true
 		this.isPongOrKong = false
 		this.isPair = false

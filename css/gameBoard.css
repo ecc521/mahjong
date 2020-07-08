@@ -158,6 +158,21 @@ This means that something using bottom is off the page - hence we must use top. 
 	text-align: center;
 }
 
+#gameBoard #discardPile {
+	position: absolute;
+	left: 9.52vh;
+	top: 22vh;
+	margin-left: 3vw;
+	margin-top: 8vh;
+	max-width: 60vw;
+	max-height: 30vh;
+}
+
+#gameBoard #discardPile * {
+	max-width: calc(60vw / 23);
+	max-height: 7.5vh;
+}
+
 /*Since we have to use top instead of bottom due to viewport bugs, this can be floating above where it should be. */
 #gameBoard #fullscreenControls {
 	position: absolute;

@@ -150,6 +150,23 @@ let wallRendering = document.createElement("div")
 wallRendering.id = "wall"
 gameBoard.appendChild(wallRendering)
 
+let discardPile = document.createElement("div")
+discardPile.id = "discardPile"
+gameBoard.appendChild(discardPile)
+
+function renderDiscardPile(tileStrings) {
+	while (discardPile.firstChild) {discardPile.firstChild.remove()}
+
+	let tiles = tileStrings.map((str) => {return Tile.fromJSON(str)})
+	tiles = Hand.sortTiles(tiles)
+
+	tiles.forEach((tile) => {
+		let img = document.createElement("img")
+		img.src = tile.imageUrl
+		discardPile.appendChild(img)
+	})
+}
+
 
 let userHandElem = createTopOrBottomHand("userHand")
 let userHandElemExposed = createTopOrBottomHand("userHandExposed")
@@ -186,6 +203,10 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		Wall.renderWall(wallRendering, message.wallTiles)
 	}
 
+	if (message.discardPile) {
+		renderDiscardPile(message.discardPile)
+	}
+
 	let clients = message.clients
 	let winds = ["north", "east", "south", "west"]
 	let hands = [userHand, leftHand, topHand, rightHand]
@@ -219,18 +240,25 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	})
 
 	hands.forEach((hand) => {hand.renderTiles()})
-
-	userHand.renderPlacemat()
 	if (message.currentTurn && message.currentTurn.thrown) {
 		//The person has thrown their tile. Waiting on players to ready.
 		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)"
 		nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
 		placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
+
+		if (message.currentTurn.userTurn !== clientId) {
+			userHand.setEvictingThrownTile(Tile.fromJSON(message.currentTurn.thrown))
+		}
+		else {
+			userHand.setEvictingThrownTile() //Clear evictingThrownTile
+		}
+		userHand.renderPlacemat()
 	}
 	else {
 		nextTurnButton.disabled = "disabled"
 		nextTurnButton.innerHTML = ""
 		placeTilesButton.disabled = ""
+		userHand.setEvictingThrownTile() //Clear evictingThrownTile
 		//The person has not yet thrown a tile.
 		if (message.currentTurn.userTurn === window.clientId) {
 			userHand.renderPlacemat("pending")
