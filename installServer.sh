@@ -39,7 +39,7 @@ sudo a2enmod proxy_http
 sudo a2enmod http2
 
 #Enable reverse proxy to /node.
-echo "LoadModule proxy_module modules/mod_proxy.so" >> $HOME/majonh/NODEMAHJONGWITHFRIENDS.conf
+echo "LoadModule proxy_module modules/mod_proxy.so" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
 echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
 echo "ProxyPass /node http://127.0.0.1:3000/node" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
 

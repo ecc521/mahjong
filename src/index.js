@@ -13,7 +13,6 @@ mobile_drag_drop_polyfill({
 let url = new URL(window.location)
 url.pathname = "/node"
 url.protocol = "ws:"
-url.port = 3000
 let websocketURL = url.toString()
 window.stateManager = new StateManager(websocketURL)
 

@@ -5087,7 +5087,6 @@ mobile_drag_drop_polyfill({
 var url = new URL(window.location);
 url.pathname = "/node";
 url.protocol = "ws:";
-url.port = 3000;
 var websocketURL = url.toString();
 window.stateManager = new StateManager(websocketURL);
 
