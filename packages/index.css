@@ -298,6 +298,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-height: calc(var(--vh) * 12);
 }
 
+/*Note: These animations are eating up a very significant amount of CPU/GPU power. We may want to stop using them. */
 @keyframes handTurnPulse {
   0% {
     filter: brightness(1);
@@ -317,7 +318,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 .brightnessPulse {
-	animation: handTurnPulse 3s infinite;
+	animation: handTurnPulse 3s linear infinite;
 }
 
 #gameBoard #tilePlacemat img {
@@ -338,7 +339,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 #gameBoard #tilePlacemat img.pending {
-	animation: discardSlotPulse 5s infinite;
+	animation: discardSlotPulse 3s infinite;
 }
 
 #gameBoard #compass {
