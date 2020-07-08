@@ -331,9 +331,59 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-width: calc(var(--vh) * 12);
 	max-height: 12vh;
 	max-height: calc(var(--vh) * 12);
-	margin-right: 1vw;
-	margin-top: 1vh;
-	margin-top: calc(var(--vh) * 1);
+	margin-right: 2vw;
+	margin-top: 2vh;
+	margin-top: calc(var(--vh) * 2);
+}
+
+#gameBoard #bottomNametag {
+	position: absolute;
+	margin: 0;
+	min-width: 12vw;
+	text-align: center;
+	right: 9.52vh;
+	right: calc(var(--vh) * 9.52);
+	top: 26vh;
+	top: calc(var(--vh) * 26);
+}
+
+#gameBoard #leftNametag {
+	position: absolute;
+	margin: 0;
+	text-align: center;
+	min-width: 12vh;
+	min-width: calc(var(--vh) * 12);
+	font-size: 1.2vw;
+	transform: rotate(270deg);
+	right: calc(9.52vh + 8vw);
+	right: calc(calc(var(--vh) * 9.52) + 8vw);
+	top: 19vh;
+	top: calc(var(--vh) * 19);
+}
+
+#gameBoard #topNametag {
+	position: absolute;
+	margin: 0;
+	min-width: 12vw;
+	text-align: center;
+	right: 9.52vh;
+	right: calc(var(--vh) * 9.52);
+	top: 12vh;
+	top: calc(var(--vh) * 12);
+}
+
+#gameBoard #rightNametag {
+	position: absolute;
+	margin: 0;
+	text-align: center;
+	min-width: 12vh;
+	min-width: calc(var(--vh) * 12);
+	font-size: 1.2vw;
+	transform: rotate(90deg);
+	right: 4.52vh;
+	right: calc(var(--vh) * 4.52);
+	top: 19vh;
+	top: calc(var(--vh) * 19);
 }
 
 /*The max number of tiles should be 91. Therefore, we will prepare for tiles 31 by 3. The last two spots will be filled by a count of the tiles in the wall.  */

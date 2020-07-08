@@ -7937,6 +7937,13 @@ var leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer");
 var leftHand = new Hand({
   handToRender: leftHandContainer
 });
+var nametagIds = ["bottomNametag", "leftNametag", "topNametag", "rightNametag"];
+var nametags = nametagIds.map(function (id) {
+  var nametag = document.createElement("p");
+  nametag.id = id;
+  gameBoard.appendChild(nametag);
+  return nametag;
+});
 window.stateManager.addEventListener("onStateUpdate", function (obj) {
   var message = obj.message;
 
@@ -7972,14 +7979,20 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
   console.log(windOrder);
   console.log(hands);
   clients.forEach(function (client) {
+    var windPosition = 0;
+
     if (client.visibleHand && client.wind) {
       console.log("Client hand stuff");
       console.log(client);
       console.log(client.wind);
-      var hand = hands[windOrder.indexOf(client.wind)];
+      windPosition = windOrder.indexOf(client.wind);
+      var hand = hands[windPosition];
       hand.syncContents(Hand.convertStringsToTiles(client.visibleHand));
       hand.wind = client.wind;
     }
+
+    var nametag = nametags[windPosition];
+    nametag.innerHTML = client.nickname;
   });
   hands.forEach(function (hand) {
     hand.renderTiles();

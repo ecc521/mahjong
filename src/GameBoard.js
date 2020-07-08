@@ -193,6 +193,13 @@ let leftHand = new Hand({
 	handToRender: leftHandContainer
 })
 
+let nametagIds = ["bottomNametag", "leftNametag", "topNametag", "rightNametag"]
+let nametags = nametagIds.map((id) => {
+	let nametag = document.createElement("p")
+	nametag.id = id
+	gameBoard.appendChild(nametag)
+	return nametag
+})
 
 window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	let message = obj.message
@@ -229,14 +236,18 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	console.log(hands)
 
 	clients.forEach((client) => {
+		let windPosition = 0;
 		if (client.visibleHand && client.wind) {
 			console.log("Client hand stuff")
 			console.log(client)
 			console.log(client.wind)
-			let hand = hands[windOrder.indexOf(client.wind)]
+			windPosition = windOrder.indexOf(client.wind)
+			let hand = hands[windPosition]
 			hand.syncContents(Hand.convertStringsToTiles(client.visibleHand))
 			hand.wind = client.wind
 		}
+		let nametag = nametags[windPosition]
+		nametag.innerHTML = client.nickname
 	})
 
 	hands.forEach((hand) => {hand.renderTiles()})

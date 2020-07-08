@@ -129,8 +129,48 @@ This means that something using bottom is off the page - hence we must use top. 
 	height: 12vw;
 	max-width: 12vh;
 	max-height: 12vh;
-	margin-right: 1vw;
-	margin-top: 1vh;
+	margin-right: 2vw;
+	margin-top: 2vh;
+}
+
+#gameBoard #bottomNametag {
+	position: absolute;
+	margin: 0;
+	min-width: 12vw;
+	text-align: center;
+	right: 9.52vh;
+	top: 26vh;
+}
+
+#gameBoard #leftNametag {
+	position: absolute;
+	margin: 0;
+	text-align: center;
+	min-width: 12vh;
+	font-size: 1.2vw;
+	transform: rotate(270deg);
+	right: calc(9.52vh + 8vw);
+	top: 19vh;
+}
+
+#gameBoard #topNametag {
+	position: absolute;
+	margin: 0;
+	min-width: 12vw;
+	text-align: center;
+	right: 9.52vh;
+	top: 12vh;
+}
+
+#gameBoard #rightNametag {
+	position: absolute;
+	margin: 0;
+	text-align: center;
+	min-width: 12vh;
+	font-size: 1.2vw;
+	transform: rotate(90deg);
+	right: 4.52vh;
+	top: 19vh;
 }
 
 /*The max number of tiles should be 91. Therefore, we will prepare for tiles 31 by 3. The last two spots will be filled by a count of the tiles in the wall.  */
