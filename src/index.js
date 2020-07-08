@@ -10,8 +10,11 @@ mobile_drag_drop_polyfill({
     dragImageTranslateOverride: scrollBehaviourDragImageTranslateOverride
 });
 
-
-let websocketURL = "ws:127.0.0.1:3000"
+let url = new URL(window.location)
+url.pathname = "/node"
+url.protocol = "ws:"
+url.port = 3000
+let websocketURL = url.toString()
 window.stateManager = new StateManager(websocketURL)
 
 
