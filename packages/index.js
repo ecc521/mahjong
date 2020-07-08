@@ -2206,11 +2206,11 @@ var StateManager = /*#__PURE__*/function () {
       }));
     };
 
-    this.endGame = function (roomId) {
+    this.endGame = function () {
       this.sendMessage(JSON.stringify({
         type: "roomActionEndGame",
         clientId: window.clientId,
-        roomId: roomId
+        roomId: window.stateManager.roomId
       }));
     };
 
@@ -5087,6 +5087,11 @@ mobile_drag_drop_polyfill({
 var url = new URL(window.location);
 url.pathname = "/node";
 url.protocol = "ws:";
+
+if (window.location.hostname === "127.0.0.1") {
+  url.port = 3000;
+}
+
 var websocketURL = url.toString();
 window.stateManager = new StateManager(websocketURL);
 
@@ -7914,6 +7919,15 @@ nextTurnButton.id = "nextTurnButton";
 gameBoard.appendChild(nextTurnButton);
 nextTurnButton.addEventListener("click", function () {
   window.stateManager.nextTurn();
+});
+var endGameButton = document.createElement("button");
+endGameButton.id = "endGameButton";
+endGameButton.innerHTML = "End Game";
+gameBoard.appendChild(endGameButton);
+endGameButton.addEventListener("click", function () {
+  if (confirm("End the game?") && confirm("Are you absolutely sure you want to end the game? You will be blamed. ")) {
+    window.stateManager.endGame();
+  }
 });
 var wallRendering = document.createElement("div");
 wallRendering.id = "wall";

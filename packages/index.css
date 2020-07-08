@@ -503,6 +503,22 @@ This means that something using bottom is off the page - hence we must use top. 
 	font-size: calc(var(--vh) * 1.6);
 }
 
+#gameBoard #endGameButton {
+	position: absolute;
+	position: absolute;
+	left: calc(9.52vh + 2vw);
+	left: calc(calc(var(--vh) * 9.52) + 2vw);
+	top: 70vh;
+	top: calc(var(--vh) * 70);
+	width: 10vw;
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	border-radius: 50vh;
+	border-radius: calc(var(--vh) * 50);
+	font-size: 1.6vh;
+	font-size: calc(var(--vh) * 1.6);
+}
+
 #gameBoard #placeTilesButton:disabled, #gameBoard #nextTurnButton:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;

@@ -338,15 +338,17 @@ class Room {
 			}
 		}).bind(this)
 
-		this.endGame = (function startGame(messageKey, clientId) {
+		this.endGame = (function endGame(messageKey, clientId) {
 			let gameEndMessage = "The Game Has Ended";
 			if (clientId) {
 				let client = global.stateManager.getClient(clientId)
 				//Tell players who ended the game, so blame can be applied.
 				gameEndMessage = "The game has been ended by " + clientId + ", who goes by the name of " + client.getNickname() + "."
 			}
+			this.inGame = false
 			this.gameData = {}
 			this.messageAll(messageKey, gameEndMessage, "success")
+			sendStateToClients()
 		}).bind(this)
 
 		function removeTilesFromHand(hand, obj, amount = 1) {

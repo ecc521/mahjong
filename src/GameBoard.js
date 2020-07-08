@@ -146,6 +146,17 @@ nextTurnButton.addEventListener("click", function() {
 	window.stateManager.nextTurn()
 })
 
+let endGameButton = document.createElement("button")
+endGameButton.id = "endGameButton"
+endGameButton.innerHTML = "End Game"
+gameBoard.appendChild(endGameButton)
+
+endGameButton.addEventListener("click", function() {
+	if (confirm("End the game?") && confirm("Are you absolutely sure you want to end the game? You will be blamed. ")) {
+		window.stateManager.endGame()
+	}
+})
+
 let wallRendering = document.createElement("div")
 wallRendering.id = "wall"
 gameBoard.appendChild(wallRendering)

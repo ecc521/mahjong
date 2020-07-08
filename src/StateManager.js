@@ -125,11 +125,11 @@ class StateManager {
 			}))
 		}
 
-		this.endGame = function(roomId) {
+		this.endGame = function() {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionEndGame",
 				clientId: window.clientId,
-				roomId,
+				roomId: window.stateManager.roomId,
 			}))
 		}
 
