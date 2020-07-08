@@ -136,6 +136,10 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
+										if (placement.amount === 4) {
+											//Draw them another tile.
+											drawTile(clientId, true) //Draw from back of wall.
+										}
 										this.gameData.currentTurn.userTurn = clientId
 									}
 									else {
