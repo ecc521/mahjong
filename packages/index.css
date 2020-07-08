@@ -298,12 +298,34 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-height: calc(var(--vh) * 12);
 }
 
+@keyframes handTurnPulse {
+  0% {
+    filter: brightness(1);
+  }
+  25% {
+    filter: brightness(0.7);
+  }
+  50% {
+	  filter: brightness(1);
+  }
+  75% {
+	  filter: brightness(1.3);
+  }
+  100% {
+	filter: brightness(1);
+  }
+}
+
+.brightnessPulse {
+	animation: handTurnPulse 3s infinite;
+}
+
 #gameBoard #tilePlacemat img {
 	margin-right: 20px;
 	border-radius: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14 / 12); /*border radius 1/12th the width of a tile. TODO: This should be analyzed later to make sure it works right*/
 }
 
-@keyframes pulse {
+@keyframes discardSlotPulse {
   0% {
     background-color: #3D003F99;
   }
@@ -316,7 +338,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 #gameBoard #tilePlacemat img.pending {
-	animation: pulse 5s infinite;
+	animation: discardSlotPulse 5s infinite;
 }
 
 #gameBoard #compass {

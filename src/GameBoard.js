@@ -237,17 +237,29 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 	clients.forEach((client) => {
 		let windPosition = 0;
+		if (client.wind) {
+			windPosition = windOrder.indexOf(client.wind)
+		}
+		let hand = hands[windPosition]
+
 		if (client.visibleHand && client.wind) {
 			console.log("Client hand stuff")
 			console.log(client)
 			console.log(client.wind)
-			windPosition = windOrder.indexOf(client.wind)
-			let hand = hands[windPosition]
 			hand.syncContents(Hand.convertStringsToTiles(client.visibleHand))
 			hand.wind = client.wind
 		}
+
 		let nametag = nametags[windPosition]
 		nametag.innerHTML = client.nickname
+
+		hand.handToRender.classList.remove("brightnessPulse")
+
+		if (message.currentTurn && !message.currentTurn.thrown) {
+			if (client.id === message.currentTurn.userTurn) {
+				hand.handToRender.classList.add("brightnessPulse")
+			}
+		}
 	})
 
 	hands.forEach((hand) => {hand.renderTiles()})

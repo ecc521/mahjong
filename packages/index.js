@@ -7981,18 +7981,29 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
   clients.forEach(function (client) {
     var windPosition = 0;
 
+    if (client.wind) {
+      windPosition = windOrder.indexOf(client.wind);
+    }
+
+    var hand = hands[windPosition];
+
     if (client.visibleHand && client.wind) {
       console.log("Client hand stuff");
       console.log(client);
       console.log(client.wind);
-      windPosition = windOrder.indexOf(client.wind);
-      var hand = hands[windPosition];
       hand.syncContents(Hand.convertStringsToTiles(client.visibleHand));
       hand.wind = client.wind;
     }
 
     var nametag = nametags[windPosition];
     nametag.innerHTML = client.nickname;
+    hand.handToRender.classList.remove("brightnessPulse");
+
+    if (message.currentTurn && !message.currentTurn.thrown) {
+      if (client.id === message.currentTurn.userTurn) {
+        hand.handToRender.classList.add("brightnessPulse");
+      }
+    }
   });
   hands.forEach(function (hand) {
     hand.renderTiles();
