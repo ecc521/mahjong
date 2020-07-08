@@ -296,18 +296,23 @@ class Hand {
 					exposedTiles.push(item)
 				}
 				else if (item instanceof Match || item instanceof Sequence) {
-					let items = item.tiles.slice(0) //Clone, as we modify for kongs.
-					if (item.exposed) {
-						if (item instanceof Match && item.amount === 4) {
+					let items;
+					if (item instanceof Sequence) {
+						items = item.tiles
+					}
+					else if (item instanceof Match) {
+						items = new Array(item.amount).fill(0).map(() => {return item.getComponentTile()})
+						if (item.amount === 4) {
 							//kong. Flip 1 tile.
 							items[0] = new Tile({faceDown: true})
 						}
+					}
+					if (item.exposed) {
 						exposedTiles = exposedTiles.concat(items)
 					}
 					else {
 						if (item instanceof Match && item.amount === 4) {
-							//In hand kong. Expose with 2 flipped tiles.
-							items[0] = new Tile({faceDown: true})
+							//In hand kong. Expose with 2 flipped tiles. (One already flipped)
 							items[3] = new Tile({faceDown: true})
 							exposedTiles.concat(items)
 						}
@@ -341,7 +346,7 @@ class Hand {
 					}
 				}
 			}).bind(this)
-
+			
 			drawTiles(exposedTiles, "exposed")
 			drawTiles(unexposedTiles, "unexposed")
 			if (this.tilePlacemat) {

@@ -739,7 +739,7 @@ var Tile = /*#__PURE__*/function () {
         return false;
       }
 
-      if (tile.type = this.type && tile.value === this.value) {
+      if (tile.type === this.type && tile.value === this.value) {
         return true;
       }
 
@@ -1679,7 +1679,7 @@ var Match = /*#__PURE__*/function () {
 
     _classCallCheck(this, Match);
 
-    if (config.exposed === undefined) {
+    if (config.exposed == undefined) {
       throw "Must specify either true or false for config.exposed. ";
     }
 
@@ -8097,6 +8097,8 @@ module.exports = function (METHOD_NAME) {
 
 __webpack_require__(101);
 
+__webpack_require__(152);
+
 __webpack_require__(148);
 
 __webpack_require__(20);
@@ -8425,6 +8427,8 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.renderTiles = function () {
+      var _this = this;
+
       if (!this.handToRender) {
         throw "Unable to render hand. You must pass config.handToRender to the constructor. ";
       }
@@ -8444,31 +8448,36 @@ var Hand = /*#__PURE__*/function () {
       var unexposedTiles = [];
       var exposedTiles = [];
 
-      for (var i = 0; i < this.contents.length; i++) {
-        var item = this.contents[i];
+      var _loop = function _loop(i) {
+        var item = _this.contents[i];
 
         if (item instanceof Tile) {
           unexposedTiles.push(item);
         } else if (item instanceof Pretty) {
           exposedTiles.push(item);
         } else if (item instanceof Match || item instanceof Sequence) {
-          var items = item.tiles.slice(0); //Clone, as we modify for kongs.
+          var items;
 
-          if (item.exposed) {
-            if (item instanceof Match && item.amount === 4) {
+          if (item instanceof Sequence) {
+            items = item.tiles;
+          } else if (item instanceof Match) {
+            items = new Array(item.amount).fill(0).map(function () {
+              return item.getComponentTile();
+            });
+
+            if (item.amount === 4) {
               //kong. Flip 1 tile.
               items[0] = new Tile({
                 faceDown: true
               });
             }
+          }
 
+          if (item.exposed) {
             exposedTiles = exposedTiles.concat(items);
           } else {
             if (item instanceof Match && item.amount === 4) {
-              //In hand kong. Expose with 2 flipped tiles.
-              items[0] = new Tile({
-                faceDown: true
-              });
+              //In hand kong. Expose with 2 flipped tiles. (One already flipped)
               items[3] = new Tile({
                 faceDown: true
               });
@@ -8480,35 +8489,39 @@ var Hand = /*#__PURE__*/function () {
         } else {
           console.error("Unknown item " + item);
         }
+      };
+
+      for (var i = 0; i < this.contents.length; i++) {
+        _loop(i);
       }
 
       var drawTiles = function drawTiles(tiles, type) {
-        var _this = this;
+        var _this2 = this;
 
-        var _loop = function _loop(_i3) {
+        var _loop2 = function _loop2(_i3) {
           var tile = tiles[_i3];
           var elem = document.createElement("img");
           elem.src = tile.imageUrl;
 
-          if (type === "exposed" && _this.handForExposed) {
-            _this.handForExposed.appendChild(elem);
+          if (type === "exposed" && _this2.handForExposed) {
+            _this2.handForExposed.appendChild(elem);
           } else if (type === "exposed") {
-            _this.handToRender.appendChild(elem);
+            _this2.handToRender.appendChild(elem);
           } else if (type === "unexposed") {
-            if (_this.interactive) {
+            if (_this2.interactive) {
               elem.draggable = true;
               elem.addEventListener("dragstart", dragstart);
-              elem.tileIndex = _this.contents.findIndex(function (item) {
+              elem.tileIndex = _this2.contents.findIndex(function (item) {
                 return item === tile;
               });
             }
 
-            _this.handToRender.appendChild(elem);
+            _this2.handToRender.appendChild(elem);
           }
         };
 
         for (var _i3 = 0; _i3 < tiles.length; _i3++) {
-          _loop(_i3);
+          _loop2(_i3);
         }
       }.bind(this);
 
@@ -9005,6 +9018,48 @@ var charAt = __webpack_require__(61).charAt;
 // https://tc39.github.io/ecma262/#sec-advancestringindex
 module.exports = function (S, index, unicode) {
   return index + (unicode ? charAt(S, index).length : 1);
+};
+
+
+/***/ }),
+/* 152 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__(3);
+var fill = __webpack_require__(153);
+var addToUnscopables = __webpack_require__(54);
+
+// `Array.prototype.fill` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.fill
+$({ target: 'Array', proto: true }, {
+  fill: fill
+});
+
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
+addToUnscopables('fill');
+
+
+/***/ }),
+/* 153 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var toObject = __webpack_require__(12);
+var toAbsoluteIndex = __webpack_require__(48);
+var toLength = __webpack_require__(11);
+
+// `Array.prototype.fill` method implementation
+// https://tc39.github.io/ecma262/#sec-array.prototype.fill
+module.exports = function fill(value /* , start = 0, end = @length */) {
+  var O = toObject(this);
+  var length = toLength(O.length);
+  var argumentsLength = arguments.length;
+  var index = toAbsoluteIndex(argumentsLength > 1 ? arguments[1] : undefined, length);
+  var end = argumentsLength > 2 ? arguments[2] : undefined;
+  var endPos = end === undefined ? length : toAbsoluteIndex(end, length);
+  while (endPos > index) O[index++] = value;
+  return O;
 };
 
 

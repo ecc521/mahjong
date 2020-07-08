@@ -3,7 +3,7 @@ const Tile = require("./Tile.js")
 class Match {
 	constructor(config = {}) {
 
-		if (config.exposed === undefined) {throw "Must specify either true or false for config.exposed. "}
+		if (config.exposed == undefined) {throw "Must specify either true or false for config.exposed. "}
 
 		if (config.amount < 2 || config.amount > 4) {throw "config.mount must be either 2, 3, or 4. "}
 

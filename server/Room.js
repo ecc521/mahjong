@@ -101,7 +101,6 @@ class Room {
 							let placement = obj[clientId]
 							//If placement succeeds, switch userTurn
 							console.log(placement)
-							console.log(placement instanceof Sequence)
 							if (placement instanceof Sequence) {
 								//Confirm that the sequence uses the thrown tile.
 								let valid = false
@@ -115,6 +114,7 @@ class Room {
 								console.log(valid)
 								if (valid) {
 									let hand = this.gameData.playerHands[clientId]
+									//Add the tile to hand, attempt to verify, and, if not, remove
 									hand.add(this.gameData.currentTurn.thrown)
 									if (removeSequenceFromHand(hand, placement)) {
 										utilized = true
@@ -131,14 +131,15 @@ class Room {
 								//Confirm that the match uses the thrown tile
 								if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
 									let hand = this.gameData.playerHands[clientId]
-									hand.add(this.gameData.currentTurn.thrown)
-									if (removeTilesFromHand(hand, placement)) {
+									//We can just verify for on less tile here.
+									if (removeTilesFromHand(hand, placement.getComponentTile(), placement.amount - 1)) {
 										utilized = true
 										hand.add(placement)
+										placement.exposed = true
 										this.gameData.currentTurn.userTurn = clientId
 									}
 									else {
-										hand.remove(this.gameData.currentTurn.thrown)
+										console.log("Attempted to place invalid match")
 										global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You can't place a match of tiles you do not possess", "error")
 									}
 								}
@@ -392,7 +393,6 @@ class Room {
 
 			let placement;
 			try {
-				console.log(obj.message)
 				placement = Hand.convertStringsToTiles(obj.message)
 				console.log(obj.message)
 
@@ -403,7 +403,6 @@ class Room {
 						placement = sequence
 					}
 					catch (e) {
-						console.log(e)
 						if (Match.isValidMatch(placement)) {
 							placement = new Match({exposed: true, amount: placement.length, type: placement[0].type, value: placement[0].value})
 						}
