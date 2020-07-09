@@ -296,12 +296,8 @@ class Hand {
 					exposedTiles.push(item)
 				}
 				else if (item instanceof Match || item instanceof Sequence) {
-					let items;
-					if (item instanceof Sequence) {
-						items = item.tiles
-					}
-					else if (item instanceof Match) {
-						items = new Array(item.amount).fill(0).map(() => {return item.getComponentTile()})
+					let items = item.tiles;
+					if (item instanceof Match) {
 						if (item.amount === 4) {
 							//kong. Flip 1 tile.
 							items[0] = new Tile({faceDown: true})
@@ -346,7 +342,7 @@ class Hand {
 					}
 				}
 			}).bind(this)
-			
+
 			drawTiles(exposedTiles, "exposed")
 			drawTiles(unexposedTiles, "unexposed")
 			if (this.tilePlacemat) {

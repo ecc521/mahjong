@@ -266,10 +266,8 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 		hand.handToRender.classList.remove("brightnessPulse")
 
-		if (message.currentTurn && !message.currentTurn.thrown) {
-			if (client.id === message.currentTurn.userTurn) {
-				hand.handToRender.classList.add("brightnessPulse")
-			}
+		if (message.currentTurn && client.id === message.currentTurn.userTurn) {
+			hand.handToRender.classList.add("brightnessPulse")
 		}
 	})
 

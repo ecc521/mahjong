@@ -1657,7 +1657,11 @@ module.exports = {
 /* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(152);
+
 __webpack_require__(29);
+
+__webpack_require__(39);
 
 __webpack_require__(18);
 
@@ -1763,17 +1767,12 @@ var Match = /*#__PURE__*/function () {
 
     Object.defineProperty(this, "tiles", {
       get: function getTiles() {
-        var arr = [];
+        var _this = this;
 
-        for (var i = 0; i < this.amount; i++) {
-          arr.push(new Tile({
-            value: this.value,
-            amount: this.amount
-          }));
-        }
-
-        return arr;
-      }
+        return new Array(this.amount).fill(0).map(function () {
+          return _this.getComponentTile();
+        }.bind(this));
+      }.bind(this)
     });
     Object.defineProperty(this, "isPair", {
       get: function isPair() {
@@ -5051,20 +5050,23 @@ Object.defineProperty(exports, '__esModule', { value: true });
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var core_js_modules_es_array_iterator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(33);
-/* harmony import */ var core_js_modules_es_array_iterator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(84);
-/* harmony import */ var core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(154);
-/* harmony import */ var core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var core_js_modules_es_string_iterator__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(60);
-/* harmony import */ var core_js_modules_es_string_iterator__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_iterator__WEBPACK_IMPORTED_MODULE_3__);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(96);
-/* harmony import */ var core_js_modules_web_dom_collections_iterator__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator__WEBPACK_IMPORTED_MODULE_4__);
-/* harmony import */ var core_js_modules_web_url__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(97);
-/* harmony import */ var core_js_modules_web_url__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_url__WEBPACK_IMPORTED_MODULE_5__);
-/* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(107);
-/* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
+/* harmony import */ var core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_for_each__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var core_js_modules_es_array_iterator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(33);
+/* harmony import */ var core_js_modules_es_array_iterator__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_array_iterator__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(84);
+/* harmony import */ var core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_object_to_string__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(154);
+/* harmony import */ var core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_regexp_to_string__WEBPACK_IMPORTED_MODULE_3__);
+/* harmony import */ var core_js_modules_es_string_iterator__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(60);
+/* harmony import */ var core_js_modules_es_string_iterator__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_es_string_iterator__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var core_js_modules_web_dom_collections_iterator__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(96);
+/* harmony import */ var core_js_modules_web_dom_collections_iterator__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_dom_collections_iterator__WEBPACK_IMPORTED_MODULE_5__);
+/* harmony import */ var core_js_modules_web_url__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(97);
+/* harmony import */ var core_js_modules_web_url__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(core_js_modules_web_url__WEBPACK_IMPORTED_MODULE_6__);
+/* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(107);
+/* harmony import */ var mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_7___default = /*#__PURE__*/__webpack_require__.n(mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_7__);
+
 
 
 
@@ -5082,18 +5084,23 @@ var mobile_drag_drop_polyfill = __webpack_require__(138).polyfill; // optional i
 
 mobile_drag_drop_polyfill({
   // use this to make use of the scroll behaviour
-  dragImageTranslateOverride: mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_6__["scrollBehaviourDragImageTranslateOverride"]
+  dragImageTranslateOverride: mobile_drag_drop_scroll_behaviour__WEBPACK_IMPORTED_MODULE_7__["scrollBehaviourDragImageTranslateOverride"]
 });
 var url = new URL(window.location);
 url.pathname = "/node";
 url.protocol = "ws:";
 
 if (window.location.hostname === "127.0.0.1") {
+  //Local development
   url.port = 3000;
 }
 
 var websocketURL = url.toString();
-window.stateManager = new StateManager(websocketURL);
+window.stateManager = new StateManager(websocketURL) //Make classes public to allow for easier development.
+;
+["Hand", "Tile", "Sequence", "Pretty", "Match"].forEach(function (className) {
+  window[className] = __webpack_require__(155)("./" + className + ".js");
+});
 
 var roomManager = __webpack_require__(139);
 
@@ -8035,10 +8042,8 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
     nametag.innerHTML = client.nickname;
     hand.handToRender.classList.remove("brightnessPulse");
 
-    if (message.currentTurn && !message.currentTurn.thrown) {
-      if (client.id === message.currentTurn.userTurn) {
-        hand.handToRender.classList.add("brightnessPulse");
-      }
+    if (message.currentTurn && client.id === message.currentTurn.userTurn) {
+      hand.handToRender.classList.add("brightnessPulse");
     }
   });
   hands.forEach(function (hand) {
@@ -8132,8 +8137,6 @@ module.exports = function (METHOD_NAME) {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(101);
-
-__webpack_require__(152);
 
 __webpack_require__(148);
 
@@ -8463,8 +8466,6 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.renderTiles = function () {
-      var _this = this;
-
       if (!this.handToRender) {
         throw "Unable to render hand. You must pass config.handToRender to the constructor. ";
       }
@@ -8484,23 +8485,17 @@ var Hand = /*#__PURE__*/function () {
       var unexposedTiles = [];
       var exposedTiles = [];
 
-      var _loop = function _loop(i) {
-        var item = _this.contents[i];
+      for (var i = 0; i < this.contents.length; i++) {
+        var item = this.contents[i];
 
         if (item instanceof Tile) {
           unexposedTiles.push(item);
         } else if (item instanceof Pretty) {
           exposedTiles.push(item);
         } else if (item instanceof Match || item instanceof Sequence) {
-          var items;
+          var items = item.tiles;
 
-          if (item instanceof Sequence) {
-            items = item.tiles;
-          } else if (item instanceof Match) {
-            items = new Array(item.amount).fill(0).map(function () {
-              return item.getComponentTile();
-            });
-
+          if (item instanceof Match) {
             if (item.amount === 4) {
               //kong. Flip 1 tile.
               items[0] = new Tile({
@@ -8525,39 +8520,35 @@ var Hand = /*#__PURE__*/function () {
         } else {
           console.error("Unknown item " + item);
         }
-      };
-
-      for (var i = 0; i < this.contents.length; i++) {
-        _loop(i);
       }
 
       var drawTiles = function drawTiles(tiles, type) {
-        var _this2 = this;
+        var _this = this;
 
-        var _loop2 = function _loop2(_i3) {
+        var _loop = function _loop(_i3) {
           var tile = tiles[_i3];
           var elem = document.createElement("img");
           elem.src = tile.imageUrl;
 
-          if (type === "exposed" && _this2.handForExposed) {
-            _this2.handForExposed.appendChild(elem);
+          if (type === "exposed" && _this.handForExposed) {
+            _this.handForExposed.appendChild(elem);
           } else if (type === "exposed") {
-            _this2.handToRender.appendChild(elem);
+            _this.handToRender.appendChild(elem);
           } else if (type === "unexposed") {
-            if (_this2.interactive) {
+            if (_this.interactive) {
               elem.draggable = true;
               elem.addEventListener("dragstart", dragstart);
-              elem.tileIndex = _this2.contents.findIndex(function (item) {
+              elem.tileIndex = _this.contents.findIndex(function (item) {
                 return item === tile;
               });
             }
 
-            _this2.handToRender.appendChild(elem);
+            _this.handToRender.appendChild(elem);
           }
         };
 
         for (var _i3 = 0; _i3 < tiles.length; _i3++) {
-          _loop2(_i3);
+          _loop(_i3);
         }
       }.bind(this);
 
@@ -9130,6 +9121,44 @@ if (NOT_GENERIC || INCORRECT_NAME) {
   }, { unsafe: true });
 }
 
+
+/***/ }),
+/* 155 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var map = {
+	"./GameBoard.js": 143,
+	"./Hand.js": 147,
+	"./Match.js": 62,
+	"./Popups.js": 100,
+	"./Pretty.js": 106,
+	"./RoomManager.js": 139,
+	"./Sequence.js": 63,
+	"./StateManager.js": 64,
+	"./Tile.js": 30,
+	"./Wall.js": 149,
+	"./index.js": 108
+};
+
+
+function webpackContext(req) {
+	var id = webpackContextResolve(req);
+	return __webpack_require__(id);
+}
+function webpackContextResolve(req) {
+	if(!__webpack_require__.o(map, req)) {
+		var e = new Error("Cannot find module '" + req + "'");
+		e.code = 'MODULE_NOT_FOUND';
+		throw e;
+	}
+	return map[req];
+}
+webpackContext.keys = function webpackContextKeys() {
+	return Object.keys(map);
+};
+webpackContext.resolve = webpackContextResolve;
+module.exports = webpackContext;
+webpackContext.id = 155;
 
 /***/ })
 /******/ ]);

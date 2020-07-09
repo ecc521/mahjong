@@ -53,16 +53,9 @@ class Match {
 		}
 
 		Object.defineProperty(this, "tiles", {
-			get: function getTiles() {
-				let arr = []
-				for (let i=0;i<this.amount;i++) {
-					arr.push(new Tile({
-						value: this.value,
-						amount: this.amount
-					}))
-				}
-				return arr
-			}
+			get: (function getTiles() {
+				return new Array(this.amount).fill(0).map((() => {return this.getComponentTile()}).bind(this))
+			}).bind(this)
 		})
 
 		Object.defineProperty(this, "isPair", {

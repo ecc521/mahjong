@@ -14,14 +14,20 @@ let url = new URL(window.location)
 url.pathname = "/node"
 url.protocol = "ws:"
 if (window.location.hostname === "127.0.0.1") {
+    //Local development
     url.port = 3000
 }
 let websocketURL = url.toString()
 window.stateManager = new StateManager(websocketURL)
 
+//Make classes public to allow for easier development.
+;(["Hand", "Tile", "Sequence", "Pretty", "Match"]).forEach((className) => {
+    window[className] = require("./" + className + ".js")
+})
 
 let roomManager = require("./RoomManager.js")
 let gameBoard = require("./GameBoard.js")
+
 
 
 //While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
