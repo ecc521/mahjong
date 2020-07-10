@@ -28,7 +28,39 @@ class Room {
 		}
 		else {this.gameData.playerHands = {}}
 
+		let goMahjong = (function goMahjong(clientId, drewOwnTile = false) {
+			//First, verify the user can go mahjong.
+			let hand = this.gameData.playerHands[clientId]
+			let isMahjong = Hand.isMahjong(hand)
+			if (isMahjong instanceof Hand) {
+				hand.contents = isMahjong.contents //Autocomplete the mahjong.
+			}
 
+			if (!isMahjong) {
+				return global.stateManager.getClient(clientId).message(obj.type, "Unable to go mahjong with this hand. ", "error")
+			}
+
+			//The game is over.
+			this.gameData.isMahjong = true
+			sendStateToClients()
+
+			let summary = ""
+			for (let id in playerHands) {
+				summary += global.stateManager.getClient(id).getNickname()
+				summary += ": "
+				summary += playerHands[id].wind + ", "
+				let points = Hand.scoreHand(playerHands[id], {userWind: playerHands[id].wind})
+				if (id === clientId) {
+					points = Hand.scoreHand(playerHands[id], {isMahjong: true, drewOwnTile, userWind: playerHands[id].wind})
+				}
+				summary += points + " points. "
+				if (id === clientId) {
+					summary += "(Mahjong)"
+				}
+			}
+			this.messageAll("roomActionMahjong", summary, "success")
+		}).bind(this)
+		
 		let turnChoicesProxyHandler = {
 			set: (function(obj, prop, value) {
 				obj[prop] = value
@@ -281,39 +313,6 @@ class Room {
 			sendStateToClients()
 			return true
 		}).bind(this)
-
-		function goMahjong(clientId, drewOwnTile = false) {
-			//First, verify the user can go mahjong.
-			let hand = this.gameData.playerHands[clientId]
-			let isMahjong = Hand.isMahjong(hand)
-			if (isMahjong instanceof Hand) {
-				hand.contents = isMahjong.contents //Autocomplete the mahjong.
-			}
-
-			if (!isMahjong) {
-				return global.stateManager.getClient(clientId).message(obj.type, "Unable to go mahjong with this hand. ", "error")
-			}
-
-			//The game is over.
-			this.gameData.isMahjong = true
-			sendStateToClients()
-
-			let summary = ""
-			for (let id in playerHands) {
-				summary += global.stateManager.getClient(id).getNickname()
-				summary += ": "
-				summary += playerHands[id].wind + ", "
-				let points = Hand.scoreHand(playerHands[id], {userWind: playerHands[id].wind})
-				if (id === clientId) {
-					points = Hand.scoreHand(playerHands[id], {isMahjong: true, drewOwnTile, userWind: playerHands[id].wind})
-				}
-				summary += points + " points. "
-				if (id === clientId) {
-					summary += "(Mahjong)"
-				}
-			}
-			this.messageAll("roomActionMahjong", summary, "success")
-		}
 
 		this.removeClient = (function(clientId, explaination = "You have left the room. ") {
 			let clientIdIndex = this.clientIds.findIndex((currentClientId) => {return currentClientId === clientId})
