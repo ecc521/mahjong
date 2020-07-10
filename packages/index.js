@@ -8517,7 +8517,7 @@ var Hand = /*#__PURE__*/function () {
         }
       });
 
-      if (indexes[0] && indexes[1] && indexes[2]) {
+      if (indexes[0] !== undefined && indexes[1] !== undefined && indexes[2] !== undefined) {
         if (simulated) {
           return true;
         } //Remove the item the farthest back in the hand to avoid position shifting.
