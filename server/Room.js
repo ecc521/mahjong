@@ -31,7 +31,7 @@ class Room {
 		let goMahjong = (function goMahjong(clientId, drewOwnTile = false) {
 			//First, verify the user can go mahjong.
 			let hand = this.gameData.playerHands[clientId]
-			let isMahjong = Hand.isMahjong(hand)
+			let isMahjong = Hand.isMahjong(hand, this.gameData.unlimitedSequences)
 			if (isMahjong instanceof Hand) {
 				hand.contents = isMahjong.contents //Autocomplete the mahjong.
 			}
@@ -512,6 +512,11 @@ class Room {
 				//This is not a discard, and it related to a throw, so must either be a pong, kong, sequence, or a pair if the user is going mahjong.
 				if (!(placement instanceof Match || placement instanceof Sequence)) {
 					return global.stateManager.getClient(clientId).message(obj.type, "You can't discard when it is not your turn", "error")
+				}
+				if (placement instanceof Sequence && !this.gameData.unlimitedSequences) {
+					if (this.gameData.playerHands[clientId].contents.some((item) => {return item instanceof Sequence})) {
+						return global.stateManager.getClient(clientId).message(obj.type, "unlimitedSequences is off, so you can't place another sequence. ", "error")
+					}
 				}
 				//Schedule the order. It's validity will be checked later.
 				console.log("Scheduling")
