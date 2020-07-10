@@ -48,7 +48,7 @@ class Room {
 			for (let id in this.gameData.playerHands) {
 				summary += global.stateManager.getClient(id).getNickname()
 				summary += ": "
-				summary += playerHands[id].wind + ", "
+				summary += this.gameData.playerHands[id].wind + ", "
 				let points = Hand.scoreHand(this.gameData.playerHands[id], {userWind: this.gameData.playerHands[id].wind})
 				if (id === clientId) {
 					points = Hand.scoreHand(this.gameData.playerHands[id], {isMahjong: true, drewOwnTile, userWind: this.gameData.playerHands[id].wind})
