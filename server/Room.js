@@ -288,7 +288,7 @@ class Room {
 						}
 						else {
 							//Game over. Show all.
-							visibleClientState.visibleHand = hand.getExposedTiles()
+							visibleClientState.visibleHand = hand.contents
 						}
 						visibleClientState.wind = hand.wind
 					}

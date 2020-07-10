@@ -8777,7 +8777,7 @@ var Hand = /*#__PURE__*/function () {
         if (item instanceof Sequence) {
           suits[item.tiles[0].type] = true;
           onesAndNines = false;
-        } else {
+        } else if (!(item instanceof Pretty)) {
           suits[item.type] = true;
 
           if (item.value !== 1 && item.value !== 9) {
