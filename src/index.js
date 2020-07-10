@@ -21,7 +21,7 @@ let websocketURL = url.toString()
 window.stateManager = new StateManager(websocketURL)
 
 //Make classes public to allow for easier development.
-;(["Hand", "Tile", "Sequence", "Pretty", "Match"]).forEach((className) => {
+;(["Hand", "Tile", "Sequence", "Pretty", "Match", "Wall"]).forEach((className) => {
     window[className] = require("./" + className + ".js")
 })
 

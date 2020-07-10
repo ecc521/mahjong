@@ -41,7 +41,7 @@ class Match {
 
 
 			if (this.amount === 4) {points *= 4} //Kongs worth 4 times as much as pongs.
-			if (!exposed) {points *= 2} //In hand worth 4 times as much.
+			if (!this.exposed) {points *= 2} //In hand worth 4 times as much.
 			return points
 		}
 

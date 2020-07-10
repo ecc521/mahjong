@@ -29,6 +29,9 @@ class StateManager {
 			else if (obj.type === "roomActionEndGame") {
 				onEndGame(obj)
 			}
+			else if (obj.type === "roomActionMahjong") {
+				if (this.onGameMahjong instanceof Function) {this.onGameMahjong(obj)}
+			}
 			else if (obj.type === "roomActionPlaceTiles") {
 				if (this.onPlaceTiles instanceof Function) {this.onPlaceTiles(obj)}
 			}
@@ -133,11 +136,12 @@ class StateManager {
 			}))
 		}
 
-		this.placeTiles = function(tiles) {
+		this.placeTiles = function(tiles, mahjong = false) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionPlaceTiles",
 				clientId: window.clientId,
 				roomId: window.stateManager.roomId,
+				mahjong,
 				message: tiles,
 			}))
 		}

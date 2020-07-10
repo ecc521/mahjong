@@ -53,14 +53,39 @@ class Room {
 				}
 
 				if (Object.keys(obj).length === 4) {
-					//TODO: Handle this turn, and begin the next one.
+					//Handle this turn, and begin the next one.
 					let priorityList = []
 					for (let key in obj) {
 						if (obj[key] !== "Next") {
-							//TODO: Need mahjong priority, which will also override sequence restrictions.
+
+							let hand = this.gameData.playerHands[key]
+							hand.add(this.gameData.currentTurn.thrown)
+							//wouldMakeMahjong will confirm that the current tile will allow mahjong to happen.
+							let mahjongHand = Hand.isMahjong(hand)
+							let wouldMakeMahjong = !!(mahjongHand);
+							hand.remove(this.gameData.currentTurn.thrown)
+
+							if (mahjongHand instanceof Array) {
+								//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
+								if (!mahjongHand.getStringContents().includes(obj[key].toJSON())) {
+									wouldMakeMahjong = false
+									global.stateManager.getClient(key).message("roomActionPlaceTiles", "You can't go mahjong at this moment with the specified placement. Your placement will be considered without mahjong priority applied. ", "error")
+								}
+							}
+
+							if (obj[key].mahjong && !wouldMakeMahjong) {
+								global.stateManager.getClient(key).message("roomActionPlaceTiles", "You can't go mahjong at this moment. Your placement will be considered without mahjong priority applied. ", "error")
+							}
+
 							let priority;
-							let placerWind = this.gameData.playerHands[key].wind
-							if (obj[key] instanceof Match) {
+							let placerWind = hand.wind
+							if (wouldMakeMahjong && obj[key].mahjong) {
+								priority = 109
+								let total = getBackwardsDistance(placerWind, throwerWind)
+								console.log(total)
+								priority -= total
+							}
+							else if (obj[key] instanceof Match) {
 								priority = 104;
 								//Add priority based on position to thrower. The closer to the thrower, the highest priority.
 								let total = getBackwardsDistance(placerWind, throwerWind)
@@ -71,18 +96,17 @@ class Room {
 								//Verify that the user is the one immediently before.
 								if (getBackwardsDistance(placerWind, throwerWind) > 1) {
 									console.log("Greater than one person distance on sequence. Denied. ")
+									global.stateManager.getClient(key).message("roomActionPlaceTiles", "You can only take a sequence from the player before you in the rotation order, except with mahjong.", "error")
 									continue;
 								}
 								priority = 99
 							}
 							else {
-								//???
 								priority = 98
 							}
 							priorityList.push([priority, key])
 						}
 					}
-
 					//If anybody attempted to place, time to process them.
 					let utilized = false; //Did we use the thrown tile?
 					console.log(priorityList.length)
@@ -116,9 +140,11 @@ class Room {
 									let hand = this.gameData.playerHands[clientId]
 									//Add the tile to hand, attempt to verify, and, if not, remove
 									hand.add(this.gameData.currentTurn.thrown)
-									if (removeSequenceFromHand(hand, placement)) {
+									if (hand.removeSequenceFromHand(placement)) {
 										utilized = true
 										hand.add(placement)
+										placement.exposed = true
+										goMahjong(clientId)
 										this.gameData.currentTurn.userTurn = clientId
 									}
 									else {
@@ -126,16 +152,20 @@ class Room {
 										global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You can't place a sequence of tiles you do not possess", "error")
 									}
 								}
+								else {
+									global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "Are you trying to hack? You must use the thrown tile when attempting to place off turn. ", "error")
+								}
 							}
 							else if (placement instanceof Match) {
 								//Confirm that the match uses the thrown tile
 								if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
 									let hand = this.gameData.playerHands[clientId]
 									//We can just verify for on less tile here.
-									if (removeTilesFromHand(hand, placement.getComponentTile(), placement.amount - 1)) {
+									if (hand.removeTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
+										goMahjong(clientId)
 										if (placement.amount === 4) {
 											//Draw them another tile.
 											drawTile(clientId, true) //Draw from back of wall.
@@ -152,6 +182,7 @@ class Room {
 					}
 
 					if (utilized === false) {
+						//TODO: Automatic fourth tile pickup for kongs if possible.
 						this.gameData.discardPile.push(this.gameData.currentTurn.thrown)
 						//Shift to next player, draw them a tile.
 						let nextWind = windOrder[windOrder.indexOf(this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind) + 1]
@@ -215,8 +246,14 @@ class Room {
 						visibleClientState.hand = hand
 					}
 					else {
-						//One can only see exposed tiles of other players. True says to include other tiles as face down.
-						visibleClientState.visibleHand = hand.getExposedTiles(true)
+						if (!this.gameData.isMahjong) {
+							//One can only see exposed tiles of other players. True says to include other tiles as face down.
+							visibleClientState.visibleHand = hand.getExposedTiles(true)
+						}
+						else {
+							//Game over. Show all.
+							visibleClientState.visibleHand = hand.getExposedTiles()
+						}
 						visibleClientState.wind = hand.wind
 					}
 				}
@@ -244,6 +281,39 @@ class Room {
 			sendStateToClients()
 			return true
 		}).bind(this)
+
+		function goMahjong(clientId, drewOwnTile = false) {
+			//First, verify the user can go mahjong.
+			let hand = this.gameData.playerHands[clientId]
+			let isMahjong = Hand.isMahjong(hand)
+			if (isMahjong instanceof Hand) {
+				hand.contents = isMahjong.contents //Autocomplete the mahjong.
+			}
+
+			if (!isMahjong) {
+				return global.stateManager.getClient(clientId).message(obj.type, "Unable to go mahjong with this hand. ", "error")
+			}
+
+			//The game is over.
+			this.gameData.isMahjong = true
+			sendStateToClients()
+
+			let summary = ""
+			for (let id in playerHands) {
+				summary += global.stateManager.getClient(id).getNickname()
+				summary += ": "
+				summary += playerHands[id].wind + ", "
+				let points = Hand.scoreHand(playerHands[id], {userWind: playerHands[id].wind})
+				if (id === clientId) {
+					points = Hand.scoreHand(playerHands[id], {isMahjong: true, drewOwnTile, userWind: playerHands[id].wind})
+				}
+				summary += points + " points. "
+				if (id === clientId) {
+					summary += "(Mahjong)"
+				}
+			}
+			this.messageAll("roomActionMahjong", summary, "success")
+		}
 
 		this.removeClient = (function(clientId, explaination = "You have left the room. ") {
 			let clientIdIndex = this.clientIds.findIndex((currentClientId) => {return currentClientId === clientId})
@@ -305,6 +375,7 @@ class Room {
 				//Build the wall.
 				this.gameData.wall = new Wall()
 				this.gameData.discardPile = []
+				this.gameData.unlimitedSequences = false
 
 				//Build the player hands.
 				//For now, we will randomly assign winds.
@@ -351,48 +422,6 @@ class Room {
 			sendStateToClients()
 		}).bind(this)
 
-		function removeTilesFromHand(hand, obj, amount = 1) {
-			//We will verify that the tiles CAN be removed before removing them.
-			let contents = hand.getStringContents()
-			let toRemove = obj.toJSON()
-
-			let indexes = []
-			contents.forEach((str, index) => {
-				if (toRemove === str) {indexes.push(index)}
-			})
-
-			if (indexes.length >= amount) {
-				for (let i=0;i<amount;i++) {
-					hand.contents.splice(indexes[indexes.length - 1 - i], 1) //Remove the item the farthest back in the hand to avoid position shifting.
-				}
-				return true
-			}
-			else {return false}
-		}
-
-		function removeSequenceFromHand(hand, sequence) {
-			//We will verify that the tiles CAN be removed before removing them.
-			let contents = hand.getStringContents()
-			let indexes = []
-			JSON.parse(JSON.stringify(sequence.tiles)).forEach((str, index) => {
-				for (let i=contents.length-1;i>=0;i--) {
-					if (contents[i] === str) {
-						indexes[index] = i
-						return
-					}
-				}
-			})
-
-			if (indexes[0] && indexes[1] && indexes[2]) {
-				//Remove the item the farthest back in the hand to avoid position shifting.
-				indexes.sort((a,b) => {return b-a}).forEach((index) => {
-					hand.contents.splice(index, 1)
-				})
-				return true
-			}
-			else {return false}
-		}
-
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
 			console.log(obj, clientId)
@@ -433,9 +462,13 @@ class Room {
 					//This player is not allowed to perform any actions at this stage.
 					return global.stateManager.getClient(clientId).message(obj.type, "Can't place after draw before throw", "error")
 				}
+				let hand = this.gameData.playerHands[clientId]
 				if (placement instanceof Tile) {
+					if (obj.mahjong) {
+						return global.stateManager.getClient(clientId).message(obj.type, "You can't discard and go mahjong. ", "error")
+					}
 					//This is a discard.
-					if (removeTilesFromHand(this.gameData.playerHands[clientId], placement)) {
+					if (hand.removeTilesFromHand(placement)) {
 						//Tile thrown
 						this.gameData.currentTurn.thrown = placement
 						sendStateToClients()
@@ -447,8 +480,10 @@ class Room {
 				}
 				else if (placement instanceof Match) {
 					if (placement.amount === 4) {
-						let hand = this.gameData.playerHands[clientId]
-						if (removeTilesFromHand(hand, placement.getComponentTile(), 4)) {
+						if (obj.mahjong) {
+							return global.stateManager.getClient(clientId).message(obj.type, "You can't go mahjong while placing a kong. ", "error")
+						}
+						if (hand.removeTilesFromHand(placement.getComponentTile(), 4)) {
 							//Place Kong. Turn remains the same, thrown false.
 							hand.contents.push(placement)
 							//This must be an in hand kong, therefore we do not expose, although in hand kongs will be shown.
@@ -457,15 +492,18 @@ class Room {
 							drawTile(clientId, true) //Draw from back of wall.
 							sendStateToClients()
 							console.log("Kong")
+
 						}
 						else {
 							return global.stateManager.getClient(clientId).message(obj.type, "You can't place tiles you do not possess", "error")
 						}
 					}
 					else {
-						//TODO: Check if this placement would make the user mahjong, and if so, end the game.
-						return global.stateManager.getClient(clientId).message(obj.type, "Can't expose in hand pong, sequence, or pair before mahjong", "error")
+						return global.stateManager.getClient(clientId).message(obj.type, "Can't expose in hand pong, sequence, or pair. This can only be done via mahjong.", "error")
 					}
+				}
+				else if (obj.mahjong) {
+					goMahjong(clientId)
 				}
 				else {
 					return global.stateManager.getClient(clientId).message(obj.type, "Invalid placement attempt for current game status", "error")
@@ -478,6 +516,7 @@ class Room {
 				}
 				//Schedule the order. It's validity will be checked later.
 				console.log("Scheduling")
+				placement.mahjong = obj.mahjong
 				this.gameData.currentTurn.turnChoices[clientId] = placement
 				sendStateToClients()
 			}

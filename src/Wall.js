@@ -18,34 +18,7 @@ class Wall {
 			this.tiles = []
 
 			//Time to add the tiles to the deck...
-			for (let i=1;i<=9;i++) {
-				for (let c=0;c<4;c++) {
-					["bamboo", "character", "circle"].forEach((type) => {
-						this.tiles.push(new Tile({
-							type,
-							value: i
-						}))
-					})
-				}
-			}
-
-			;["red", "green", "white"].forEach((value) => {
-				for (let i=0;i<4;i++) {
-					this.tiles.push(new Tile({
-						type: "dragon",
-						value: value
-					}))
-				}
-			})
-
-			;["north", "south", "east", "west"].forEach((value) => {
-				for (let i=0;i<4;i++) {
-					this.tiles.push(new Tile({
-						type: "wind",
-						value: value
-					}))
-				}
-			})
+			this.tiles = this.tiles.concat(Wall.getNonPrettyTiles())
 
 			;[false, true].forEach((isSeason) => {
 				for (let i=1;i<=4;i++) {
@@ -63,6 +36,40 @@ class Wall {
 		this.toJSON = (function() {
 			return JSON.stringify(this.tiles)
 		}).bind(this)
+	}
+
+	static getNonPrettyTiles(amount = 4) {
+		//We have this as a static method because it can be useful to obtain a copy of every playing tiles in the game.
+		let tiles = []
+		for (let i=1;i<=9;i++) {
+			for (let c=0;c<amount;c++) {
+				["bamboo", "character", "circle"].forEach((type) => {
+					tiles.push(new Tile({
+						type,
+						value: i
+					}))
+				})
+			}
+		}
+
+		;["red", "green", "white"].forEach((value) => {
+			for (let i=0;i<amount;i++) {
+				tiles.push(new Tile({
+					type: "dragon",
+					value: value
+				}))
+			}
+		})
+
+		;["north", "south", "east", "west"].forEach((value) => {
+			for (let i=0;i<amount;i++) {
+				tiles.push(new Tile({
+					type: "wind",
+					value: value
+				}))
+			}
+		})
+		return tiles
 	}
 
 	static shuffleArray(array) {

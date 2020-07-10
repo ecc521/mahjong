@@ -1740,7 +1740,7 @@ var Match = /*#__PURE__*/function () {
       } //Kongs worth 4 times as much as pongs.
 
 
-      if (!exposed) {
+      if (!this.exposed) {
         points *= 2;
       } //In hand worth 4 times as much.
 
@@ -2022,6 +2022,10 @@ var StateManager = /*#__PURE__*/function () {
         onStartGame(obj);
       } else if (obj.type === "roomActionEndGame") {
         onEndGame(obj);
+      } else if (obj.type === "roomActionMahjong") {
+        if (this.onGameMahjong instanceof Function) {
+          this.onGameMahjong(obj);
+        }
       } else if (obj.type === "roomActionPlaceTiles") {
         if (this.onPlaceTiles instanceof Function) {
           this.onPlaceTiles(obj);
@@ -2214,10 +2218,12 @@ var StateManager = /*#__PURE__*/function () {
     };
 
     this.placeTiles = function (tiles) {
+      var mahjong = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       this.sendMessage(JSON.stringify({
         type: "roomActionPlaceTiles",
         clientId: window.clientId,
         roomId: window.stateManager.roomId,
+        mahjong: mahjong,
         message: tiles
       }));
     };
@@ -5098,7 +5104,7 @@ if (window.location.hostname === "127.0.0.1") {
 var websocketURL = url.toString();
 window.stateManager = new StateManager(websocketURL) //Make classes public to allow for easier development.
 ;
-["Hand", "Tile", "Sequence", "Pretty", "Match"].forEach(function (className) {
+["Hand", "Tile", "Sequence", "Pretty", "Match", "Wall"].forEach(function (className) {
   window[className] = __webpack_require__(155)("./" + className + ".js");
 });
 
@@ -7936,6 +7942,22 @@ endGameButton.addEventListener("click", function () {
     window.stateManager.endGame();
   }
 });
+var goMahjongButton = document.createElement("button");
+goMahjongButton.id = "goMahjongButton";
+goMahjongButton.innerHTML = "Mahjong";
+gameBoard.appendChild(goMahjongButton);
+goMahjongButton.addEventListener("click", function () {
+  var placement = userHand.inPlacemat;
+  console.log(placement);
+  window.stateManager.placeTiles(placement, {
+    mahjong: true
+  });
+});
+
+stateManager.onGameMahjong = function (obj) {
+  new Popups.Notification("Mahjong!", obj.message).show();
+};
+
 var wallRendering = document.createElement("div");
 wallRendering.id = "wall";
 gameBoard.appendChild(wallRendering);
@@ -8136,15 +8158,27 @@ module.exports = function (METHOD_NAME) {
 /* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(158);
+
+__webpack_require__(160);
+
+__webpack_require__(161);
+
 __webpack_require__(101);
+
+__webpack_require__(164);
 
 __webpack_require__(148);
 
 __webpack_require__(20);
 
+__webpack_require__(162);
+
 __webpack_require__(29);
 
 __webpack_require__(102);
+
+__webpack_require__(33);
 
 __webpack_require__(39);
 
@@ -8156,9 +8190,29 @@ __webpack_require__(82);
 
 __webpack_require__(18);
 
+__webpack_require__(163);
+
+__webpack_require__(165);
+
+__webpack_require__(84);
+
+__webpack_require__(154);
+
+__webpack_require__(60);
+
 __webpack_require__(28);
 
+__webpack_require__(96);
+
 __webpack_require__(19);
+
+__webpack_require__(137);
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -8417,6 +8471,67 @@ var Hand = /*#__PURE__*/function () {
       }
     }
 
+    this.removeTilesFromHand = function removeTilesFromHand(obj) {
+      var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+      var simulated = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+      //We will verify that the tiles CAN be removed before removing them.
+      var contents = this.getStringContents();
+      var toRemove = obj.toJSON();
+      var indexes = [];
+      contents.forEach(function (str, index) {
+        if (toRemove === str) {
+          indexes.push(index);
+        }
+      });
+
+      if (indexes.length >= amount) {
+        if (simulated) {
+          return true;
+        }
+
+        for (var i = 0; i < amount; i++) {
+          this.contents.splice(indexes[indexes.length - 1 - i], 1); //Remove the item the farthest back in the hand to avoid position shifting.
+        }
+
+        return true;
+      } else {
+        return false;
+      }
+    }.bind(this);
+
+    this.removeSequenceFromHand = function removeSequenceFromHand(sequence) {
+      var _this = this;
+
+      var simulated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+      //We will verify that the tiles CAN be removed before removing them.
+      var contents = this.getStringContents();
+      var indexes = [];
+      JSON.parse(JSON.stringify(sequence.tiles)).forEach(function (str, index) {
+        for (var i = contents.length - 1; i >= 0; i--) {
+          if (contents[i] === str) {
+            indexes[index] = i;
+            return;
+          }
+        }
+      });
+
+      if (indexes[0] && indexes[1] && indexes[2]) {
+        if (simulated) {
+          return true;
+        } //Remove the item the farthest back in the hand to avoid position shifting.
+
+
+        indexes.sort(function (a, b) {
+          return b - a;
+        }).forEach(function (index) {
+          _this.contents.splice(index, 1);
+        });
+        return true;
+      } else {
+        return false;
+      }
+    }.bind(this);
+
     this.renderPlacemat = function (classForFirst) {
       while (this.tilePlacemat.firstChild) {
         this.tilePlacemat.firstChild.remove();
@@ -8523,27 +8638,27 @@ var Hand = /*#__PURE__*/function () {
       }
 
       var drawTiles = function drawTiles(tiles, type) {
-        var _this = this;
+        var _this2 = this;
 
         var _loop = function _loop(_i3) {
           var tile = tiles[_i3];
           var elem = document.createElement("img");
           elem.src = tile.imageUrl;
 
-          if (type === "exposed" && _this.handForExposed) {
-            _this.handForExposed.appendChild(elem);
+          if (type === "exposed" && _this2.handForExposed) {
+            _this2.handForExposed.appendChild(elem);
           } else if (type === "exposed") {
-            _this.handToRender.appendChild(elem);
+            _this2.handToRender.appendChild(elem);
           } else if (type === "unexposed") {
-            if (_this.interactive) {
+            if (_this2.interactive) {
               elem.draggable = true;
               elem.addEventListener("dragstart", dragstart);
-              elem.tileIndex = _this.contents.findIndex(function (item) {
+              elem.tileIndex = _this2.contents.findIndex(function (item) {
                 return item === tile;
               });
             }
 
-            _this.handToRender.appendChild(elem);
+            _this2.handToRender.appendChild(elem);
           }
         };
 
@@ -8608,58 +8723,312 @@ var Hand = /*#__PURE__*/function () {
     }
   }, {
     key: "scoreHand",
-    value: function scoreHand(hand, config) {
-      //Hand is an array of arrays of Tiles, Matches, and Prettys
+    value: function scoreHand(hand) {
+      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+
+      if (hand instanceof Hand) {
+        hand = hand.contents;
+      } //Hand is an array of arrays of Tiles, Matches, and Prettys
+
+
       var doubles = 0;
       var score = 0;
+      var sequences = false;
+
+      if (!config.userWind) {
+        console.warn("scoreHand not provided config.userWind, may result in improper scoring. ");
+      }
 
       for (var i = 0; i < hand.length; i++) {
         var match = hand[i];
         doubles += match.isDouble(config.userWind);
-        points += match.getPoints(config.userWind);
+        score += match.getPoints(config.userWind);
+        sequences = sequences || match.isSequence;
       }
 
-      if (isMahjong(hand, config.unlimitedSequences)) {
+      if (config.isMahjong) {
         score += 20;
 
         if (config.drewOwnTile) {
           score += 10;
         }
 
-        if (sequences === 0) {
+        if (!sequences) {
           score += 10;
         }
       }
 
+      doubles += Hand.getClearHandDoubles(hand);
       return score * Math.pow(2, doubles);
+    }
+  }, {
+    key: "getClearHandDoubles",
+    value: function getClearHandDoubles(hand) {
+      if (hand instanceof Hand) {
+        hand = hand.contents;
+      }
+
+      var suits = {};
+      var honors = false;
+      var onesAndNines = true;
+      hand.forEach(function (item) {
+        if (item instanceof Sequence) {
+          suits[item.tiles[0].type] = true;
+          onesAndNines = false;
+        } else {
+          suits[item.type] = true;
+
+          if (item.value !== 1 && item.value !== 9) {
+            onesAndNines = false;
+          }
+        }
+      });
+
+      if (suits["wind"] || suits["dragon"]) {
+        delete suits["wind"];
+        delete suiuts["dragon"];
+        honors = true;
+      }
+
+      suits = Object.keys(suits).length;
+
+      if (suits === 0) {
+        //All honors
+        return 3;
+      } else if (suits === 1 && !honors) {
+        return 3;
+      } else if (suits === 1 && honors) {
+        return 1;
+      } else if (onesAndNines && !honors) {
+        return 3;
+      } else if (onesAndNines && honors) {
+        return 1;
+      }
+
+      return 0;
     }
   }, {
     key: "isMahjong",
     value: function isMahjong(hand, unlimitedSequences) {
+      var _marked2 = /*#__PURE__*/regeneratorRuntime.mark(generateCombinations);
+
+      if (hand instanceof Hand) {
+        hand = hand.contents;
+      } //Returns 2 for mahjong, and 0 for not mahjong.
+      //If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
+
+
       var pongOrKong = 0;
       var pairs = 0;
       var sequences = 0;
+      var remainingTiles = [];
 
       for (var i = 0; i < hand.length; i++) {
         var match = hand[i];
-        pongOrKong += match.isPongOrKong;
-        pairs += match.isPair;
-        sequences += match.isSequence;
+
+        if (match.isPongOrKong) {
+          pongOrKong++;
+        } else if (match.isPair) {
+          pairs++;
+        } else if (match.isSequence) {
+          sequences++;
+        } else {
+          remainingTiles.push(match);
+        }
       }
 
       if (pairs === 1) {
         if (unlimitedSequences) {
           if (sequences + pongOrKong === 4) {
-            return true;
+            return 2;
           }
         } else {
-          if (Math.max(sequences, 1) + pongOrKong === 4) {
-            return true;
+          if (Math.min(sequences, 1) + pongOrKong === 4) {
+            return 2;
           }
         }
+      } //Now we need to go through our remaining tiles.
+
+
+      console.log(pongOrKong, sequences, pairs);
+      console.log(remainingTiles);
+      var allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1));
+      var possibleMatches = [];
+      var possibleSequences = [];
+      var testingHand = new Hand();
+      testingHand.contents = remainingTiles.slice(0);
+      allTiles.forEach(function (tile) {
+        if (testingHand.removeTilesFromHand(tile, 3, true)) {
+          possibleMatches.push(tile);
+        }
+      });
+      allTiles.forEach(function (tile, index) {
+        if (!Sequence.isValidSequence(allTiles.slice(index, index + 3))) {
+          return;
+        }
+
+        var sequence = new Sequence({
+          exposed: false,
+          tiles: allTiles.slice(index, index + 3)
+        });
+
+        if (testingHand.removeSequenceFromHand(sequence, true)) {
+          possibleSequences.push(sequence);
+        }
+      }); //https://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array/39092843#39092843
+
+      function generateCombinations(arr, size) {
+        var _marked, doGenerateCombinations;
+
+        return regeneratorRuntime.wrap(function generateCombinations$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                doGenerateCombinations = function _doGenerateCombinatio(offset, combo) {
+                  var _i4;
+
+                  return regeneratorRuntime.wrap(function doGenerateCombinations$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          if (!(combo.length == size)) {
+                            _context.next = 5;
+                            break;
+                          }
+
+                          _context.next = 3;
+                          return combo;
+
+                        case 3:
+                          _context.next = 11;
+                          break;
+
+                        case 5:
+                          _i4 = offset;
+
+                        case 6:
+                          if (!(_i4 < arr.length)) {
+                            _context.next = 11;
+                            break;
+                          }
+
+                          return _context.delegateYield(doGenerateCombinations(_i4 + 1, combo.concat(arr[_i4])), "t0", 8);
+
+                        case 8:
+                          _i4++;
+                          _context.next = 6;
+                          break;
+
+                        case 11:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  }, _marked);
+                };
+
+                _marked = /*#__PURE__*/regeneratorRuntime.mark(doGenerateCombinations);
+                return _context2.delegateYield(doGenerateCombinations(0, []), "t0", 3);
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _marked2);
       }
 
-      return false;
+      var combinations = [];
+      var allPossibilities = possibleMatches;
+      var neededPongEquivs = 4;
+
+      if (unlimitedSequences || sequences === 0) {
+        allPossibilities = allPossibilities.concat(possibleSequences);
+        neededPongEquivs -= sequences;
+      } else {
+        neededPongEquivs -= Math.min(sequences, 1);
+      }
+
+      neededPongEquivs -= pongOrKong;
+
+      var _iterator = _createForOfIteratorHelper(generateCombinations(allPossibilities, neededPongEquivs)),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var combo = _step.value;
+          combinations.push(combo);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      console.log(possibleMatches);
+      console.log(possibleSequences);
+      console.log(combinations);
+      var successfulCombinations = [];
+      combinations.forEach(function (combo, index) {
+        var localTestHand = new Hand();
+        localTestHand.contents = testingHand.contents.slice(0);
+
+        for (var _i5 = 0; _i5 < combo.length; _i5++) {
+          var item = combo[_i5];
+
+          if (item instanceof Tile) {
+            if (!localTestHand.removeTilesFromHand(item, 3)) {
+              return 0;
+            }
+
+            localTestHand.add(new Match({
+              type: item.type,
+              value: item.value,
+              exposed: false,
+              amount: 3
+            }));
+          } else if (item instanceof Sequence) {
+            if (!localTestHand.removeSequenceFromHand(item)) {
+              return 0;
+            }
+
+            localTestHand.add(item);
+          }
+        } //Check for a pair
+
+
+        var tile = localTestHand.contents.filter(function (item) {
+          return item instanceof Tile;
+        })[0];
+
+        if (!localTestHand.removeTilesFromHand(tile, 2, true)) {
+          return 0;
+        } else {
+          localTestHand.add(new Match({
+            type: tile.type,
+            value: tile.value,
+            exposed: false,
+            amount: 2
+          }));
+          localTestHand.removeTilesFromHand(tile, 2);
+          console.log(Hand.scoreHand(localTestHand, {
+            isMahjong: true
+          }));
+          successfulCombinations.push(localTestHand);
+          return true;
+        }
+      });
+      console.log(successfulCombinations);
+
+      if (successfulCombinations.length > 1) {
+        alert("You've created a hand that our code didn't know was possible. Everything may work fine, but please take a screenshot of your hand and open an issue at https://github.com/ecc521/mahjong. ");
+      }
+
+      if (successfulCombinations.length > 0) {
+        return successfulCombinations[0];
+      }
+
+      return 0;
     }
   }, {
     key: "convertStringsToTiles",
@@ -8736,6 +9105,8 @@ addToUnscopables(FIND_INDEX);
 /* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(101);
+
 __webpack_require__(20);
 
 __webpack_require__(39);
@@ -8781,42 +9152,11 @@ var Wall = /*#__PURE__*/function () {
     } else {
       this.tiles = []; //Time to add the tiles to the deck...
 
-      var _loop = function _loop(i) {
-        for (var c = 0; c < 4; c++) {
-          ["bamboo", "character", "circle"].forEach(function (type) {
-            _this.tiles.push(new Tile({
-              type: type,
-              value: i
-            }));
-          });
-        }
-      };
-
-      for (var i = 1; i <= 9; i++) {
-        _loop(i);
-      }
-
-      ;
-      ["red", "green", "white"].forEach(function (value) {
-        for (var _i = 0; _i < 4; _i++) {
-          _this.tiles.push(new Tile({
-            type: "dragon",
-            value: value
-          }));
-        }
-      });
-      ["north", "south", "east", "west"].forEach(function (value) {
-        for (var _i2 = 0; _i2 < 4; _i2++) {
-          _this.tiles.push(new Tile({
-            type: "wind",
-            value: value
-          }));
-        }
-      });
+      this.tiles = this.tiles.concat(Wall.getNonPrettyTiles());
       [false, true].forEach(function (isSeason) {
-        for (var _i3 = 1; _i3 <= 4; _i3++) {
+        for (var i = 1; i <= 4; i++) {
           _this.tiles.push(new Pretty({
-            value: _i3,
+            value: i,
             seasonOrFlower: isSeason ? "season" : "flower"
           }));
         }
@@ -8831,6 +9171,47 @@ var Wall = /*#__PURE__*/function () {
   }
 
   _createClass(Wall, null, [{
+    key: "getNonPrettyTiles",
+    value: function getNonPrettyTiles() {
+      var amount = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 4;
+      //We have this as a static method because it can be useful to obtain a copy of every playing tiles in the game.
+      var tiles = [];
+
+      var _loop = function _loop(i) {
+        for (var c = 0; c < amount; c++) {
+          ["bamboo", "character", "circle"].forEach(function (type) {
+            tiles.push(new Tile({
+              type: type,
+              value: i
+            }));
+          });
+        }
+      };
+
+      for (var i = 1; i <= 9; i++) {
+        _loop(i);
+      }
+
+      ;
+      ["red", "green", "white"].forEach(function (value) {
+        for (var _i = 0; _i < amount; _i++) {
+          tiles.push(new Tile({
+            type: "dragon",
+            value: value
+          }));
+        }
+      });
+      ["north", "south", "east", "west"].forEach(function (value) {
+        for (var _i2 = 0; _i2 < amount; _i2++) {
+          tiles.push(new Tile({
+            type: "wind",
+            value: value
+          }));
+        }
+      });
+      return tiles;
+    }
+  }, {
     key: "shuffleArray",
     value: function shuffleArray(array) {
       //Durstenfeld shuffle
@@ -9159,6 +9540,538 @@ webpackContext.keys = function webpackContextKeys() {
 webpackContext.resolve = webpackContextResolve;
 module.exports = webpackContext;
 webpackContext.id = 155;
+
+/***/ }),
+/* 156 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var wellKnownSymbol = __webpack_require__(0);
+
+exports.f = wellKnownSymbol;
+
+
+/***/ }),
+/* 157 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var path = __webpack_require__(113);
+var has = __webpack_require__(6);
+var wrappedWellKnownSymbolModule = __webpack_require__(156);
+var defineProperty = __webpack_require__(14).f;
+
+module.exports = function (NAME) {
+  var Symbol = path.Symbol || (path.Symbol = {});
+  if (!has(Symbol, NAME)) defineProperty(Symbol, NAME, {
+    value: wrappedWellKnownSymbolModule.f(NAME)
+  });
+};
+
+
+/***/ }),
+/* 158 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(3);
+var global = __webpack_require__(1);
+var getBuiltIn = __webpack_require__(17);
+var IS_PURE = __webpack_require__(23);
+var DESCRIPTORS = __webpack_require__(7);
+var NATIVE_SYMBOL = __webpack_require__(74);
+var USE_SYMBOL_AS_UID = __webpack_require__(115);
+var fails = __webpack_require__(2);
+var has = __webpack_require__(6);
+var isArray = __webpack_require__(52);
+var isObject = __webpack_require__(5);
+var anObject = __webpack_require__(4);
+var toObject = __webpack_require__(12);
+var toIndexedObject = __webpack_require__(22);
+var toPrimitive = __webpack_require__(31);
+var createPropertyDescriptor = __webpack_require__(21);
+var nativeObjectCreate = __webpack_require__(55);
+var objectKeys = __webpack_require__(76);
+var getOwnPropertyNamesModule = __webpack_require__(114);
+var getOwnPropertyNamesExternal = __webpack_require__(159);
+var getOwnPropertySymbolsModule = __webpack_require__(71);
+var getOwnPropertyDescriptorModule = __webpack_require__(40);
+var definePropertyModule = __webpack_require__(14);
+var propertyIsEnumerableModule = __webpack_require__(65);
+var createNonEnumerableProperty = __webpack_require__(8);
+var redefine = __webpack_require__(10);
+var shared = __webpack_require__(68);
+var sharedKey = __webpack_require__(45);
+var hiddenKeys = __webpack_require__(46);
+var uid = __webpack_require__(69);
+var wellKnownSymbol = __webpack_require__(0);
+var wrappedWellKnownSymbolModule = __webpack_require__(156);
+var defineWellKnownSymbol = __webpack_require__(157);
+var setToStringTag = __webpack_require__(27);
+var InternalStateModule = __webpack_require__(16);
+var $forEach = __webpack_require__(50).forEach;
+
+var HIDDEN = sharedKey('hidden');
+var SYMBOL = 'Symbol';
+var PROTOTYPE = 'prototype';
+var TO_PRIMITIVE = wellKnownSymbol('toPrimitive');
+var setInternalState = InternalStateModule.set;
+var getInternalState = InternalStateModule.getterFor(SYMBOL);
+var ObjectPrototype = Object[PROTOTYPE];
+var $Symbol = global.Symbol;
+var $stringify = getBuiltIn('JSON', 'stringify');
+var nativeGetOwnPropertyDescriptor = getOwnPropertyDescriptorModule.f;
+var nativeDefineProperty = definePropertyModule.f;
+var nativeGetOwnPropertyNames = getOwnPropertyNamesExternal.f;
+var nativePropertyIsEnumerable = propertyIsEnumerableModule.f;
+var AllSymbols = shared('symbols');
+var ObjectPrototypeSymbols = shared('op-symbols');
+var StringToSymbolRegistry = shared('string-to-symbol-registry');
+var SymbolToStringRegistry = shared('symbol-to-string-registry');
+var WellKnownSymbolsStore = shared('wks');
+var QObject = global.QObject;
+// Don't use setters in Qt Script, https://github.com/zloirock/core-js/issues/173
+var USE_SETTER = !QObject || !QObject[PROTOTYPE] || !QObject[PROTOTYPE].findChild;
+
+// fallback for old Android, https://code.google.com/p/v8/issues/detail?id=687
+var setSymbolDescriptor = DESCRIPTORS && fails(function () {
+  return nativeObjectCreate(nativeDefineProperty({}, 'a', {
+    get: function () { return nativeDefineProperty(this, 'a', { value: 7 }).a; }
+  })).a != 7;
+}) ? function (O, P, Attributes) {
+  var ObjectPrototypeDescriptor = nativeGetOwnPropertyDescriptor(ObjectPrototype, P);
+  if (ObjectPrototypeDescriptor) delete ObjectPrototype[P];
+  nativeDefineProperty(O, P, Attributes);
+  if (ObjectPrototypeDescriptor && O !== ObjectPrototype) {
+    nativeDefineProperty(ObjectPrototype, P, ObjectPrototypeDescriptor);
+  }
+} : nativeDefineProperty;
+
+var wrap = function (tag, description) {
+  var symbol = AllSymbols[tag] = nativeObjectCreate($Symbol[PROTOTYPE]);
+  setInternalState(symbol, {
+    type: SYMBOL,
+    tag: tag,
+    description: description
+  });
+  if (!DESCRIPTORS) symbol.description = description;
+  return symbol;
+};
+
+var isSymbol = USE_SYMBOL_AS_UID ? function (it) {
+  return typeof it == 'symbol';
+} : function (it) {
+  return Object(it) instanceof $Symbol;
+};
+
+var $defineProperty = function defineProperty(O, P, Attributes) {
+  if (O === ObjectPrototype) $defineProperty(ObjectPrototypeSymbols, P, Attributes);
+  anObject(O);
+  var key = toPrimitive(P, true);
+  anObject(Attributes);
+  if (has(AllSymbols, key)) {
+    if (!Attributes.enumerable) {
+      if (!has(O, HIDDEN)) nativeDefineProperty(O, HIDDEN, createPropertyDescriptor(1, {}));
+      O[HIDDEN][key] = true;
+    } else {
+      if (has(O, HIDDEN) && O[HIDDEN][key]) O[HIDDEN][key] = false;
+      Attributes = nativeObjectCreate(Attributes, { enumerable: createPropertyDescriptor(0, false) });
+    } return setSymbolDescriptor(O, key, Attributes);
+  } return nativeDefineProperty(O, key, Attributes);
+};
+
+var $defineProperties = function defineProperties(O, Properties) {
+  anObject(O);
+  var properties = toIndexedObject(Properties);
+  var keys = objectKeys(properties).concat($getOwnPropertySymbols(properties));
+  $forEach(keys, function (key) {
+    if (!DESCRIPTORS || $propertyIsEnumerable.call(properties, key)) $defineProperty(O, key, properties[key]);
+  });
+  return O;
+};
+
+var $create = function create(O, Properties) {
+  return Properties === undefined ? nativeObjectCreate(O) : $defineProperties(nativeObjectCreate(O), Properties);
+};
+
+var $propertyIsEnumerable = function propertyIsEnumerable(V) {
+  var P = toPrimitive(V, true);
+  var enumerable = nativePropertyIsEnumerable.call(this, P);
+  if (this === ObjectPrototype && has(AllSymbols, P) && !has(ObjectPrototypeSymbols, P)) return false;
+  return enumerable || !has(this, P) || !has(AllSymbols, P) || has(this, HIDDEN) && this[HIDDEN][P] ? enumerable : true;
+};
+
+var $getOwnPropertyDescriptor = function getOwnPropertyDescriptor(O, P) {
+  var it = toIndexedObject(O);
+  var key = toPrimitive(P, true);
+  if (it === ObjectPrototype && has(AllSymbols, key) && !has(ObjectPrototypeSymbols, key)) return;
+  var descriptor = nativeGetOwnPropertyDescriptor(it, key);
+  if (descriptor && has(AllSymbols, key) && !(has(it, HIDDEN) && it[HIDDEN][key])) {
+    descriptor.enumerable = true;
+  }
+  return descriptor;
+};
+
+var $getOwnPropertyNames = function getOwnPropertyNames(O) {
+  var names = nativeGetOwnPropertyNames(toIndexedObject(O));
+  var result = [];
+  $forEach(names, function (key) {
+    if (!has(AllSymbols, key) && !has(hiddenKeys, key)) result.push(key);
+  });
+  return result;
+};
+
+var $getOwnPropertySymbols = function getOwnPropertySymbols(O) {
+  var IS_OBJECT_PROTOTYPE = O === ObjectPrototype;
+  var names = nativeGetOwnPropertyNames(IS_OBJECT_PROTOTYPE ? ObjectPrototypeSymbols : toIndexedObject(O));
+  var result = [];
+  $forEach(names, function (key) {
+    if (has(AllSymbols, key) && (!IS_OBJECT_PROTOTYPE || has(ObjectPrototype, key))) {
+      result.push(AllSymbols[key]);
+    }
+  });
+  return result;
+};
+
+// `Symbol` constructor
+// https://tc39.github.io/ecma262/#sec-symbol-constructor
+if (!NATIVE_SYMBOL) {
+  $Symbol = function Symbol() {
+    if (this instanceof $Symbol) throw TypeError('Symbol is not a constructor');
+    var description = !arguments.length || arguments[0] === undefined ? undefined : String(arguments[0]);
+    var tag = uid(description);
+    var setter = function (value) {
+      if (this === ObjectPrototype) setter.call(ObjectPrototypeSymbols, value);
+      if (has(this, HIDDEN) && has(this[HIDDEN], tag)) this[HIDDEN][tag] = false;
+      setSymbolDescriptor(this, tag, createPropertyDescriptor(1, value));
+    };
+    if (DESCRIPTORS && USE_SETTER) setSymbolDescriptor(ObjectPrototype, tag, { configurable: true, set: setter });
+    return wrap(tag, description);
+  };
+
+  redefine($Symbol[PROTOTYPE], 'toString', function toString() {
+    return getInternalState(this).tag;
+  });
+
+  redefine($Symbol, 'withoutSetter', function (description) {
+    return wrap(uid(description), description);
+  });
+
+  propertyIsEnumerableModule.f = $propertyIsEnumerable;
+  definePropertyModule.f = $defineProperty;
+  getOwnPropertyDescriptorModule.f = $getOwnPropertyDescriptor;
+  getOwnPropertyNamesModule.f = getOwnPropertyNamesExternal.f = $getOwnPropertyNames;
+  getOwnPropertySymbolsModule.f = $getOwnPropertySymbols;
+
+  wrappedWellKnownSymbolModule.f = function (name) {
+    return wrap(wellKnownSymbol(name), name);
+  };
+
+  if (DESCRIPTORS) {
+    // https://github.com/tc39/proposal-Symbol-description
+    nativeDefineProperty($Symbol[PROTOTYPE], 'description', {
+      configurable: true,
+      get: function description() {
+        return getInternalState(this).description;
+      }
+    });
+    if (!IS_PURE) {
+      redefine(ObjectPrototype, 'propertyIsEnumerable', $propertyIsEnumerable, { unsafe: true });
+    }
+  }
+}
+
+$({ global: true, wrap: true, forced: !NATIVE_SYMBOL, sham: !NATIVE_SYMBOL }, {
+  Symbol: $Symbol
+});
+
+$forEach(objectKeys(WellKnownSymbolsStore), function (name) {
+  defineWellKnownSymbol(name);
+});
+
+$({ target: SYMBOL, stat: true, forced: !NATIVE_SYMBOL }, {
+  // `Symbol.for` method
+  // https://tc39.github.io/ecma262/#sec-symbol.for
+  'for': function (key) {
+    var string = String(key);
+    if (has(StringToSymbolRegistry, string)) return StringToSymbolRegistry[string];
+    var symbol = $Symbol(string);
+    StringToSymbolRegistry[string] = symbol;
+    SymbolToStringRegistry[symbol] = string;
+    return symbol;
+  },
+  // `Symbol.keyFor` method
+  // https://tc39.github.io/ecma262/#sec-symbol.keyfor
+  keyFor: function keyFor(sym) {
+    if (!isSymbol(sym)) throw TypeError(sym + ' is not a symbol');
+    if (has(SymbolToStringRegistry, sym)) return SymbolToStringRegistry[sym];
+  },
+  useSetter: function () { USE_SETTER = true; },
+  useSimple: function () { USE_SETTER = false; }
+});
+
+$({ target: 'Object', stat: true, forced: !NATIVE_SYMBOL, sham: !DESCRIPTORS }, {
+  // `Object.create` method
+  // https://tc39.github.io/ecma262/#sec-object.create
+  create: $create,
+  // `Object.defineProperty` method
+  // https://tc39.github.io/ecma262/#sec-object.defineproperty
+  defineProperty: $defineProperty,
+  // `Object.defineProperties` method
+  // https://tc39.github.io/ecma262/#sec-object.defineproperties
+  defineProperties: $defineProperties,
+  // `Object.getOwnPropertyDescriptor` method
+  // https://tc39.github.io/ecma262/#sec-object.getownpropertydescriptors
+  getOwnPropertyDescriptor: $getOwnPropertyDescriptor
+});
+
+$({ target: 'Object', stat: true, forced: !NATIVE_SYMBOL }, {
+  // `Object.getOwnPropertyNames` method
+  // https://tc39.github.io/ecma262/#sec-object.getownpropertynames
+  getOwnPropertyNames: $getOwnPropertyNames,
+  // `Object.getOwnPropertySymbols` method
+  // https://tc39.github.io/ecma262/#sec-object.getownpropertysymbols
+  getOwnPropertySymbols: $getOwnPropertySymbols
+});
+
+// Chrome 38 and 39 `Object.getOwnPropertySymbols` fails on primitives
+// https://bugs.chromium.org/p/v8/issues/detail?id=3443
+$({ target: 'Object', stat: true, forced: fails(function () { getOwnPropertySymbolsModule.f(1); }) }, {
+  getOwnPropertySymbols: function getOwnPropertySymbols(it) {
+    return getOwnPropertySymbolsModule.f(toObject(it));
+  }
+});
+
+// `JSON.stringify` method behavior with symbols
+// https://tc39.github.io/ecma262/#sec-json.stringify
+if ($stringify) {
+  var FORCED_JSON_STRINGIFY = !NATIVE_SYMBOL || fails(function () {
+    var symbol = $Symbol();
+    // MS Edge converts symbol values to JSON as {}
+    return $stringify([symbol]) != '[null]'
+      // WebKit converts symbol values to JSON as null
+      || $stringify({ a: symbol }) != '{}'
+      // V8 throws on boxed symbols
+      || $stringify(Object(symbol)) != '{}';
+  });
+
+  $({ target: 'JSON', stat: true, forced: FORCED_JSON_STRINGIFY }, {
+    // eslint-disable-next-line no-unused-vars
+    stringify: function stringify(it, replacer, space) {
+      var args = [it];
+      var index = 1;
+      var $replacer;
+      while (arguments.length > index) args.push(arguments[index++]);
+      $replacer = replacer;
+      if (!isObject(replacer) && it === undefined || isSymbol(it)) return; // IE8 returns string on undefined
+      if (!isArray(replacer)) replacer = function (key, value) {
+        if (typeof $replacer == 'function') value = $replacer.call(this, key, value);
+        if (!isSymbol(value)) return value;
+      };
+      args[1] = replacer;
+      return $stringify.apply(null, args);
+    }
+  });
+}
+
+// `Symbol.prototype[@@toPrimitive]` method
+// https://tc39.github.io/ecma262/#sec-symbol.prototype-@@toprimitive
+if (!$Symbol[PROTOTYPE][TO_PRIMITIVE]) {
+  createNonEnumerableProperty($Symbol[PROTOTYPE], TO_PRIMITIVE, $Symbol[PROTOTYPE].valueOf);
+}
+// `Symbol.prototype[@@toStringTag]` property
+// https://tc39.github.io/ecma262/#sec-symbol.prototype-@@tostringtag
+setToStringTag($Symbol, SYMBOL);
+
+hiddenKeys[HIDDEN] = true;
+
+
+/***/ }),
+/* 159 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var toIndexedObject = __webpack_require__(22);
+var nativeGetOwnPropertyNames = __webpack_require__(114).f;
+
+var toString = {}.toString;
+
+var windowNames = typeof window == 'object' && window && Object.getOwnPropertyNames
+  ? Object.getOwnPropertyNames(window) : [];
+
+var getWindowNames = function (it) {
+  try {
+    return nativeGetOwnPropertyNames(it);
+  } catch (error) {
+    return windowNames.slice();
+  }
+};
+
+// fallback for IE11 buggy Object.getOwnPropertyNames with iframe and window
+module.exports.f = function getOwnPropertyNames(it) {
+  return windowNames && toString.call(it) == '[object Window]'
+    ? getWindowNames(it)
+    : nativeGetOwnPropertyNames(toIndexedObject(it));
+};
+
+
+/***/ }),
+/* 160 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+// `Symbol.prototype.description` getter
+// https://tc39.github.io/ecma262/#sec-symbol.prototype.description
+
+var $ = __webpack_require__(3);
+var DESCRIPTORS = __webpack_require__(7);
+var global = __webpack_require__(1);
+var has = __webpack_require__(6);
+var isObject = __webpack_require__(5);
+var defineProperty = __webpack_require__(14).f;
+var copyConstructorProperties = __webpack_require__(111);
+
+var NativeSymbol = global.Symbol;
+
+if (DESCRIPTORS && typeof NativeSymbol == 'function' && (!('description' in NativeSymbol.prototype) ||
+  // Safari 12 bug
+  NativeSymbol().description !== undefined
+)) {
+  var EmptyStringDescriptionStore = {};
+  // wrap Symbol constructor for correct work with undefined description
+  var SymbolWrapper = function Symbol() {
+    var description = arguments.length < 1 || arguments[0] === undefined ? undefined : String(arguments[0]);
+    var result = this instanceof SymbolWrapper
+      ? new NativeSymbol(description)
+      // in Edge 13, String(Symbol(undefined)) === 'Symbol(undefined)'
+      : description === undefined ? NativeSymbol() : NativeSymbol(description);
+    if (description === '') EmptyStringDescriptionStore[result] = true;
+    return result;
+  };
+  copyConstructorProperties(SymbolWrapper, NativeSymbol);
+  var symbolPrototype = SymbolWrapper.prototype = NativeSymbol.prototype;
+  symbolPrototype.constructor = SymbolWrapper;
+
+  var symbolToString = symbolPrototype.toString;
+  var native = String(NativeSymbol('test')) == 'Symbol(test)';
+  var regexp = /^Symbol\((.*)\)[^)]+$/;
+  defineProperty(symbolPrototype, 'description', {
+    configurable: true,
+    get: function description() {
+      var symbol = isObject(this) ? this.valueOf() : this;
+      var string = symbolToString.call(symbol);
+      if (has(EmptyStringDescriptionStore, symbol)) return '';
+      var desc = native ? string.slice(7, -1) : string.replace(regexp, '$1');
+      return desc === '' ? undefined : desc;
+    }
+  });
+
+  $({ global: true, forced: true }, {
+    Symbol: SymbolWrapper
+  });
+}
+
+
+/***/ }),
+/* 161 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var defineWellKnownSymbol = __webpack_require__(157);
+
+// `Symbol.iterator` well-known symbol
+// https://tc39.github.io/ecma262/#sec-symbol.iterator
+defineWellKnownSymbol('iterator');
+
+
+/***/ }),
+/* 162 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__(3);
+var from = __webpack_require__(133);
+var checkCorrectnessOfIteration = __webpack_require__(124);
+
+var INCORRECT_ITERATION = !checkCorrectnessOfIteration(function (iterable) {
+  Array.from(iterable);
+});
+
+// `Array.from` method
+// https://tc39.github.io/ecma262/#sec-array.from
+$({ target: 'Array', stat: true, forced: INCORRECT_ITERATION }, {
+  from: from
+});
+
+
+/***/ }),
+/* 163 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var DESCRIPTORS = __webpack_require__(7);
+var defineProperty = __webpack_require__(14).f;
+
+var FunctionPrototype = Function.prototype;
+var FunctionPrototypeToString = FunctionPrototype.toString;
+var nameRE = /^\s*function ([^ (]*)/;
+var NAME = 'name';
+
+// Function instances `.name` property
+// https://tc39.github.io/ecma262/#sec-function-instances-name
+if (DESCRIPTORS && !(NAME in FunctionPrototype)) {
+  defineProperty(FunctionPrototype, NAME, {
+    configurable: true,
+    get: function () {
+      try {
+        return FunctionPrototypeToString.call(this).match(nameRE)[1];
+      } catch (error) {
+        return '';
+      }
+    }
+  });
+}
+
+
+/***/ }),
+/* 164 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(3);
+var $filter = __webpack_require__(50).filter;
+var arrayMethodHasSpeciesSupport = __webpack_require__(35);
+var arrayMethodUsesToLength = __webpack_require__(15);
+
+var HAS_SPECIES_SUPPORT = arrayMethodHasSpeciesSupport('filter');
+// Edge 14- issue
+var USES_TO_LENGTH = arrayMethodUsesToLength('filter');
+
+// `Array.prototype.filter` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.filter
+// with adding support of @@species
+$({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGTH }, {
+  filter: function filter(callbackfn /* , thisArg */) {
+    return $filter(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+/* 165 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var $ = __webpack_require__(3);
+var toObject = __webpack_require__(12);
+var nativeKeys = __webpack_require__(76);
+var fails = __webpack_require__(2);
+
+var FAILS_ON_PRIMITIVES = fails(function () { nativeKeys(1); });
+
+// `Object.keys` method
+// https://tc39.github.io/ecma262/#sec-object.keys
+$({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
+  keys: function keys(it) {
+    return nativeKeys(toObject(it));
+  }
+});
+
 
 /***/ })
 /******/ ]);

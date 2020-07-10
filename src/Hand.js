@@ -234,6 +234,52 @@ class Hand {
 			}
 		}
 
+
+		this.removeTilesFromHand = (function removeTilesFromHand(obj, amount = 1, simulated = false) {
+			//We will verify that the tiles CAN be removed before removing them.
+			let contents = this.getStringContents()
+			let toRemove = obj.toJSON()
+
+			let indexes = []
+			contents.forEach((str, index) => {
+				if (toRemove === str) {indexes.push(index)}
+			})
+
+			if (indexes.length >= amount) {
+				if (simulated) {return true}
+				for (let i=0;i<amount;i++) {
+					this.contents.splice(indexes[indexes.length - 1 - i], 1) //Remove the item the farthest back in the hand to avoid position shifting.
+				}
+				return true
+			}
+			else {return false}
+		}).bind(this)
+
+		this.removeSequenceFromHand = (function removeSequenceFromHand(sequence, simulated = false) {
+			//We will verify that the tiles CAN be removed before removing them.
+			let contents = this.getStringContents()
+			let indexes = []
+			JSON.parse(JSON.stringify(sequence.tiles)).forEach((str, index) => {
+				for (let i=contents.length-1;i>=0;i--) {
+					if (contents[i] === str) {
+						indexes[index] = i
+						return
+					}
+				}
+			})
+
+			if (indexes[0] && indexes[1] && indexes[2]) {
+				if (simulated) {return true}
+				//Remove the item the farthest back in the hand to avoid position shifting.
+				indexes.sort((a,b) => {return b-a}).forEach((index) => {
+					this.contents.splice(index, 1)
+				})
+				return true
+			}
+			else {return false}
+		}).bind(this)
+
+
 		this.renderPlacemat = (function(classForFirst) {
 			while (this.tilePlacemat.firstChild) {this.tilePlacemat.firstChild.remove()} //Delete everything currently rendered in the hand.
 
@@ -386,53 +432,212 @@ class Hand {
 		})
 	}
 
-	static scoreHand(hand, config) {
+	static scoreHand(hand, config = {}) {
+		if (hand instanceof Hand) {hand = hand.contents}
 		//Hand is an array of arrays of Tiles, Matches, and Prettys
 
 		let doubles = 0
 		let score = 0
+		let sequences = false
+
+		if (!config.userWind) {console.warn("scoreHand not provided config.userWind, may result in improper scoring. ")}
 
 		for (let i=0;i<hand.length;i++) {
 			let match = hand[i]
 			doubles += match.isDouble(config.userWind)
-			points += match.getPoints(config.userWind)
+			score += match.getPoints(config.userWind)
+			sequences = sequences || match.isSequence
 		}
 
-		if (isMahjong(hand, config.unlimitedSequences)) {
+		if (config.isMahjong) {
 			score += 20
 			if (config.drewOwnTile) {
 				score += 10
 			}
-			if (sequences === 0) {
+			if (!sequences) {
 				score += 10
 			}
 		}
 
+		doubles += Hand.getClearHandDoubles(hand)
+
 		return score * (2**doubles)
 	}
 
+	static getClearHandDoubles(hand) {
+		if (hand instanceof Hand) {hand = hand.contents}
+
+		let suits = {}
+		let honors = false
+		let onesAndNines = true
+
+		hand.forEach((item) => {
+			if (item instanceof Sequence) {
+				suits[item.tiles[0].type] = true
+				onesAndNines = false
+			}
+			else {
+				suits[item.type] = true
+				if (item.value !== 1 && item.value !== 9) {
+					onesAndNines = false
+				}
+			}
+		})
+
+		if (suits["wind"] || suits["dragon"]) {
+			delete suits["wind"]
+			delete suiuts["dragon"]
+			honors = true
+		}
+
+		suits = Object.keys(suits).length
+		if (suits === 0) {
+			//All honors
+			return 3
+		}
+		else if (suits === 1 && !honors) {
+			return 3
+		}
+		else if (suits === 1 && honors) {
+			return 1
+		}
+		else if (onesAndNines && !honors) {
+			return 3
+		}
+		else if (onesAndNines && honors) {
+			return 1
+		}
+
+		return 0
+	}
+
 	static isMahjong(hand, unlimitedSequences) {
+		if (hand instanceof Hand) {hand = hand.contents}
+
+		//Returns 2 for mahjong, and 0 for not mahjong.
+		//If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
 		let pongOrKong = 0
 		let pairs = 0
 		let sequences = 0
 
+		let remainingTiles = []
 		for (let i=0;i<hand.length;i++) {
 			let match = hand[i]
-			pongOrKong += match.isPongOrKong
-			pairs += match.isPair
-			sequences += match.isSequence
+			if (match.isPongOrKong) {pongOrKong++}
+			else if (match.isPair) {pairs++}
+			else if (match.isSequence) {sequences++}
+			else {remainingTiles.push(match)}
 		}
 
 		if (pairs === 1) {
 			if (unlimitedSequences) {
-				if (sequences + pongOrKong === 4) {return true}
+				if (sequences + pongOrKong === 4) {return 2}
 			}
 			else {
-				if (Math.max(sequences, 1) + pongOrKong === 4) {return true}
+				if (Math.min(sequences, 1) + pongOrKong === 4) {return 2}
 			}
 		}
 
-		return false
+		//Now we need to go through our remaining tiles.
+		console.log(pongOrKong, sequences, pairs)
+		console.log(remainingTiles)
+		let allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1))
+		let possibleMatches = []
+		let possibleSequences = []
+		let testingHand = new Hand()
+		testingHand.contents = remainingTiles.slice(0)
+
+		allTiles.forEach((tile) => {
+		    if (testingHand.removeTilesFromHand(tile, 3, true)) {
+		    	possibleMatches.push(tile)
+			}
+		})
+
+		allTiles.forEach((tile, index) => {
+		    if (!Sequence.isValidSequence(allTiles.slice(index, index+3))) {
+				return;
+			}
+			let sequence = new Sequence({
+				exposed: false,
+				tiles: allTiles.slice(index, index+3)
+			})
+		    if (testingHand.removeSequenceFromHand(sequence, true)) {
+		    	possibleSequences.push(sequence)
+			}
+		})
+
+		//https://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array/39092843#39092843
+		function* generateCombinations(arr, size) {
+		  function* doGenerateCombinations(offset, combo) {
+		    if (combo.length == size) {
+		      yield combo;
+		    } else {
+		      for (let i = offset; i < arr.length; i++) {
+		        yield* doGenerateCombinations(i + 1, combo.concat(arr[i]));
+		      }
+		    }
+		  }
+		  yield* doGenerateCombinations(0, []);
+		}
+
+		let combinations = []
+		let allPossibilities = possibleMatches
+		let neededPongEquivs = 4
+
+		if (unlimitedSequences || sequences === 0) {
+			allPossibilities = allPossibilities.concat(possibleSequences)
+			neededPongEquivs -= sequences
+		}
+		else {
+			neededPongEquivs -= Math.min(sequences, 1)
+		}
+		neededPongEquivs -= pongOrKong
+
+		for (let combo of generateCombinations(allPossibilities, neededPongEquivs)) {
+  			combinations.push(combo);
+		}
+
+		console.log(possibleMatches)
+		console.log(possibleSequences)
+		console.log(combinations)
+
+		let successfulCombinations = []
+		combinations.forEach((combo, index) => {
+			let localTestHand = new Hand()
+			localTestHand.contents = testingHand.contents.slice(0)
+			for (let i=0;i<combo.length;i++) {
+				let item = combo[i]
+				if (item instanceof Tile) {
+					if (!localTestHand.removeTilesFromHand(item, 3)) {
+						return 0
+					}
+					localTestHand.add(new Match({type: item.type, value: item.value, exposed: false, amount: 3}))
+				}
+				else if (item instanceof Sequence) {
+					if (!localTestHand.removeSequenceFromHand(item)) {
+						return 0
+					}
+					localTestHand.add(item)
+				}
+			}
+			//Check for a pair
+			let tile = (localTestHand.contents.filter((item) => {return item instanceof Tile}))[0]
+			if (!localTestHand.removeTilesFromHand(tile, 2, true)) {
+				return 0
+			}
+			else {
+				localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
+				localTestHand.removeTilesFromHand(tile, 2)
+				console.log(Hand.scoreHand(localTestHand, {isMahjong: true}))
+				successfulCombinations.push(localTestHand)
+				return true
+			}
+		})
+
+		console.log(successfulCombinations)
+		if (successfulCombinations.length > 1) {alert("You've created a hand that our code didn't know was possible. Everything may work fine, but please take a screenshot of your hand and open an issue at https://github.com/ecc521/mahjong. ")}
+		if (successfulCombinations.length > 0) {return successfulCombinations[0]}
+		return 0
 	}
 
 	static convertStringsToTiles(arr) {

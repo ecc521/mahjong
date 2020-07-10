@@ -268,9 +268,18 @@ This means that something using bottom is off the page - hence we must use top. 
 
 #gameBoard #endGameButton {
 	position: absolute;
-	position: absolute;
 	left: calc(9.52vh + 2vw);
 	top: 70vh;
+	width: 10vw;
+	height: 5vh;
+	border-radius: 50vh;
+	font-size: 1.6vh;
+}
+
+#gameBoard #goMahjongButton {
+	position: absolute;
+	left: calc(9.52vh + 2vw);
+	top: 64vh;
 	width: 10vw;
 	height: 5vh;
 	border-radius: 50vh;

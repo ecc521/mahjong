@@ -157,6 +157,21 @@ endGameButton.addEventListener("click", function() {
 	}
 })
 
+let goMahjongButton = document.createElement("button")
+goMahjongButton.id = "goMahjongButton"
+goMahjongButton.innerHTML = "Mahjong"
+gameBoard.appendChild(goMahjongButton)
+
+goMahjongButton.addEventListener("click", function() {
+	let placement = userHand.inPlacemat
+	console.log(placement)
+	window.stateManager.placeTiles(placement, {mahjong: true})
+})
+
+stateManager.onGameMahjong = function(obj) {
+	new Popups.Notification("Mahjong!", obj.message).show()
+}
+
 let wallRendering = document.createElement("div")
 wallRendering.id = "wall"
 gameBoard.appendChild(wallRendering)
