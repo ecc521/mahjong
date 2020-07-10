@@ -55,8 +55,9 @@ class Room {
 				}
 				summary += points + " points. "
 				if (id === clientId) {
-					summary += "(Mahjong)\n"
+					summary += "(Mahjong)"
 				}
+				summary += "\n"
 			}
 			this.messageAll("roomActionMahjong", summary, "success")
 			sendStateToClients()
@@ -507,7 +508,7 @@ class Room {
 					}
 				}
 				else if (obj.mahjong) {
-					goMahjong(clientId)
+					goMahjong(clientId, true)
 				}
 				else {
 					return global.stateManager.getClient(clientId).message(obj.type, "Invalid placement attempt for current game status", "error")
