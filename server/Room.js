@@ -37,7 +37,7 @@ class Room {
 			}
 
 			if (!isMahjong) {
-				return global.stateManager.getClient(clientId).message(obj.type, "Unable to go mahjong with this hand. ", "error")
+				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "Unable to go mahjong with this hand. ", "error")
 			}
 
 			//The game is over.
@@ -60,7 +60,7 @@ class Room {
 			}
 			this.messageAll("roomActionMahjong", summary, "success")
 		}).bind(this)
-		
+
 		let turnChoicesProxyHandler = {
 			set: (function(obj, prop, value) {
 				obj[prop] = value
