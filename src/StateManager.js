@@ -45,6 +45,7 @@ class StateManager {
 			this.websocket.addEventListener("message", onmessage)
 			this.websocket.addEventListener("error", (async function(e) {
 				console.error(e)
+				await new Promise((resolve, reject) => {setTimeout(resolve, 2000)}) //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
 				this.createWebsocket()
 				this.getCurrentRoom() //Syncs state.
 			}).bind(this))

@@ -53,10 +53,10 @@ let joinRoom = document.createElement("button")
 joinRoom.id = "joinRoom"
 joinRoom.innerHTML = "Join Room"
 joinRoom.addEventListener("click", function() {
-	if (roomIdInput.value.trim().length < 5) {
-		return new Popups.Notification("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show()
+	if (roomIdInput.value.trim().length === 0) {
+		return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	window.stateManager.joinRoom(roomIdInput.value, nicknameInput.value)
+	window.stateManager.joinRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(joinRoom)
 
@@ -64,10 +64,10 @@ let createRoom = document.createElement("button")
 createRoom.id = "createRoom"
 createRoom.innerHTML = "Create Room"
 createRoom.addEventListener("click", function() {
-	if (roomIdInput.value.trim().length < 5) {
-		return new Popups.Notification("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
+	if (roomIdInput.value.trim().length === 0) {
+		return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	window.stateManager.createRoom(roomIdInput.value, nicknameInput.value)
+	window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(createRoom)
 

@@ -3190,10 +3190,17 @@ var StateManager = /*#__PURE__*/function () {
                         switch (_context.prev = _context.next) {
                           case 0:
                             console.error(e);
+                            _context.next = 3;
+                            return new Promise(function (resolve, reject) {
+                              setTimeout(resolve, 2000);
+                            });
+
+                          case 3:
+                            //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
                             this.createWebsocket();
                             this.getCurrentRoom(); //Syncs state.
 
-                          case 3:
+                          case 5:
                           case "end":
                             return _context.stop();
                         }
@@ -7524,22 +7531,22 @@ var joinRoom = document.createElement("button");
 joinRoom.id = "joinRoom";
 joinRoom.innerHTML = "Join Room";
 joinRoom.addEventListener("click", function () {
-  if (roomIdInput.value.trim().length < 5) {
-    return new Popups.Notification("Room Name Invalid", "The room name should be at least 5 characters long. Please enter it into the box labeled \"Enter Room Name\" ").show();
+  if (roomIdInput.value.trim().length === 0) {
+    return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show();
   }
 
-  window.stateManager.joinRoom(roomIdInput.value, nicknameInput.value);
+  window.stateManager.joinRoom(roomIdInput.value.toLowerCase(), nicknameInput.value);
 });
 joinOrCreateRoom.appendChild(joinRoom);
 var createRoom = document.createElement("button");
 createRoom.id = "createRoom";
 createRoom.innerHTML = "Create Room";
 createRoom.addEventListener("click", function () {
-  if (roomIdInput.value.trim().length < 5) {
-    return new Popups.Notification("Unable to Create Room", "Please pick a 5+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show();
+  if (roomIdInput.value.trim().length === 0) {
+    return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show();
   }
 
-  window.stateManager.createRoom(roomIdInput.value, nicknameInput.value);
+  window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value);
 });
 joinOrCreateRoom.appendChild(createRoom);
 var inRoomContainer = document.createElement("div");

@@ -67,8 +67,8 @@ websocketServer.on('connection', function connection(websocket) {
 		}
 
 		if (obj.type === "createRoom") {
-			if (typeof obj.roomId !== "string" || obj.roomId.length < 5) {
-				return websocket.send(getMessage("createRoom", "roomId must be a string with length of at least 5", "error"))
+			if (typeof obj.roomId !== "string" || obj.roomId.trim().length === 0) {
+				return websocket.send(getMessage("createRoom", "roomId must be a string with at least one character", "error"))
 			}
 			else if (global.stateManager.getRoom(obj.roomId)) {
 				return websocket.send(getMessage("createRoom", "Room Already Exists", "error"))
