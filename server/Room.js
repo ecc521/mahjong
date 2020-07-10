@@ -176,7 +176,7 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
-										if (placement.mahjong && !wouldMakeMahjong) {
+										if (placement.mahjong) {
 											goMahjong(clientId)
 										}
 										this.gameData.currentTurn.userTurn = clientId
@@ -199,7 +199,7 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
-										if (placement.mahjong && !wouldMakeMahjong) {
+										if (placement.mahjong) {
 											goMahjong(clientId)
 										}
 										if (placement.amount === 4) {
