@@ -8788,7 +8788,7 @@ var Hand = /*#__PURE__*/function () {
 
       if (suits["wind"] || suits["dragon"]) {
         delete suits["wind"];
-        delete suiuts["dragon"];
+        delete suits["dragon"];
         honors = true;
       }
 
