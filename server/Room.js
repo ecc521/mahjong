@@ -45,13 +45,13 @@ class Room {
 			sendStateToClients()
 
 			let summary = ""
-			for (let id in playerHands) {
+			for (let id in this.gameData.playerHands) {
 				summary += global.stateManager.getClient(id).getNickname()
 				summary += ": "
 				summary += playerHands[id].wind + ", "
-				let points = Hand.scoreHand(playerHands[id], {userWind: playerHands[id].wind})
+				let points = Hand.scoreHand(this.gameData.playerHands[id], {userWind: this.gameData.playerHands[id].wind})
 				if (id === clientId) {
-					points = Hand.scoreHand(playerHands[id], {isMahjong: true, drewOwnTile, userWind: playerHands[id].wind})
+					points = Hand.scoreHand(this.gameData.playerHands[id], {isMahjong: true, drewOwnTile, userWind: this.gameData.playerHands[id].wind})
 				}
 				summary += points + " points. "
 				if (id === clientId) {
