@@ -522,11 +522,24 @@ class Hand {
 		let sequences = 0
 
 		let remainingTiles = []
+		let initialTiles = []
 		for (let i=0;i<hand.length;i++) {
 			let match = hand[i]
-			if (match.isPongOrKong) {pongOrKong++}
-			else if (match.isPair) {pairs++}
-			else if (match.isSequence) {sequences++}
+			if (match.isPongOrKong) {
+				pongOrKong++
+				initialTiles.push(match)
+			}
+			else if (match.isPair) {
+				pairs++
+				initialTiles.push(match)
+			}
+			else if (match.isSequence) {
+				sequences++
+				initialTiles.push(match)
+			}
+			else if (match instanceof Pretty) {
+				initialTiles.push(match)
+			}
 			else {remainingTiles.push(match)}
 		}
 
@@ -593,6 +606,7 @@ class Hand {
 			neededPongEquivs -= Math.min(sequences, 1)
 		}
 		neededPongEquivs -= pongOrKong
+		console.log(neededPongEquivs)
 
 		for (let combo of generateCombinations(allPossibilities, neededPongEquivs)) {
   			combinations.push(combo);
@@ -629,7 +643,7 @@ class Hand {
 			else {
 				localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
 				localTestHand.removeTilesFromHand(tile, 2)
-				console.log(Hand.scoreHand(localTestHand, {isMahjong: true}))
+				localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
 				successfulCombinations.push(localTestHand)
 				return true
 			}
