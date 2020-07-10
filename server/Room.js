@@ -176,7 +176,9 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
-										goMahjong(clientId)
+										if (placement.mahjong && !wouldMakeMahjong) {
+											goMahjong(clientId)
+										}
 										this.gameData.currentTurn.userTurn = clientId
 									}
 									else {
@@ -197,7 +199,9 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
-										goMahjong(clientId)
+										if (placement.mahjong && !wouldMakeMahjong) {
+											goMahjong(clientId)
+										}
 										if (placement.amount === 4) {
 											//Draw them another tile.
 											drawTile(clientId, true) //Draw from back of wall.
