@@ -1,5 +1,7 @@
 class Notification {
 	constructor(errorText, messageText) {
+		messageText = messageText.split("\n").join("<br>")
+
 		let cover = document.createElement("div")
 		cover.id = "errorPopupCover"
 		cover.style.display = "none"

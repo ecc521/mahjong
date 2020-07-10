@@ -359,7 +359,8 @@ class Hand {
 							exposedTiles.concat(items)
 						}
 						else {
-							unexposedTiles = tiles.concat(items)
+							console.log(items)
+							unexposedTiles = unexposedTiles.concat(items)
 						}
 					}
 				}

@@ -4474,7 +4474,13 @@ module.exports = '\u0009\u000A\u000B\u000C\u000D\u0020\u00A0\u1680\u2000\u2001\u
 
 /***/ }),
 /* 100 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(166);
+
+__webpack_require__(37);
+
+__webpack_require__(150);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -4483,6 +4489,7 @@ var Notification = function Notification(errorText, messageText) {
 
   _classCallCheck(this, Notification);
 
+  messageText = messageText.split("\n").join("<br>");
   var cover = document.createElement("div");
   cover.id = "errorPopupCover";
   cover.style.display = "none";
@@ -8631,7 +8638,8 @@ var Hand = /*#__PURE__*/function () {
               });
               exposedTiles.concat(items);
             } else {
-              unexposedTiles = tiles.concat(items);
+              console.log(items);
+              unexposedTiles = unexposedTiles.concat(items);
             }
           }
         } else {
@@ -10071,6 +10079,31 @@ var FAILS_ON_PRIMITIVES = fails(function () { nativeKeys(1); });
 $({ target: 'Object', stat: true, forced: FAILS_ON_PRIMITIVES }, {
   keys: function keys(it) {
     return nativeKeys(toObject(it));
+  }
+});
+
+
+/***/ }),
+/* 166 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(3);
+var IndexedObject = __webpack_require__(41);
+var toIndexedObject = __webpack_require__(22);
+var arrayMethodIsStrict = __webpack_require__(53);
+
+var nativeJoin = [].join;
+
+var ES3_STRINGS = IndexedObject != Object;
+var STRICT_METHOD = arrayMethodIsStrict('join', ',');
+
+// `Array.prototype.join` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.join
+$({ target: 'Array', proto: true, forced: ES3_STRINGS || !STRICT_METHOD }, {
+  join: function join(separator) {
+    return nativeJoin.call(toIndexedObject(this), separator === undefined ? ',' : separator);
   }
 });
 

@@ -55,10 +55,11 @@ class Room {
 				}
 				summary += points + " points. "
 				if (id === clientId) {
-					summary += "(Mahjong)"
+					summary += "(Mahjong)\n"
 				}
 			}
 			this.messageAll("roomActionMahjong", summary, "success")
+			sendStateToClients()
 		}).bind(this)
 
 		let turnChoicesProxyHandler = {
