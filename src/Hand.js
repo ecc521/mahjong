@@ -2,6 +2,7 @@ const Tile = require("./Tile.js")
 const Match = require("./Match.js")
 const Sequence = require("./Sequence.js")
 const Pretty = require("./Pretty.js")
+const Wall = require("./Wall.js")
 
 class Hand {
 	constructor(config = {}) {
