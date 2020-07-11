@@ -26,7 +26,25 @@ class Room {
 				this.gameData.playerHands[clientId] = Hand.fromString(this.gameData.playerHands[clientId])
 			}
 		}
-		else {this.gameData.playerHands = {}}
+
+		let getSummary = (function(mahjongClientId, drewOwnTile) {
+			let summary = ""
+			for (let id in this.gameData.playerHands) {
+				summary += global.stateManager.getClient(id).getNickname()
+				summary += ": "
+				summary += this.gameData.playerHands[id].wind + ", "
+				let points = Hand.scoreHand(this.gameData.playerHands[id], {userWind: this.gameData.playerHands[id].wind})
+				if (id === mahjongClientId) {
+					points = Hand.scoreHand(this.gameData.playerHands[id], {isMahjong: true, drewOwnTile, userWind: this.gameData.playerHands[id].wind})
+				}
+				summary += points + " points. "
+				if (id === mahjongClientId) {
+					summary += "(Mahjong)"
+				}
+				summary += "\n"
+			}
+			return summary
+		}).bind(this)
 
 		let goMahjong = (function goMahjong(clientId, drewOwnTile = false) {
 			//First, verify the user can go mahjong.
@@ -43,23 +61,9 @@ class Room {
 			//The game is over.
 			this.gameData.isMahjong = true
 			sendStateToClients()
+			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
 
-			let summary = ""
-			for (let id in this.gameData.playerHands) {
-				summary += global.stateManager.getClient(id).getNickname()
-				summary += ": "
-				summary += this.gameData.playerHands[id].wind + ", "
-				let points = Hand.scoreHand(this.gameData.playerHands[id], {userWind: this.gameData.playerHands[id].wind})
-				if (id === clientId) {
-					points = Hand.scoreHand(this.gameData.playerHands[id], {isMahjong: true, drewOwnTile, userWind: this.gameData.playerHands[id].wind})
-				}
-				summary += points + " points. "
-				if (id === clientId) {
-					summary += "(Mahjong)"
-				}
-				summary += "\n"
-			}
-			this.messageAll("roomActionMahjong", summary, "success")
+			this.messageAll("roomActionMahjong", getSummary(clientid, drewOwnTile), "success")
 			sendStateToClients()
 		}).bind(this)
 
@@ -220,8 +224,6 @@ class Room {
 					}
 
 					if (utilized === false) {
-						//TODO: Automatic fourth tile pickup for kongs if possible.
-						this.gameData.discardPile.push(this.gameData.currentTurn.thrown)
 						//Shift to next player, draw them a tile.
 						let nextWind = windOrder[windOrder.indexOf(this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind) + 1]
 						if (nextWind === undefined) {nextWind = "north"}
@@ -229,8 +231,25 @@ class Room {
 						for (let clientId in this.gameData.playerHands) {
 							let hand = this.gameData.playerHands[clientId]
 							if (hand.wind === nextWind) {
+
+								//Pick up as 4th tile for an exposed pong if possible.
+								hand.forEach((item) => {
+									if (item instanceof Match && item.type === this.gameData.currentTurn.thrown.type && item.value === this.gameData.currentTurn.thrown.value) {
+										utilized = true
+										Match.amount = 4
+									}
+								})
+
+								//Switch the turn, and draw the next tile.
+								if (utilized === false) {
+									this.gameData.discardPile.push(this.gameData.currentTurn.thrown)
+									drawTile(clientId)
+								}
+								else {
+									drawTile(clientId, true)
+								}
+
 								this.gameData.currentTurn.userTurn = clientId
-								drawTile(clientId)
 							}
 						}
 					}
@@ -238,6 +257,7 @@ class Room {
 
 					//Clear the object.
 					for (let key in obj) {delete obj[key]}
+					sendStateToClients()
 				}
 
 				return true
@@ -366,7 +386,19 @@ class Room {
 				else {
 					tile = this.gameData.wall.drawFirst()
 				}
-				if (!tile) {console.log("Wall Empty");return} //TODO: Game over. Wall empty.
+				if (!tile) {
+					console.log("Wall Empty");
+					this.messageAll("roomActionWallEmpty", getSummary(), "success")
+					if (!this.gameData.eastWindPlayerId) {
+						for (let clientId in this.gameData.playerHands) {
+							if (this.gameData.playerHands[clientId].wind === "south") {
+								this.gameData.eastWindPlayerId = clientId
+							}
+						}
+					}
+					sendStateToClients() //Game over. Wall empty.
+					return
+				}
 				this.gameData.playerHands[clientId].add(tile)
 			}
 		}).bind(this)
@@ -381,16 +413,28 @@ class Room {
 				this.gameData.wall = new Wall()
 				this.gameData.discardPile = []
 				this.gameData.unlimitedSequences = false
+				this.gameData.playerHands = {}
 
 				//Build the player hands.
 				//For now, we will randomly assign winds.
 				let winds = ["north", "east", "south", "west"]
 				let eastWindPlayerId;
 
+				if (this.clientIds.includes(this.gameData.eastWindPlayerId)) {
+					winds.splice(winds.indexOf("east"), 1) //Delete east wind option
+				}
+
 				for (let i=0;i<this.clientIds.length;i++) {
 					let clientId = this.clientIds[i]
 
-					let wind = winds.splice(Math.floor(Math.random() * winds.length), 1)[0]
+					let wind;
+					if (this.gameData.eastWindPlayerId === clientId) {
+						wind = "east"
+						delete this.gameData.eastWindPlayerId
+					}
+					else {
+						wind = winds.splice(Math.floor(Math.random() * winds.length), 1)[0]
+					}
 					let hand = new Hand({wind})
 					this.gameData.playerHands[clientId] = hand
 
@@ -422,7 +466,7 @@ class Room {
 				gameEndMessage = "The game has been ended by " + clientId + ", who goes by the name of " + client.getNickname() + "."
 			}
 			this.inGame = false
-			this.gameData = {}
+			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
 			this.messageAll(messageKey, gameEndMessage, "success")
 			sendStateToClients()
 		}).bind(this)
@@ -472,9 +516,20 @@ class Room {
 					if (obj.mahjong) {
 						return global.stateManager.getClient(clientId).message(obj.type, "You can't discard and go mahjong. ", "error")
 					}
-					//This is a discard.
+
 					if (hand.removeTilesFromHand(placement)) {
-						//Tile thrown
+						//If this is the 4th tile for an exposed pong in this hand, we will turn it into a kong and draw another tile.
+						//TODO: Note that it is remotely possible players will want to throw the 4th tile instead, as it is a very safe (if honor, entirely safe), throw.
+						//This would mean sacraficing points and a draw in order to get a safe throw, and I have never seen it done, but there are scenarios where it may
+						//actually be the best idea. We should probably allow this at some point.
+						hand.forEach((item) => {
+							if (item instanceof Match && item.type === placement.type && item.value === placement.value) {
+								Match.amount = 4
+								return drawTile(clientId, true)
+							}
+						})
+
+						//Discard tile.
 						this.gameData.currentTurn.thrown = placement
 						sendStateToClients()
 						console.log("Throw")

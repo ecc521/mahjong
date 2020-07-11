@@ -137,6 +137,11 @@ window.stateManager.onPlaceTiles = function(obj) {
 	}
 }
 
+window.stateManager.onWallEmpty = function(obj) {
+	if (obj.status === "success") {
+		new Popups.Notification("Game Over - Wall Empty", obj.message).show()
+	}
+}
 
 let nextTurnButton = document.createElement("button")
 nextTurnButton.id = "nextTurnButton"

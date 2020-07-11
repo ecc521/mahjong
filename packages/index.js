@@ -3166,6 +3166,10 @@ var StateManager = /*#__PURE__*/function () {
         if (this.onGameMahjong instanceof Function) {
           this.onGameMahjong(obj);
         }
+      } else if (obj.type === "roomActionWallEmpty") {
+        if (this.onGameMahjong instanceof Function) {
+          this.onWallEmpty(obj);
+        }
       } else if (obj.type === "roomActionPlaceTiles") {
         if (this.onPlaceTiles instanceof Function) {
           this.onPlaceTiles(obj);
@@ -6055,6 +6059,12 @@ placeTilesButton.addEventListener("click", function () {
 window.stateManager.onPlaceTiles = function (obj) {
   if (obj.status === "error") {
     new Popups.Notification("Error Placing Tiles", obj.message).show();
+  }
+};
+
+window.stateManager.onWallEmpty = function (obj) {
+  if (obj.status === "success") {
+    new Popups.Notification("Game Over - Wall Empty", obj.message).show();
   }
 };
 

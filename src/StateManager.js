@@ -32,6 +32,9 @@ class StateManager {
 			else if (obj.type === "roomActionMahjong") {
 				if (this.onGameMahjong instanceof Function) {this.onGameMahjong(obj)}
 			}
+			else if (obj.type === "roomActionWallEmpty") {
+				if (this.onGameMahjong instanceof Function) {this.onWallEmpty(obj)}
+			}
 			else if (obj.type === "roomActionPlaceTiles") {
 				if (this.onPlaceTiles instanceof Function) {this.onPlaceTiles(obj)}
 			}
