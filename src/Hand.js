@@ -255,7 +255,7 @@ class Hand {
 			//We will verify that the tiles CAN be removed before removing them.
 			let indexes = []
 			this.contents.forEach((item, index) => {
-				if (item.matches(obj)) {
+				if (item.matches && item.matches(obj)) {
 					indexes.push(index)
 				}
 			})

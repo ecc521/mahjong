@@ -6702,7 +6702,7 @@ var Hand = /*#__PURE__*/function () {
       //We will verify that the tiles CAN be removed before removing them.
       var indexes = [];
       this.contents.forEach(function (item, index) {
-        if (item.matches(obj)) {
+        if (item.matches && item.matches(obj)) {
           indexes.push(index);
         }
       });
