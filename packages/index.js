@@ -660,7 +660,7 @@ var Tile = /*#__PURE__*/function () {
         return false;
       }
 
-      if (tile.type === this.type && tile.value === this.value) {
+      if (tile instanceof Tile && tile.type === this.type && tile.value === this.value) {
         return true;
       }
 
@@ -1591,7 +1591,7 @@ var Match = /*#__PURE__*/function () {
       get: function getTiles() {
         var _this = this;
 
-        return new Array(this.amount).fill(0).map(function () {
+        return new Array(this.amount).fill().map(function () {
           return _this.getComponentTile();
         }.bind(this));
       }.bind(this)
@@ -6355,6 +6355,8 @@ __webpack_require__(154);
 
 __webpack_require__(75);
 
+__webpack_require__(160);
+
 __webpack_require__(155);
 
 __webpack_require__(156);
@@ -6372,6 +6374,8 @@ __webpack_require__(22);
 __webpack_require__(37);
 
 __webpack_require__(115);
+
+__webpack_require__(167);
 
 __webpack_require__(120);
 
@@ -6472,7 +6476,7 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.remove = function (obj) {
-      console.log(obj);
+      //console.log(obj)
       var index = this.contents.findIndex(function (value) {
         return value === obj;
       });
@@ -6488,6 +6492,31 @@ var Hand = /*#__PURE__*/function () {
         throw obj + " does not exist in hand. ";
       }
     }.bind(this);
+
+    this.removeMatchingTile = function (obj) {
+      var _this = this;
+
+      //Removes a Tile that matches the object passed, although may not be the same objet.
+      if (!obj instanceof Tile) {
+        throw "removeMatchingTile only supports Tiles";
+      }
+
+      if (this.inPlacemat.length > 0) {
+        console.warn("Hand.removeMatchingTile is intended for server side use only. ");
+      }
+
+      if (!this.contents.some(function (item, index) {
+        if (item.matches && item.matches(obj)) {
+          _this.contents.splice(index, 1);
+
+          return true;
+        }
+
+        return false;
+      }.bind(this))) {} else {
+        return false;
+      }
+    };
 
     this.getExposedTiles = function () {
       var includeFaceDown = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
@@ -6691,15 +6720,14 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.removeSequenceFromHand = function removeSequenceFromHand(sequence) {
-      var _this = this;
+      var _this2 = this;
 
       var simulated = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       //We will verify that the tiles CAN be removed before removing them.
-      var contents = this.getStringContents();
       var indexes = [];
-      JSON.parse(JSON.stringify(sequence.tiles)).forEach(function (str, index) {
-        for (var i = contents.length - 1; i >= 0; i--) {
-          if (contents[i] === str) {
+      sequence.tiles.forEach(function (tile, index) {
+        for (var i = _this2.contents.length - 1; i >= 0; i--) {
+          if (tile.matches(_this2.contents[i])) {
             indexes[index] = i;
             return;
           }
@@ -6715,7 +6743,7 @@ var Hand = /*#__PURE__*/function () {
         indexes.sort(function (a, b) {
           return b - a;
         }).forEach(function (index) {
-          _this.contents.splice(index, 1);
+          _this2.contents.splice(index, 1);
         });
         return true;
       } else {
@@ -6830,27 +6858,27 @@ var Hand = /*#__PURE__*/function () {
       }
 
       var drawTiles = function drawTiles(tiles, type) {
-        var _this2 = this;
+        var _this3 = this;
 
         var _loop = function _loop(_i3) {
           var tile = tiles[_i3];
           var elem = document.createElement("img");
           elem.src = tile.imageUrl;
 
-          if (type === "exposed" && _this2.handForExposed) {
-            _this2.handForExposed.appendChild(elem);
+          if (type === "exposed" && _this3.handForExposed) {
+            _this3.handForExposed.appendChild(elem);
           } else if (type === "exposed") {
-            _this2.handToRender.appendChild(elem);
+            _this3.handToRender.appendChild(elem);
           } else if (type === "unexposed") {
-            if (_this2.interactive) {
+            if (_this3.interactive) {
               elem.draggable = true;
               elem.addEventListener("dragstart", dragstart);
-              elem.tileIndex = _this2.contents.findIndex(function (item) {
+              elem.tileIndex = _this3.contents.findIndex(function (item) {
                 return item === tile;
               });
             }
 
-            _this2.handToRender.appendChild(elem);
+            _this3.handToRender.appendChild(elem);
           }
         };
 
@@ -6870,7 +6898,9 @@ var Hand = /*#__PURE__*/function () {
     this.getStringContents = function () {
       var prop = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : "contents";
       //Can also pass "inPlacemat" for placemat contents.
-      return JSON.parse(JSON.stringify(this[prop]));
+      return this[prop].map(function (item) {
+        return item.toJSON();
+      });
     }.bind(this);
 
     this.toJSON = function () {
@@ -7148,7 +7178,13 @@ var Hand = /*#__PURE__*/function () {
       }
 
       neededPongEquivs -= pongOrKong;
-      console.log(neededPongEquivs);
+      console.log(neededPongEquivs); //If we have too few possibilities to make this work, return false.
+
+      /*console.log(neededPongEquivs - possibleMatches.length - unlimitedSequences?possibleSequences.length:(sequences?0:Math.min(possibleSequences.length, 1)))
+      if ((neededPongEquivs - possibleMatches.length - unlimitedSequences?possibleSequences.length:(sequences?0:Math.min(possibleSequences.length, 1))) > 0) {
+      	console.log("Short Circut 1")
+      	return false
+      }*/
 
       var _iterator = _createForOfIteratorHelper(generateCombinations(allPossibilities, neededPongEquivs)),
           _step;
@@ -7156,6 +7192,19 @@ var Hand = /*#__PURE__*/function () {
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var combo = _step.value;
+          //Remove all combos that result in too many sequences.
+
+          /*console.log(combo)
+          let sequenceCount = combo.reduce((total, value) => {return total+Number(value instanceof Sequence)}, 0)
+          let matchCount = neededPongEquivs - sequenceCount
+          sequenceCount += sequences
+          console.log(sequenceCount)
+          console.log(pongOrKong)
+          console.log(matchCount)
+          if (!unlimitedSequences && 4-pongOrKong-matchCount > Math.min(1, sequenceCount)) {
+          	console.log("Short Circut 2 - Per Combo")
+          	continue;
+          }*/
           combinations.push(combo);
         }
       } catch (err) {
@@ -7226,6 +7275,50 @@ var Hand = /*#__PURE__*/function () {
       }
 
       return 0;
+    }
+  }, {
+    key: "isCalling",
+    value: function isCalling(userHand, discardPile, unlimitedSequences) {
+      //This determines if, from the player's point of view, they are calling.
+      //We don't access any information that they do not have access to in making this determination.
+      var allTilesHand = new Hand();
+      allTilesHand.contents = Wall.getNonPrettyTiles();
+      discardPile.forEach(function (tile) {
+        allTilesHand.removeMatchingTile(tile);
+      }); //We don't check inPlacemat, so should be used for server side use only.
+      //Remove the contents of the user's hand from allTilesHand
+
+      userHand.contents.forEach(function (item) {
+        if (item instanceof Tile) {
+          allTilesHand.removeMatchingTile(item);
+        } else if (item instanceof Sequence) {
+          item.tiles.forEach(function (tile) {
+            allTilesHand.removeMatchingTile(tile);
+          });
+        } else if (item instanceof Match) {
+          new Array(item.amount).fill().forEach(function () {
+            allTilesHand.removeMatchingTile(item.getComponentTile());
+          });
+        }
+      });
+
+      for (var i = 0; i < allTilesHand.contents.length; i++) {
+        var tile = allTilesHand.contents[i];
+
+        while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
+
+
+        userHand.add(tile);
+
+        if (Hand.isMahjong(userHand, unlimitedSequences)) {
+          userHand.remove(tile);
+          return true;
+        }
+
+        userHand.remove(tile);
+      }
+
+      return false;
     }
   }, {
     key: "convertStringsToTiles",
@@ -10128,6 +10221,29 @@ module.exports = function (METHOD_NAME) {
     return !!whitespaces[METHOD_NAME]() || non[METHOD_NAME]() != non || whitespaces[METHOD_NAME].name !== METHOD_NAME;
   });
 };
+
+
+/***/ }),
+/* 167 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(0);
+var $some = __webpack_require__(28).some;
+var arrayMethodIsStrict = __webpack_require__(45);
+var arrayMethodUsesToLength = __webpack_require__(15);
+
+var STRICT_METHOD = arrayMethodIsStrict('some');
+var USES_TO_LENGTH = arrayMethodUsesToLength('some');
+
+// `Array.prototype.some` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.some
+$({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
+  some: function some(callbackfn /* , thisArg */) {
+    return $some(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
 
 
 /***/ })

@@ -13,7 +13,7 @@ class Tile {
 
 		this.matches = function(tile) {
 			if (this.faceDown) {return false}
-			if (tile.type === this.type && tile.value === this.value) {return true}
+			if (tile instanceof Tile && tile.type === this.type && tile.value === this.value) {return true}
 			return false
 		}
 
