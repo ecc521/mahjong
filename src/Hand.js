@@ -64,16 +64,14 @@ class Hand {
 			//Removes a Tile that matches the object passed, although may not be the same objet.
 			if (!obj instanceof Tile) {throw "removeMatchingTile only supports Tiles"}
 			if (this.inPlacemat.length > 0) {console.warn("Hand.removeMatchingTile is intended for server side use only. ")}
-			if (!this.contents.some(((item, index) => {
-				if (item.matches && item.matches(obj)) {
+			if (this.contents.some(((item, index) => {
+				if (obj.matches(item)) {
 					this.contents.splice(index, 1)
 					return true
 				}
 				return false
-			}).bind(this))) {}
-			else {
-				return false
-			}
+			}).bind(this))) {return true}
+			return false
 		})
 
 		this.getExposedTiles = (function(includeFaceDown = false) {
@@ -255,7 +253,7 @@ class Hand {
 			//We will verify that the tiles CAN be removed before removing them.
 			let indexes = []
 			this.contents.forEach((item, index) => {
-				if (item.matches && item.matches(obj)) {
+				if (obj.matches(item)) {
 					indexes.push(index)
 				}
 			})
@@ -687,9 +685,30 @@ class Hand {
 			else if (item instanceof Match) {new Array(item.amount).fill().forEach(() => {allTilesHand.removeMatchingTile(item.getComponentTile())})}
 		})
 
-		for (let i=0;i<allTilesHand.contents.length;i++) {
-			let tile = allTilesHand.contents[i]
+		while (allTilesHand.contents.length) {
+			let tile = allTilesHand.contents[0]
 			while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
+
+			//isMahjong can be rather slow when called repeatedly. Let's do some quick checking to confirm this tile may actually help.
+			//We either need to have an existing copy of the tile, or the ability for this tile to fill a sequence.
+			let passes = userHand.contents.some((item, i) => {
+				return tile.matches(item)
+			});
+
+			if (!passes && !isNaN(tile.value)) {
+				let arr = [,,true,,,]
+				userHand.contents.forEach((item) => {
+					if (item.type === tile.type && Math.abs(item.value - tile.value) <= 2) {
+						arr[2-(item.value - tile.value)] = true
+					}
+				})
+				if (arr[0] && arr[1] || arr[3] && arr[4]) {passes = true}
+			}
+
+			if (!passes) {
+				continue;
+			}
+
 			userHand.add(tile)
 			if (Hand.isMahjong(userHand, unlimitedSequences)) {
 				userHand.remove(tile)

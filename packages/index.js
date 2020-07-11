@@ -6407,6 +6407,8 @@ __webpack_require__(26);
 
 __webpack_require__(112);
 
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it; if (typeof Symbol === "undefined" || o[Symbol.iterator] == null) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = o[Symbol.iterator](); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it.return != null) it.return(); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -6510,17 +6512,19 @@ var Hand = /*#__PURE__*/function () {
         console.warn("Hand.removeMatchingTile is intended for server side use only. ");
       }
 
-      if (!this.contents.some(function (item, index) {
-        if (item.matches && item.matches(obj)) {
+      if (this.contents.some(function (item, index) {
+        if (obj.matches(item)) {
           _this.contents.splice(index, 1);
 
           return true;
         }
 
         return false;
-      }.bind(this))) {} else {
-        return false;
+      }.bind(this))) {
+        return true;
       }
+
+      return false;
     };
 
     this.getExposedTiles = function () {
@@ -6702,7 +6706,7 @@ var Hand = /*#__PURE__*/function () {
       //We will verify that the tiles CAN be removed before removing them.
       var indexes = [];
       this.contents.forEach(function (item, index) {
-        if (item.matches && item.matches(obj)) {
+        if (obj.matches(item)) {
           indexes.push(index);
         }
       });
@@ -7284,20 +7288,57 @@ var Hand = /*#__PURE__*/function () {
         }
       });
 
-      for (var i = 0; i < allTilesHand.contents.length; i++) {
-        var tile = allTilesHand.contents[i];
+      var _loop2 = function _loop2() {
+        var tile = allTilesHand.contents[0];
 
         while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
+        //isMahjong can be rather slow when called repeatedly. Let's do some quick checking to confirm this tile may actually help.
+        //We either need to have an existing copy of the tile, or the ability for this tile to fill a sequence.
 
+
+        var passes = userHand.contents.some(function (item, i) {
+          return tile.matches(item);
+        });
+
+        if (!passes && !isNaN(tile.value)) {
+          var arr = [,, true,,,];
+          userHand.contents.forEach(function (item) {
+            if (item.type === tile.type && Math.abs(item.value - tile.value) <= 2) {
+              arr[2 - (item.value - tile.value)] = true;
+            }
+          });
+
+          if (arr[0] && arr[1] || arr[3] && arr[4]) {
+            passes = true;
+          }
+        }
+
+        if (!passes) {
+          return "continue";
+        }
 
         userHand.add(tile);
 
         if (Hand.isMahjong(userHand, unlimitedSequences)) {
           userHand.remove(tile);
-          return true;
+          return {
+            v: true
+          };
         }
 
         userHand.remove(tile);
+      };
+
+      while (allTilesHand.contents.length) {
+        var _ret = _loop2();
+
+        switch (_ret) {
+          case "continue":
+            continue;
+
+          default:
+            if (_typeof(_ret) === "object") return _ret.v;
+        }
       }
 
       return false;
