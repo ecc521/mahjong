@@ -49,7 +49,6 @@ class Hand {
 		}).bind(this)
 
 		this.remove = (function(obj) {
-			console.log(obj)
 			let index = this.contents.findIndex((value) => {return value === obj})
 			let placematIndex = this.inPlacemat.findIndex((value) => {return value === obj})
 			if (index !== -1) {
@@ -60,6 +59,22 @@ class Hand {
 			}
 			else {throw obj + " does not exist in hand. "}
 		}).bind(this)
+
+		this.removeMatchingTile = (function(obj) {
+			//Removes a Tile that matches the object passed, although may not be the same objet.
+			if (!obj instanceof Tile) {throw "removeMatchingTile only supports Tiles"}
+			if (this.inPlacemat.length > 0) {console.warn("Hand.removeMatchingTile is intended for server side use only. ")}
+			if (!this.contents.some(((item, index) => {
+				if (item.matches && item.matches(obj)) {
+					this.contents.splice(index, 1)
+					return true
+				}
+				return false
+			}).bind(this))) {}
+			else {
+				return false
+			}
+		})
 
 		this.getExposedTiles = (function(includeFaceDown = false) {
 			let exposedTiles = []
@@ -238,12 +253,11 @@ class Hand {
 
 		this.removeTilesFromHand = (function removeTilesFromHand(obj, amount = 1, simulated = false) {
 			//We will verify that the tiles CAN be removed before removing them.
-			let contents = this.getStringContents()
-			let toRemove = obj.toJSON()
-
 			let indexes = []
-			contents.forEach((str, index) => {
-				if (toRemove === str) {indexes.push(index)}
+			this.contents.forEach((item, index) => {
+				if (item.matches(obj)) {
+					indexes.push(index)
+				}
 			})
 
 			if (indexes.length >= amount) {
@@ -258,11 +272,10 @@ class Hand {
 
 		this.removeSequenceFromHand = (function removeSequenceFromHand(sequence, simulated = false) {
 			//We will verify that the tiles CAN be removed before removing them.
-			let contents = this.getStringContents()
 			let indexes = []
-			JSON.parse(JSON.stringify(sequence.tiles)).forEach((str, index) => {
-				for (let i=contents.length-1;i>=0;i--) {
-					if (contents[i] === str) {
+			sequence.tiles.forEach((tile, index) => {
+				for (let i=this.contents.length-1;i>=0;i--) {
+					if (tile.matches(this.contents[i])) {
 						indexes[index] = i
 						return
 					}
@@ -399,7 +412,7 @@ class Hand {
 
 		this.getStringContents = (function(prop = "contents") {
 			//Can also pass "inPlacemat" for placemat contents.
-			return JSON.parse(JSON.stringify(this[prop]))
+			return this[prop].map((item) => {return item.toJSON()})
 		}).bind(this)
 
 		this.toJSON = (function() {
@@ -609,6 +622,13 @@ class Hand {
 		console.log(neededPongEquivs)
 
 		for (let combo of generateCombinations(allPossibilities, neededPongEquivs)) {
+			//Remove all combos that result in too many sequences, or that are obviously impossible.
+			let sequenceCount = combo.reduce((total, value) => {return total+Number(value instanceof Sequence)}, 0)
+			let matchCount = neededPongEquivs - sequenceCount
+			sequenceCount += sequences
+			if (!unlimitedSequences && 4-pongOrKong-matchCount > Math.min(1, sequenceCount)) {
+				continue;
+			}
   			combinations.push(combo);
 		}
 
@@ -616,8 +636,7 @@ class Hand {
 		console.log(possibleSequences)
 		console.log(combinations)
 
-		let successfulCombinations = []
-		combinations.forEach((combo, index) => {
+		return combinations.find((combo, index) => {
 			let localTestHand = new Hand()
 			localTestHand.contents = testingHand.contents.slice(0)
 			for (let i=0;i<combo.length;i++) {
@@ -644,15 +663,41 @@ class Hand {
 				localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
 				localTestHand.removeTilesFromHand(tile, 2)
 				localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
-				successfulCombinations.push(localTestHand)
-				return true
+				return localTestHand
 			}
+		}) || 0
+	}
+
+	static isCalling(userHand, discardPile, unlimitedSequences) {
+		//This determines if, from the player's point of view, they are calling.
+		//We don't access any information that they do not have access to in making this determination.
+
+		let allTilesHand = new Hand()
+		allTilesHand.contents = Wall.getNonPrettyTiles()
+
+		discardPile.forEach((tile) => {
+			allTilesHand.removeMatchingTile(tile)
 		})
 
-		console.log(successfulCombinations)
-		if (successfulCombinations.length > 1) {alert("You've created a hand that our code didn't know was possible. Everything may work fine, but please take a screenshot of your hand and open an issue at https://github.com/ecc521/mahjong. ")}
-		if (successfulCombinations.length > 0) {return successfulCombinations[0]}
-		return 0
+		//We don't check inPlacemat, so should be used for server side use only.
+		//Remove the contents of the user's hand from allTilesHand
+		userHand.contents.forEach((item) => {
+			if (item instanceof Tile) {allTilesHand.removeMatchingTile(item)}
+			else if (item instanceof Sequence) {item.tiles.forEach((tile) => {allTilesHand.removeMatchingTile(tile)})}
+			else if (item instanceof Match) {new Array(item.amount).fill().forEach(() => {allTilesHand.removeMatchingTile(item.getComponentTile())})}
+		})
+
+		for (let i=0;i<allTilesHand.contents.length;i++) {
+			let tile = allTilesHand.contents[i]
+			while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
+			userHand.add(tile)
+			if (Hand.isMahjong(userHand, unlimitedSequences)) {
+				userHand.remove(tile)
+				return true
+			}
+			userHand.remove(tile)
+		}
+		return false
 	}
 
 	static convertStringsToTiles(arr) {

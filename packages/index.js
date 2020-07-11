@@ -6359,6 +6359,8 @@ __webpack_require__(160);
 
 __webpack_require__(155);
 
+__webpack_require__(172);
+
 __webpack_require__(156);
 
 __webpack_require__(19);
@@ -6373,6 +6375,8 @@ __webpack_require__(22);
 
 __webpack_require__(37);
 
+__webpack_require__(168);
+
 __webpack_require__(115);
 
 __webpack_require__(167);
@@ -6384,6 +6388,8 @@ __webpack_require__(102);
 __webpack_require__(25);
 
 __webpack_require__(158);
+
+__webpack_require__(170);
 
 __webpack_require__(159);
 
@@ -6476,7 +6482,6 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.remove = function (obj) {
-      //console.log(obj)
       var index = this.contents.findIndex(function (value) {
         return value === obj;
       });
@@ -6695,11 +6700,9 @@ var Hand = /*#__PURE__*/function () {
       var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
       var simulated = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
       //We will verify that the tiles CAN be removed before removing them.
-      var contents = this.getStringContents();
-      var toRemove = obj.toJSON();
       var indexes = [];
-      contents.forEach(function (str, index) {
-        if (toRemove === str) {
+      this.contents.forEach(function (item, index) {
+        if (item.matches(obj)) {
           indexes.push(index);
         }
       });
@@ -7178,13 +7181,7 @@ var Hand = /*#__PURE__*/function () {
       }
 
       neededPongEquivs -= pongOrKong;
-      console.log(neededPongEquivs); //If we have too few possibilities to make this work, return false.
-
-      /*console.log(neededPongEquivs - possibleMatches.length - unlimitedSequences?possibleSequences.length:(sequences?0:Math.min(possibleSequences.length, 1)))
-      if ((neededPongEquivs - possibleMatches.length - unlimitedSequences?possibleSequences.length:(sequences?0:Math.min(possibleSequences.length, 1))) > 0) {
-      	console.log("Short Circut 1")
-      	return false
-      }*/
+      console.log(neededPongEquivs);
 
       var _iterator = _createForOfIteratorHelper(generateCombinations(allPossibilities, neededPongEquivs)),
           _step;
@@ -7192,19 +7189,17 @@ var Hand = /*#__PURE__*/function () {
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var combo = _step.value;
-          //Remove all combos that result in too many sequences.
+          //Remove all combos that result in too many sequences, or that are obviously impossible.
+          var sequenceCount = combo.reduce(function (total, value) {
+            return total + Number(value instanceof Sequence);
+          }, 0);
+          var matchCount = neededPongEquivs - sequenceCount;
+          sequenceCount += sequences;
 
-          /*console.log(combo)
-          let sequenceCount = combo.reduce((total, value) => {return total+Number(value instanceof Sequence)}, 0)
-          let matchCount = neededPongEquivs - sequenceCount
-          sequenceCount += sequences
-          console.log(sequenceCount)
-          console.log(pongOrKong)
-          console.log(matchCount)
-          if (!unlimitedSequences && 4-pongOrKong-matchCount > Math.min(1, sequenceCount)) {
-          	console.log("Short Circut 2 - Per Combo")
-          	continue;
-          }*/
+          if (!unlimitedSequences && 4 - pongOrKong - matchCount > Math.min(1, sequenceCount)) {
+            continue;
+          }
+
           combinations.push(combo);
         }
       } catch (err) {
@@ -7216,8 +7211,7 @@ var Hand = /*#__PURE__*/function () {
       console.log(possibleMatches);
       console.log(possibleSequences);
       console.log(combinations);
-      var successfulCombinations = [];
-      combinations.forEach(function (combo, index) {
+      return combinations.find(function (combo, index) {
         var localTestHand = new Hand();
         localTestHand.contents = testingHand.contents.slice(0);
 
@@ -7260,21 +7254,9 @@ var Hand = /*#__PURE__*/function () {
           }));
           localTestHand.removeTilesFromHand(tile, 2);
           localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0));
-          successfulCombinations.push(localTestHand);
-          return true;
+          return localTestHand;
         }
-      });
-      console.log(successfulCombinations);
-
-      if (successfulCombinations.length > 1) {
-        alert("You've created a hand that our code didn't know was possible. Everything may work fine, but please take a screenshot of your hand and open an issue at https://github.com/ecc521/mahjong. ");
-      }
-
-      if (successfulCombinations.length > 0) {
-        return successfulCombinations[0];
-      }
-
-      return 0;
+      }) || 0;
     }
   }, {
     key: "isCalling",
@@ -10244,6 +10226,214 @@ $({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
     return $some(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
   }
 });
+
+
+/***/ }),
+/* 168 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(0);
+var $reduce = __webpack_require__(169).left;
+var arrayMethodIsStrict = __webpack_require__(45);
+var arrayMethodUsesToLength = __webpack_require__(15);
+
+var STRICT_METHOD = arrayMethodIsStrict('reduce');
+var USES_TO_LENGTH = arrayMethodUsesToLength('reduce', { 1: 0 });
+
+// `Array.prototype.reduce` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+$({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
+  reduce: function reduce(callbackfn /* , initialValue */) {
+    return $reduce(this, callbackfn, arguments.length, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+
+/***/ }),
+/* 169 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var aFunction = __webpack_require__(30);
+var toObject = __webpack_require__(9);
+var IndexedObject = __webpack_require__(39);
+var toLength = __webpack_require__(12);
+
+// `Array.prototype.{ reduce, reduceRight }` methods implementation
+var createMethod = function (IS_RIGHT) {
+  return function (that, callbackfn, argumentsLength, memo) {
+    aFunction(callbackfn);
+    var O = toObject(that);
+    var self = IndexedObject(O);
+    var length = toLength(O.length);
+    var index = IS_RIGHT ? length - 1 : 0;
+    var i = IS_RIGHT ? -1 : 1;
+    if (argumentsLength < 2) while (true) {
+      if (index in self) {
+        memo = self[index];
+        index += i;
+        break;
+      }
+      index += i;
+      if (IS_RIGHT ? index < 0 : length <= index) {
+        throw TypeError('Reduce of empty array with no initial value');
+      }
+    }
+    for (;IS_RIGHT ? index >= 0 : length > index; index += i) if (index in self) {
+      memo = callbackfn(memo, self[index], index, O);
+    }
+    return memo;
+  };
+};
+
+module.exports = {
+  // `Array.prototype.reduce` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.reduce
+  left: createMethod(false),
+  // `Array.prototype.reduceRight` method
+  // https://tc39.github.io/ecma262/#sec-array.prototype.reduceright
+  right: createMethod(true)
+};
+
+
+/***/ }),
+/* 170 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var DESCRIPTORS = __webpack_require__(7);
+var global = __webpack_require__(3);
+var isForced = __webpack_require__(85);
+var redefine = __webpack_require__(11);
+var has = __webpack_require__(5);
+var classof = __webpack_require__(14);
+var inheritIfRequired = __webpack_require__(171);
+var toPrimitive = __webpack_require__(27);
+var fails = __webpack_require__(2);
+var create = __webpack_require__(47);
+var getOwnPropertyNames = __webpack_require__(62).f;
+var getOwnPropertyDescriptor = __webpack_require__(38).f;
+var defineProperty = __webpack_require__(8).f;
+var trim = __webpack_require__(165).trim;
+
+var NUMBER = 'Number';
+var NativeNumber = global[NUMBER];
+var NumberPrototype = NativeNumber.prototype;
+
+// Opera ~12 has broken Object#toString
+var BROKEN_CLASSOF = classof(create(NumberPrototype)) == NUMBER;
+
+// `ToNumber` abstract operation
+// https://tc39.github.io/ecma262/#sec-tonumber
+var toNumber = function (argument) {
+  var it = toPrimitive(argument, false);
+  var first, third, radix, maxCode, digits, length, index, code;
+  if (typeof it == 'string' && it.length > 2) {
+    it = trim(it);
+    first = it.charCodeAt(0);
+    if (first === 43 || first === 45) {
+      third = it.charCodeAt(2);
+      if (third === 88 || third === 120) return NaN; // Number('+0x1') should be NaN, old V8 fix
+    } else if (first === 48) {
+      switch (it.charCodeAt(1)) {
+        case 66: case 98: radix = 2; maxCode = 49; break; // fast equal of /^0b[01]+$/i
+        case 79: case 111: radix = 8; maxCode = 55; break; // fast equal of /^0o[0-7]+$/i
+        default: return +it;
+      }
+      digits = it.slice(2);
+      length = digits.length;
+      for (index = 0; index < length; index++) {
+        code = digits.charCodeAt(index);
+        // parseInt parses a string to a first unavailable symbol
+        // but ToNumber should return NaN if a string contains unavailable symbols
+        if (code < 48 || code > maxCode) return NaN;
+      } return parseInt(digits, radix);
+    }
+  } return +it;
+};
+
+// `Number` constructor
+// https://tc39.github.io/ecma262/#sec-number-constructor
+if (isForced(NUMBER, !NativeNumber(' 0o1') || !NativeNumber('0b1') || NativeNumber('+0x1'))) {
+  var NumberWrapper = function Number(value) {
+    var it = arguments.length < 1 ? 0 : value;
+    var dummy = this;
+    return dummy instanceof NumberWrapper
+      // check on 1..constructor(foo) case
+      && (BROKEN_CLASSOF ? fails(function () { NumberPrototype.valueOf.call(dummy); }) : classof(dummy) != NUMBER)
+        ? inheritIfRequired(new NativeNumber(toNumber(it)), dummy, NumberWrapper) : toNumber(it);
+  };
+  for (var keys = DESCRIPTORS ? getOwnPropertyNames(NativeNumber) : (
+    // ES3:
+    'MAX_VALUE,MIN_VALUE,NaN,NEGATIVE_INFINITY,POSITIVE_INFINITY,' +
+    // ES2015 (in case, if modules with ES2015 Number statics required before):
+    'EPSILON,isFinite,isInteger,isNaN,isSafeInteger,MAX_SAFE_INTEGER,' +
+    'MIN_SAFE_INTEGER,parseFloat,parseInt,isInteger'
+  ).split(','), j = 0, key; keys.length > j; j++) {
+    if (has(NativeNumber, key = keys[j]) && !has(NumberWrapper, key)) {
+      defineProperty(NumberWrapper, key, getOwnPropertyDescriptor(NativeNumber, key));
+    }
+  }
+  NumberWrapper.prototype = NumberPrototype;
+  NumberPrototype.constructor = NumberWrapper;
+  redefine(global, NUMBER, NumberWrapper);
+}
+
+
+/***/ }),
+/* 171 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var isObject = __webpack_require__(6);
+var setPrototypeOf = __webpack_require__(129);
+
+// makes subclassing work correct for wrapped built-ins
+module.exports = function ($this, dummy, Wrapper) {
+  var NewTarget, NewTargetPrototype;
+  if (
+    // it can work only with native `setPrototypeOf`
+    setPrototypeOf &&
+    // we haven't completely correct pre-ES6 way for getting `new.target`, so use this
+    typeof (NewTarget = dummy.constructor) == 'function' &&
+    NewTarget !== Wrapper &&
+    isObject(NewTargetPrototype = NewTarget.prototype) &&
+    NewTargetPrototype !== Wrapper.prototype
+  ) setPrototypeOf($this, NewTargetPrototype);
+  return $this;
+};
+
+
+/***/ }),
+/* 172 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+var $ = __webpack_require__(0);
+var $find = __webpack_require__(28).find;
+var addToUnscopables = __webpack_require__(46);
+var arrayMethodUsesToLength = __webpack_require__(15);
+
+var FIND = 'find';
+var SKIPS_HOLES = true;
+
+var USES_TO_LENGTH = arrayMethodUsesToLength(FIND);
+
+// Shouldn't skip holes
+if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
+
+// `Array.prototype.find` method
+// https://tc39.github.io/ecma262/#sec-array.prototype.find
+$({ target: 'Array', proto: true, forced: SKIPS_HOLES || !USES_TO_LENGTH }, {
+  find: function find(callbackfn /* , that = undefined */) {
+    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
+  }
+});
+
+// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
+addToUnscopables(FIND);
 
 
 /***/ })

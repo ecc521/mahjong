@@ -54,7 +54,7 @@ class Match {
 
 		Object.defineProperty(this, "tiles", {
 			get: (function getTiles() {
-				return new Array(this.amount).fill(0).map((() => {return this.getComponentTile()}).bind(this))
+				return new Array(this.amount).fill().map((() => {return this.getComponentTile()}).bind(this))
 			}).bind(this)
 		})
 
