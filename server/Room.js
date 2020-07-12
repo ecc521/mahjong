@@ -64,7 +64,7 @@ class Room {
 			sendStateToClients()
 			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
 
-			this.messageAll("roomActionMahjong", getSummary(clientid, drewOwnTile), "success")
+			this.messageAll([], "roomActionMahjong", getSummary(clientid, drewOwnTile), "success")
 			sendStateToClients()
 		}).bind(this)
 
@@ -369,9 +369,10 @@ class Room {
 			}
 		}).bind(this)
 
-		this.messageAll = (function(...args) {
+		this.messageAll = (function(exclude = [], ...args) {
 			console.log(this.clientIds.length)
 			this.clientIds.forEach((clientId) => {
+				if (exclude.includes(clientId)) {return}
 				console.log("Messaging client " + clientId)
 				let client = global.stateManager.getClient(clientId)
 				client.message(...args)
@@ -391,7 +392,7 @@ class Room {
 				}
 				if (!tile) {
 					console.log("Wall Empty");
-					this.messageAll("roomActionWallEmpty", getSummary(), "success")
+					this.messageAll([], "roomActionWallEmpty", getSummary(), "success")
 					if (!this.gameData.eastWindPlayerId) {
 						for (let clientId in this.gameData.playerHands) {
 							if (this.gameData.playerHands[clientId].wind === "south") {
@@ -420,7 +421,7 @@ class Room {
 			if (this.clientIds.length !== 4) {return "Not Enough Clients"}
 			else {
 				this.inGame = true
-				this.messageAll(messageKey, "Game Started", "success")
+				this.messageAll([], messageKey, "Game Started", "success")
 				//Build the wall.
 				this.gameData.wall = new Wall()
 				this.gameData.discardPile = []
@@ -479,13 +480,14 @@ class Room {
 			}
 			this.inGame = false
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
-			this.messageAll(messageKey, gameEndMessage, "success")
+			this.messageAll([], messageKey, gameEndMessage, "success")
 			sendStateToClients()
 		}).bind(this)
 
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
 			console.log(obj, clientId)
+			let client = global.stateManager.getClient(clientId)
 
 			let placement;
 			try {
@@ -503,7 +505,7 @@ class Room {
 							placement = new Match({exposed: true, amount: placement.length, type: placement[0].type, value: placement[0].value})
 						}
 						else {
-							return global.stateManager.getClient(clientId).message(obj.type, "Unable to create a sequence, or match. Please check your tiles. ", "error")
+							return client.message(obj.type, "Unable to create a sequence, or match. Please check your tiles. ", "error")
 						}
 					}
 				}
@@ -512,7 +514,7 @@ class Room {
 				}
 			}
 			catch (e) {
-				return global.stateManager.getClient(clientId).message(obj.type, "Error: " + e.message, "error")
+				return client.message(obj.type, "Error: " + e.message, "error")
 			}
 			//The users wishes to place down tiles.
 			//If it is not their turn, we will hold until all other players have either attempted to place or nexted.
@@ -521,12 +523,12 @@ class Room {
 			if (this.gameData.currentTurn.thrown === false) {
 				if (clientId !== this.gameData.currentTurn.userTurn) {
 					//This player is not allowed to perform any actions at this stage.
-					return global.stateManager.getClient(clientId).message(obj.type, "Can't place after draw before throw", "error")
+					return client.message(obj.type, "Can't place after draw before throw", "error")
 				}
 				let hand = this.gameData.playerHands[clientId]
 				if (placement instanceof Tile) {
 					if (obj.mahjong) {
-						return global.stateManager.getClient(clientId).message(obj.type, "You can't discard and go mahjong. ", "error")
+						return client.message(obj.type, "You can't discard and go mahjong. ", "error")
 					}
 
 					if (hand.removeTilesFromHand(placement)) {
@@ -544,16 +546,18 @@ class Room {
 						//Discard tile.
 						this.gameData.currentTurn.thrown = placement
 						sendStateToClients()
+						this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has thrown a " + placement.value + " " + placement.type, "success")
+
 						console.log("Throw")
 					}
 					else {
-						return global.stateManager.getClient(clientId).message(obj.type, "You can't place a tile you do not possess", "error")
+						return client.message(obj.type, "You can't place a tile you do not possess", "error")
 					}
 				}
 				else if (placement instanceof Match) {
 					if (placement.amount === 4) {
 						if (obj.mahjong) {
-							return global.stateManager.getClient(clientId).message(obj.type, "You can't go mahjong while placing a kong. ", "error")
+							return client.message(obj.type, "You can't go mahjong while placing a kong. ", "error")
 						}
 						if (hand.removeTilesFromHand(placement.getComponentTile(), 4)) {
 							//Place Kong. Turn remains the same, thrown false.
@@ -567,28 +571,28 @@ class Room {
 
 						}
 						else {
-							return global.stateManager.getClient(clientId).message(obj.type, "You can't place tiles you do not possess", "error")
+							return client.message(obj.type, "You can't place tiles you do not possess", "error")
 						}
 					}
 					else {
-						return global.stateManager.getClient(clientId).message(obj.type, "Can't expose in hand pong, sequence, or pair. This can only be done via mahjong.", "error")
+						return client.message(obj.type, "Can't expose in hand pong, sequence, or pair. This can only be done via mahjong.", "error")
 					}
 				}
 				else if (obj.mahjong) {
 					goMahjong(clientId, true)
 				}
 				else {
-					return global.stateManager.getClient(clientId).message(obj.type, "Invalid placement attempt for current game status", "error")
+					return client.message(obj.type, "Invalid placement attempt for current game status", "error")
 				}
 			}
 			else {
 				//This is not a discard, and it related to a throw, so must either be a pong, kong, sequence, or a pair if the user is going mahjong.
 				if (!(placement instanceof Match || placement instanceof Sequence)) {
-					return global.stateManager.getClient(clientId).message(obj.type, "You can't discard when it is not your turn", "error")
+					return client.message(obj.type, "You can't discard when it is not your turn", "error")
 				}
 				if (placement instanceof Sequence && !this.gameData.unlimitedSequences) {
 					if (this.gameData.playerHands[clientId].contents.some((item) => {return item instanceof Sequence})) {
-						return global.stateManager.getClient(clientId).message(obj.type, "unlimitedSequences is off, so you can't place another sequence. ", "error")
+						return client.message(obj.type, "unlimitedSequences is off, so you can't place another sequence. ", "error")
 					}
 				}
 				//Schedule the order. It's validity will be checked later.
