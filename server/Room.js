@@ -95,6 +95,7 @@ class Room {
 					//Handle this turn, and begin the next one.
 					let priorityList = []
 					for (let key in obj) {
+						let client = global.stateManager.getClient(key)
 						if (obj[key] !== "Next") {
 
 							let hand = this.gameData.playerHands[key]
@@ -108,12 +109,12 @@ class Room {
 								//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
 								if (!mahjongHand.getStringContents().includes(obj[key].toJSON())) {
 									wouldMakeMahjong = false
-									global.stateManager.getClient(key).message("roomActionPlaceTiles", "You can't go mahjong at this moment with the specified placement. Your placement will be considered without mahjong priority applied. ", "error")
+									client.message("roomActionPlaceTiles", "You can't go mahjong at this moment with the specified placement. Your placement will be considered without mahjong priority applied. ", "error")
 								}
 							}
 
 							if (obj[key].mahjong && !wouldMakeMahjong) {
-								global.stateManager.getClient(key).message("roomActionPlaceTiles", "You can't go mahjong at this moment. Your placement will be considered without mahjong priority applied. ", "error")
+								client.message("roomActionPlaceTiles", "You can't go mahjong at this moment. Your placement will be considered without mahjong priority applied. ", "error")
 							}
 
 							let priority;
@@ -135,7 +136,7 @@ class Room {
 								//Verify that the user is the one immediently before.
 								if (getBackwardsDistance(placerWind, throwerWind) > 1) {
 									console.log("Greater than one person distance on sequence. Denied. ")
-									global.stateManager.getClient(key).message("roomActionPlaceTiles", "You can only take a sequence from the player before you in the rotation order, except with mahjong.", "error")
+									client.message("roomActionPlaceTiles", "You can only take a sequence from the player before you in the rotation order, except with mahjong.", "error")
 									continue;
 								}
 								priority = 99
@@ -238,7 +239,7 @@ class Room {
 
 								//Pick up as 4th tile for an exposed pong if possible.
 								//TODO: Consider notifying people when the 4th tile is added. We currently don't do this, because it is just points, so shouldn't really impact
-								//gameplay, and the message can't currently be sent to the person who gained the pickup, as they receive tile pickup message too. 
+								//gameplay, and the message can't currently be sent to the person who gained the pickup, as they receive tile pickup message too.
 								hand.contents.forEach((item) => {
 									if (item instanceof Match && item.type === this.gameData.currentTurn.thrown.type && item.value === this.gameData.currentTurn.thrown.value) {
 										utilized = true
