@@ -143,6 +143,11 @@ window.stateManager.onWallEmpty = function(obj) {
 	}
 }
 
+window.stateManager.onGameplayAlert = function(obj) {
+	console.log(obj.message)
+	new Popups.BlocklessAlert(obj.message, 4000)
+}
+
 let nextTurnButton = document.createElement("button")
 nextTurnButton.id = "nextTurnButton"
 gameBoard.appendChild(nextTurnButton)

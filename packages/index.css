@@ -614,6 +614,28 @@ This means that something using bottom is off the page - hence we must use top. 
 	font-size: 16px;
 }
 
+.blocklessAlertCover {
+	position: absolute;
+	width: 100vw;
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	background-image: radial-gradient(transparent, black);
+	z-index: 98;
+	opacity: 0;
+	transition: opacity .5s;
+	pointer-events: none;
+}
+
+.blocklessAlertCover p {
+	text-align: center;
+	font-size: 3vw;
+	margin:0;
+	height: 100vh;
+	height: calc(var(--vh) * 100);
+	line-height: 100vh;
+	line-height: calc(var(--vh) * 100);
+}
+
 
 
 

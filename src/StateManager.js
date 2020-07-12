@@ -38,6 +38,9 @@ class StateManager {
 			else if (obj.type === "roomActionPlaceTiles") {
 				if (this.onPlaceTiles instanceof Function) {this.onPlaceTiles(obj)}
 			}
+			else if (obj.type === "roomActionGameplayAlert") {
+				if (this.onGameplayAlert instanceof Function) {this.onGameplayAlert(obj)}
+			}
 			else {
 				console.log("Unknown Type " + obj.type)
 			}
@@ -46,18 +49,17 @@ class StateManager {
 		this.createWebsocket = (async function createWebsocket() {
 			this.websocket = new WebSocket(websocketURL)
 			this.websocket.addEventListener("message", onmessage)
+
 			this.websocket.addEventListener("error", (async function(e) {
 				console.error(e)
-				await new Promise((resolve, reject) => {setTimeout(resolve, 2000)}) //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
-				this.createWebsocket()
-				this.getCurrentRoom() //Syncs state.
 			}).bind(this))
 
+			//Error events also result in a close, so we end up with exponential blowup if reconnect on both. We'll only reconnect on close.
 			this.websocket.addEventListener("close", (async function(e) {
 				console.warn(e)
 				if (e.code !== 1000) {
 					//If not a normal closure, reestablish and sync.
-					await new Promise((resolve, reject) => {setTimeout(resolve, 2000)}) //2 second delay on reconnects. Don't want to send out 100s of requests per second when something goes wrong.
+					await new Promise((resolve, reject) => {setTimeout(resolve, 1000)}) //1 second delay on reconnects.
 					this.createWebsocket()
 					this.getCurrentRoom() //Syncs state.
 				}

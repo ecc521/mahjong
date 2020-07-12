@@ -2,6 +2,7 @@ const Wall = require("../src/Wall.js")
 const Hand = require("../src/Hand.js")
 const Tile = require("../src/Tile.js")
 const Match = require("../src/Match.js")
+const Pretty = require("../src/Pretty.js")
 const Sequence = require("../src/Sequence.js")
 
 class Room {
@@ -233,7 +234,7 @@ class Room {
 							if (hand.wind === nextWind) {
 
 								//Pick up as 4th tile for an exposed pong if possible.
-								hand.forEach((item) => {
+								hand.contents.forEach((item) => {
 									if (item instanceof Match && item.type === this.gameData.currentTurn.thrown.type && item.value === this.gameData.currentTurn.thrown.value) {
 										utilized = true
 										Match.amount = 4
@@ -377,7 +378,7 @@ class Room {
 			})
 		}).bind(this)
 
-		let drawTile = (function drawTile(clientId, last = false) {
+		let drawTile = (function drawTile(clientId, last = false, doNotMessage = false) {
 			let tile;
 			while (!(tile instanceof Tile)) {
 				if (last) {
@@ -400,6 +401,10 @@ class Room {
 					return
 				}
 				this.gameData.playerHands[clientId].add(tile)
+				if (!doNotMessage || tile instanceof Pretty) {
+					//We will always notify about Prettys
+					global.stateManager.getClient(clientId).message("roomActionGameplayAlert", "You drew a " + (tile instanceof Pretty?"pretty!":tile.value + " " + tile.type + "!"), "success")
+				}
 			}
 		}).bind(this)
 
@@ -444,7 +449,7 @@ class Room {
 						tileCount = 14
 					}
 					for (let i=0;i<tileCount;i++) {
-						drawTile(clientId)
+						drawTile(clientId, false, true)
 					}
 				}
 
@@ -522,7 +527,7 @@ class Room {
 						//TODO: Note that it is remotely possible players will want to throw the 4th tile instead, as it is a very safe (if honor, entirely safe), throw.
 						//This would mean sacraficing points and a draw in order to get a safe throw, and I have never seen it done, but there are scenarios where it may
 						//actually be the best idea. We should probably allow this at some point.
-						hand.forEach((item) => {
+						hand.contents.forEach((item) => {
 							if (item instanceof Match && item.type === placement.type && item.value === placement.value) {
 								Match.amount = 4
 								return drawTile(clientId, true)

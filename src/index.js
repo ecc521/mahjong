@@ -21,13 +21,12 @@ let websocketURL = url.toString()
 window.stateManager = new StateManager(websocketURL)
 
 //Make classes public to allow for easier development.
-;(["Hand", "Tile", "Sequence", "Pretty", "Match", "Wall"]).forEach((className) => {
+;(["Hand", "Tile", "Sequence", "Pretty", "Match", "Wall", "Popups"]).forEach((className) => {
     window[className] = require("./" + className + ".js")
 })
 
 let roomManager = require("./RoomManager.js")
 let gameBoard = require("./GameBoard.js")
-
 
 
 //While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.

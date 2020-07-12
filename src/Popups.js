@@ -45,6 +45,28 @@ class Notification {
 	}
 }
 
+class BlocklessAlert {
+	constructor(messageText, duration = 4000) {
+		let cover = document.createElement("div")
+		cover.classList.add("blocklessAlertCover")
+		document.body.appendChild(cover)
+
+		let message = document.createElement("p")
+		message.innerHTML = messageText
+		window.requestAnimationFrame(function() {
+			cover.style.opacity = 1
+		})
+		setTimeout(function() {
+			cover.style.transition = "opacity " + duration/1000 + "s"
+			cover.style.opacity = 0
+			setTimeout(function() {cover.remove()}, duration)
+		}, Number(window.getComputedStyle(cover).transition.match(/opacity\s(\d+[.]\d+)s/)[1]) * 1000)
+
+		cover.appendChild(message)
+	}
+}
+
+
 class MessageBar {
 	constructor(text) {
 		let bar = document.createElement("div")
@@ -65,5 +87,6 @@ class MessageBar {
 
 module.exports = {
 	Notification,
-	MessageBar
+	MessageBar,
+	BlocklessAlert
 }
