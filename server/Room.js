@@ -380,7 +380,9 @@ class Room {
 
 		let drawTile = (function drawTile(clientId, last = false, doNotMessage = false) {
 			let tile;
+			let pretty = -1
 			while (!(tile instanceof Tile)) {
+				pretty++
 				if (last) {
 					tile = this.gameData.wall.drawLast()
 				}
@@ -401,10 +403,15 @@ class Room {
 					return
 				}
 				this.gameData.playerHands[clientId].add(tile)
-				if (!doNotMessage || tile instanceof Pretty) {
-					//We will always notify about Prettys
-					global.stateManager.getClient(clientId).message("roomActionGameplayAlert", "You drew a " + (tile instanceof Pretty?"pretty!":tile.value + " " + tile.type + "!"), "success")
+			}
+			if (!doNotMessage) {
+				if (pretty > 0) {
+					global.stateManager.getClient(clientId).message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), "success")
 				}
+			}
+			else if (pretty > 0) {
+				//If doNotMessage is passed, this is beginning of game setup. We won't send anything other than "You drew a pretty" to avoid having multiple overlapping pieces of text.
+				global.stateManager.getClient(clientId).message("roomActionGameplayAlert", "You drew a pretty!", "success")
 			}
 		}).bind(this)
 
