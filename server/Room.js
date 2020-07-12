@@ -155,9 +155,10 @@ class Room {
 						for (let i=0;i<priorityList.length;i++) {
 							console.log("Here 1")
 							let clientId = priorityList[i][1]
+							let client = global.stateManager.getClient(clientId)
 
 							if (utilized === true) {
-								global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "Placing tiles failed because another player had a higher priority placement (mahjong>match>sequence, and by order within category).", "error")
+								client.message("roomActionPlaceTiles", "Placing tiles failed because another player had a higher priority placement (mahjong>match>sequence, and by order within category).", "error")
 								continue;
 							}
 
@@ -183,6 +184,7 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
+										this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a sequence of " + placement.tiles[0].type + "s" , "success")
 										if (placement.mahjong) {
 											goMahjong(clientId)
 										}
@@ -190,11 +192,11 @@ class Room {
 									}
 									else {
 										hand.remove(this.gameData.currentTurn.thrown)
-										global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You can't place a sequence of tiles you do not possess", "error")
+										client.message("roomActionPlaceTiles", "You can't place a sequence of tiles you do not possess", "error")
 									}
 								}
 								else {
-									global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "Are you trying to hack? You must use the thrown tile when attempting to place off turn. ", "error")
+									client.message("roomActionPlaceTiles", "Are you trying to hack? You must use the thrown tile when attempting to place off turn. ", "error")
 								}
 							}
 							else if (placement instanceof Match) {
@@ -206,6 +208,7 @@ class Room {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
+										this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a " + [,,"pair","pong","kong"][placement.amount] + " of " + placement.value + " " + placement.type + "s", "success")
 										if (placement.mahjong) {
 											goMahjong(clientId)
 										}
@@ -217,7 +220,7 @@ class Room {
 									}
 									else {
 										console.log("Attempted to place invalid match")
-										global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You can't place a match of tiles you do not possess", "error")
+										client.message("roomActionPlaceTiles", "You can't place a match of tiles you do not possess", "error")
 									}
 								}
 							}
@@ -234,6 +237,8 @@ class Room {
 							if (hand.wind === nextWind) {
 
 								//Pick up as 4th tile for an exposed pong if possible.
+								//TODO: Consider notifying people when the 4th tile is added. We currently don't do this, because it is just points, so shouldn't really impact
+								//gameplay, and the message can't currently be sent to the person who gained the pickup, as they receive tile pickup message too. 
 								hand.contents.forEach((item) => {
 									if (item instanceof Match && item.type === this.gameData.currentTurn.thrown.type && item.value === this.gameData.currentTurn.thrown.value) {
 										utilized = true
@@ -567,6 +572,7 @@ class Room {
 							//Draw them another tile.
 							drawTile(clientId, true) //Draw from back of wall.
 							sendStateToClients()
+							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed an in-hand kong of " + placement.value + " " + placement.type + "s", "success")
 							console.log("Kong")
 
 						}
