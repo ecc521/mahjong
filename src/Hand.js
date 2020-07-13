@@ -92,7 +92,7 @@ class Hand {
 			return exposedTiles
 		}).bind(this)
 
-		this.syncContents = (function(syncContents) {
+		this.syncContents = (function(syncContents, addAdditionsToPlacematIfOpen = false) {
 			//We allow the user to sort their hand by themselves, however it is possible that, due to lag or other reasons, the users hand ends up not matching the server.
 			//This function will sync the contents of the users hand with contents, preserving some user ordering.
 
@@ -132,19 +132,25 @@ class Hand {
 				tempContents = tempContents.concat(this.inPlacemat.slice(0))
 			}
 
-			//Everything that matches is now nulled out.
-			//Add the things in syncContents but not in currentContents
-			for (let i=0;i<syncContentsStrings.length;i++) {
-				let item = syncContentsStrings[i]
-				if (item) {
-					this.add(syncContents[i])
-				}
-			}
-
 			for (let i=0;i<currentContentsStrings.length;i++) {
 				let item = currentContentsStrings[i]
 				if (item) {
 					this.remove(tempContents[i])
+				}
+			}
+
+			//Everything that matches is now nulled out.
+			//Add the things in syncContents but not in currentContents
+			//We run this after removal so that the placemat can be cleared out for addAdditionsToPlacematIfOpen
+			for (let i=0;i<syncContentsStrings.length;i++) {
+				let item = syncContentsStrings[i]
+				if (item) {
+					if (addAdditionsToPlacematIfOpen && this.inPlacemat.length < 3) {
+						this.inPlacemat.push(syncContents[i])
+					}
+					else {
+						this.add(syncContents[i])
+					}
 				}
 			}
 		}).bind(this)

@@ -6216,6 +6216,8 @@ var nametags = nametagIds.map(function (id) {
   return nametag;
 });
 window.stateManager.addEventListener("onStateUpdate", function (obj) {
+  var _message$currentTurn2, _message$currentTurn3;
+
   var message = obj.message;
 
   if (!message.inGame) {
@@ -6238,9 +6240,11 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
   var userWind;
   clients.forEach(function (client) {
     if (client.hand) {
+      var _message$currentTurn;
+
       console.log("User hand stuff");
       var tempHand = Hand.fromString(client.hand);
-      userHand.syncContents(tempHand.contents);
+      userHand.syncContents(tempHand.contents, message === null || message === void 0 ? void 0 : (_message$currentTurn = message.currentTurn) === null || _message$currentTurn === void 0 ? void 0 : _message$currentTurn.charleston);
       userWind = tempHand.wind;
     }
   });
@@ -6278,11 +6282,15 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
     hand.renderTiles();
   });
 
-  if (message.currentTurn && message.currentTurn.thrown) {
+  if (((_message$currentTurn2 = message.currentTurn) === null || _message$currentTurn2 === void 0 ? void 0 : (_message$currentTurn3 = _message$currentTurn2.playersReady) === null || _message$currentTurn3 === void 0 ? void 0 : _message$currentTurn3.length) > 0) {
     //The person has thrown their tile. Waiting on players to ready.
     nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)";
     nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId) ? "disabled" : "";
     placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId) ? "disabled" : "";
+
+    if (message.currentTurn.charleston) {
+      nextTurnButton.disabled = "disabled";
+    }
 
     if (message.currentTurn.userTurn !== clientId) {
       userHand.setEvictingThrownTile(Tile.fromJSON(message.currentTurn.thrown));
@@ -6612,6 +6620,7 @@ var Hand = /*#__PURE__*/function () {
     }.bind(this);
 
     this.syncContents = function (syncContents) {
+      var addAdditionsToPlacematIfOpen = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
       //We allow the user to sort their hand by themselves, however it is possible that, due to lag or other reasons, the users hand ends up not matching the server.
       //This function will sync the contents of the users hand with contents, preserving some user ordering.
       var currentContentsStrings = [];
@@ -6649,23 +6658,28 @@ var Hand = /*#__PURE__*/function () {
         tempContents = tempContents.concat(this.inPlacemat.slice(1));
       } else {
         tempContents = tempContents.concat(this.inPlacemat.slice(0));
-      } //Everything that matches is now nulled out.
-      //Add the things in syncContents but not in currentContents
-
-
-      for (var _i = 0; _i < syncContentsStrings.length; _i++) {
-        var item = syncContentsStrings[_i];
-
-        if (item) {
-          this.add(syncContents[_i]);
-        }
       }
 
-      for (var _i2 = 0; _i2 < currentContentsStrings.length; _i2++) {
-        var _item = currentContentsStrings[_i2];
+      for (var _i = 0; _i < currentContentsStrings.length; _i++) {
+        var item = currentContentsStrings[_i];
+
+        if (item) {
+          this.remove(tempContents[_i]);
+        }
+      } //Everything that matches is now nulled out.
+      //Add the things in syncContents but not in currentContents
+      //We run this after removal so that the placemat can be cleared out for addAdditionsToPlacematIfOpen
+
+
+      for (var _i2 = 0; _i2 < syncContentsStrings.length; _i2++) {
+        var _item = syncContentsStrings[_i2];
 
         if (_item) {
-          this.remove(tempContents[_i2]);
+          if (addAdditionsToPlacematIfOpen && this.inPlacemat.length < 3) {
+            this.inPlacemat.push(syncContents[_i2]);
+          } else {
+            this.add(syncContents[_i2]);
+          }
         }
       }
     }.bind(this);

@@ -259,7 +259,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		if (client.hand) {
 			console.log("User hand stuff")
 			let tempHand = Hand.fromString(client.hand)
-			userHand.syncContents(tempHand.contents)
+			userHand.syncContents(tempHand.contents,  message?.currentTurn?.charleston)
 			userWind = tempHand.wind
 		}
 	})
@@ -297,11 +297,15 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	})
 
 	hands.forEach((hand) => {hand.renderTiles()})
-	if (message.currentTurn && message.currentTurn.thrown) {
+	if (message.currentTurn?.playersReady?.length > 0) {
 		//The person has thrown their tile. Waiting on players to ready.
 		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)"
 		nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
 		placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
+
+		if (message.currentTurn.charleston) {
+			nextTurnButton.disabled = "disabled"
+		}
 
 		if (message.currentTurn.userTurn !== clientId) {
 			userHand.setEvictingThrownTile(Tile.fromJSON(message.currentTurn.thrown))
