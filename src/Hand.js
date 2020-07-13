@@ -132,6 +132,7 @@ class Hand {
 				tempContents = tempContents.concat(this.inPlacemat.slice(0))
 			}
 
+			//Everything that matches is now nulled out, so we remove everything remaining in currentContentsStrings, and add everything remaining in syncContentsStrings.
 			for (let i=0;i<currentContentsStrings.length;i++) {
 				let item = currentContentsStrings[i]
 				if (item) {
@@ -139,8 +140,6 @@ class Hand {
 				}
 			}
 
-			//Everything that matches is now nulled out.
-			//Add the things in syncContents but not in currentContents
 			//We run this after removal so that the placemat can be cleared out for addAdditionsToPlacematIfOpen
 			for (let i=0;i<syncContentsStrings.length;i++) {
 				let item = syncContentsStrings[i]
