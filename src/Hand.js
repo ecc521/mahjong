@@ -249,37 +249,31 @@ class Hand {
 		}
 
 
-		this.removeTilesFromHand = (function removeTilesFromHand(obj, amount = 1, simulated = false) {
-			//We will verify that the tiles CAN be removed before removing them.
-			let indexes = []
-			this.contents.forEach((item, index) => {
-				if (obj.matches(item)) {
-					indexes.push(index)
-				}
-			})
-
-			if (indexes.length >= amount) {
-				if (simulated) {return true}
-				for (let i=0;i<amount;i++) {
-					this.contents.splice(indexes[indexes.length - 1 - i], 1) //Remove the item the farthest back in the hand to avoid position shifting.
-				}
-				return true
-			}
-			else {return false}
+		this.removeMatchingTilesFromHand = (function removeMatchingTilesFromHand(obj, amount = 1, simulated = false) {
+			return this.removeTilesFromHand(new Array(amount).fill(obj), simulated)
 		}).bind(this)
 
-		this.removeSequenceFromHand = (function removeSequenceFromHand(sequence, simulated = false) {
+		this.removeTilesFromHand = (function removeTilesFromHand(tiles, simulated = false) {
+			if (tiles instanceof Sequence) {tiles = tiles.tiles}
+
 			//We will verify that the tiles CAN be removed before removing them.
 			let indexes = []
-			sequence.tiles.forEach((tile, index) => {
+			tiles.forEach((tile, index) => {
 				for (let i=this.contents.length-1;i>=0;i--) {
-					if (tile.matches(this.contents[i])) {
+					if (tile.matches(this.contents[i]) && !indexes.includes(i)) {
 						indexes[index] = i
 						return
 					}
 				}
 			})
-			if (indexes[0] !== undefined && indexes[1] !== undefined && indexes[2] !== undefined) {
+
+			let allDefined = true
+			for (let i=0;i<tiles.length;i++) {
+				if (indexes[i] === undefined) {
+					allDefined = false
+				}
+			}
+			if (allDefined) {
 				if (simulated) {return true}
 				//Remove the item the farthest back in the hand to avoid position shifting.
 				indexes.sort((a,b) => {return b-a}).forEach((index) => {
@@ -573,7 +567,7 @@ class Hand {
 		testingHand.contents = remainingTiles.slice(0)
 
 		allTiles.forEach((tile) => {
-		    if (testingHand.removeTilesFromHand(tile, 3, true)) {
+		    if (testingHand.removeMatchingTilesFromHand(tile, 3, true)) {
 		    	possibleMatches.push(tile)
 			}
 		})
@@ -586,7 +580,7 @@ class Hand {
 				exposed: false,
 				tiles: allTiles.slice(index, index+3)
 			})
-		    if (testingHand.removeSequenceFromHand(sequence, true)) {
+		    if (testingHand.removeTilesFromHand(sequence, true)) {
 		    	possibleSequences.push(sequence)
 			}
 		})
@@ -640,13 +634,13 @@ class Hand {
 			for (let i=0;i<combo.length;i++) {
 				let item = combo[i]
 				if (item instanceof Tile) {
-					if (!localTestHand.removeTilesFromHand(item, 3)) {
+					if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
 						return 0
 					}
 					localTestHand.add(new Match({type: item.type, value: item.value, exposed: false, amount: 3}))
 				}
 				else if (item instanceof Sequence) {
-					if (!localTestHand.removeSequenceFromHand(item)) {
+					if (!localTestHand.removeTilesFromHand(item)) {
 						return 0
 					}
 					localTestHand.add(item)
@@ -654,12 +648,12 @@ class Hand {
 			}
 			//Check for a pair
 			let tile = (localTestHand.contents.filter((item) => {return item instanceof Tile}))[0]
-			if (!localTestHand.removeTilesFromHand(tile, 2, true)) {
+			if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
 				return 0
 			}
 			else {
 				localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
-				localTestHand.removeTilesFromHand(tile, 2)
+				localTestHand.removeMatchingTilesFromHand(tile, 2)
 				localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
 				return localTestHand
 			}

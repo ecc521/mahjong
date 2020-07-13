@@ -181,7 +181,7 @@ class Room {
 									let hand = this.gameData.playerHands[clientId]
 									//Add the tile to hand, attempt to verify, and, if not, remove
 									hand.add(this.gameData.currentTurn.thrown)
-									if (hand.removeSequenceFromHand(placement)) {
+									if (hand.removeTilesFromHand(placement)) {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
@@ -205,7 +205,7 @@ class Room {
 								if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
 									let hand = this.gameData.playerHands[clientId]
 									//We can just verify for on less tile here.
-									if (hand.removeTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
+									if (hand.removeMatchingTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
 										utilized = true
 										hand.add(placement)
 										placement.exposed = true
@@ -423,11 +423,11 @@ class Room {
 		}).bind(this)
 
 		//TODO: We'll eventually need to do charleston.
-		this.startGame = (function(messageKey) {
+		this.startGame = (function(obj) {
 			if (this.clientIds.length !== 4) {return "Not Enough Clients"}
 			else {
 				this.inGame = true
-				this.messageAll([], messageKey, "Game Started", "success")
+				this.messageAll([], obj.type, "Game Started", "success")
 				//Build the wall.
 				this.gameData.wall = new Wall()
 				this.gameData.discardPile = []
@@ -477,7 +477,7 @@ class Room {
 			}
 		}).bind(this)
 
-		this.endGame = (function endGame(messageKey, clientId) {
+		this.endGame = (function endGame(obj, clientId) {
 			let gameEndMessage = "The Game Has Ended";
 			if (clientId) {
 				let client = global.stateManager.getClient(clientId)
@@ -486,7 +486,7 @@ class Room {
 			}
 			this.inGame = false
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
-			this.messageAll([], messageKey, gameEndMessage, "success")
+			this.messageAll([], obj.type, gameEndMessage, "success")
 			sendStateToClients()
 		}).bind(this)
 
@@ -537,7 +537,7 @@ class Room {
 						return client.message(obj.type, "You can't discard and go mahjong. ", "error")
 					}
 
-					if (hand.removeTilesFromHand(placement)) {
+					if (hand.removeMatchingTilesFromHand(placement)) {
 						//If this is the 4th tile for an exposed pong in this hand, we will turn it into a kong and draw another tile.
 						//TODO: Note that it is remotely possible players will want to throw the 4th tile instead, as it is a very safe (if honor, entirely safe), throw.
 						//This would mean sacraficing points and a draw in order to get a safe throw, and I have never seen it done, but there are scenarios where it may
@@ -565,7 +565,7 @@ class Room {
 						if (obj.mahjong) {
 							return client.message(obj.type, "You can't go mahjong while placing a kong. ", "error")
 						}
-						if (hand.removeTilesFromHand(placement.getComponentTile(), 4)) {
+						if (hand.removeMatchingTilesFromHand(placement.getComponentTile(), 4)) {
 							//Place Kong. Turn remains the same, thrown false.
 							hand.contents.push(placement)
 							//This must be an in hand kong, therefore we do not expose, although in hand kongs will be shown.
@@ -648,14 +648,14 @@ class Room {
 				}
 
 				//Time to start the game.
-				return this.startGame(obj.type)
+				return this.startGame(obj)
 			}
 			else if (obj.type === "roomActionEndGame") {
 				//Anybody can end the game, as they could do the same going AFK.
 				if (!this.inGame) {
 					return client.message(obj.type, "No Game In Progress", "error")
 				}
-				this.endGame(obj.type, clientId) //Clientid is an optional parameter.
+				this.endGame(obj, clientId) //Clientid is an optional parameter.
 			}
 			else if (obj.type === "roomActionCloseRoom") {
 				if (!isHost) {
