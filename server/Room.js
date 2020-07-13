@@ -34,9 +34,9 @@ class Room {
 				summary += global.stateManager.getClient(id).getNickname()
 				summary += ": "
 				summary += this.gameData.playerHands[id].wind + ", "
-				let points = Hand.scoreHand(this.gameData.playerHands[id], {userWind: this.gameData.playerHands[id].wind})
+				let points = this.gameData.playerHands[id].score()
 				if (id === mahjongClientId) {
-					points = Hand.scoreHand(this.gameData.playerHands[id], {isMahjong: true, drewOwnTile, userWind: this.gameData.playerHands[id].wind})
+					points = this.gameData.playerHands[id].score({isMahjong: true, drewOwnTile})
 				}
 				summary += points + " points. "
 				if (id === mahjongClientId) {
@@ -50,7 +50,7 @@ class Room {
 		let goMahjong = (function goMahjong(clientId, drewOwnTile = false) {
 			//First, verify the user can go mahjong.
 			let hand = this.gameData.playerHands[clientId]
-			let isMahjong = Hand.isMahjong(hand, this.gameData.unlimitedSequences)
+			let isMahjong = hand.isMahjong(this.gameData.unlimitedSequences)
 			if (isMahjong instanceof Hand) {
 				hand.contents = isMahjong.contents //Autocomplete the mahjong.
 			}
@@ -101,7 +101,7 @@ class Room {
 							let hand = this.gameData.playerHands[key]
 							hand.add(this.gameData.currentTurn.thrown)
 							//wouldMakeMahjong will confirm that the current tile will allow mahjong to happen.
-							let mahjongHand = Hand.isMahjong(hand)
+							let mahjongHand = hand.isMahjong()
 							let wouldMakeMahjong = !!(mahjongHand);
 							hand.remove(this.gameData.currentTurn.thrown)
 

@@ -284,6 +284,271 @@ class Hand {
 			else {return false}
 		}).bind(this)
 
+		this.score = (function scoreHand(config = {}) {
+			let doubles = 0
+			let score = 0
+			let sequences = false
+
+			for (let i=0;i<this.contents.length;i++) {
+				let match = this.contents[i]
+				doubles += match.isDouble(this.wind)
+				score += match.getPoints(this.wind)
+				sequences = sequences || match.isSequence
+			}
+
+			if (config.isMahjong) {
+				score += 20
+				if (config.drewOwnTile) {
+					score += 10
+				}
+				if (!sequences) {
+					score += 10
+				}
+			}
+
+			doubles += this.getClearHandDoubles()
+
+			return score * (2**doubles)
+		}).bind(this)
+
+		this.getClearHandDoubles = (function getClearHandDoubles() {
+			let suits = {}
+			let honors = false
+			let onesAndNines = true
+
+			this.contents.forEach((item) => {
+				if (item instanceof Sequence) {
+					suits[item.tiles[0].type] = true
+					onesAndNines = false
+				}
+				else if (!(item instanceof Pretty)){
+					suits[item.type] = true
+					if (item.value !== 1 && item.value !== 9) {
+						onesAndNines = false
+					}
+				}
+			})
+
+			if (suits["wind"] || suits["dragon"]) {
+				delete suits["wind"]
+				delete suits["dragon"]
+				honors = true
+			}
+
+			suits = Object.keys(suits).length
+			if (suits === 0) {
+				//All honors
+				return 3
+			}
+			else if (suits === 1 && !honors) {
+				return 3
+			}
+			else if (suits === 1 && honors) {
+				return 1
+			}
+			else if (onesAndNines && !honors) {
+				return 3
+			}
+			else if (onesAndNines && honors) {
+				return 1
+			}
+
+			return 0
+		}).bind(this)
+
+		this.isMahjong = (function isMahjong(unlimitedSequences) {
+			//Returns 2 for mahjong, and 0 for not mahjong.
+			//If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
+			let pongOrKong = 0
+			let pairs = 0
+			let sequences = 0
+
+			let remainingTiles = []
+			let initialTiles = []
+			for (let i=0;i<this.contents.length;i++) {
+				let match = this.contents[i]
+				if (match.isPongOrKong) {
+					pongOrKong++
+					initialTiles.push(match)
+				}
+				else if (match.isPair) {
+					pairs++
+					initialTiles.push(match)
+				}
+				else if (match.isSequence) {
+					sequences++
+					initialTiles.push(match)
+				}
+				else if (match instanceof Pretty) {
+					initialTiles.push(match)
+				}
+				else {remainingTiles.push(match)}
+			}
+
+			if (pairs === 1) {
+				if (unlimitedSequences) {
+					if (sequences + pongOrKong === 4) {return 2}
+				}
+				else {
+					if (Math.min(sequences, 1) + pongOrKong === 4) {return 2}
+				}
+			}
+
+			//Now we need to go through our remaining tiles.
+			console.log(pongOrKong, sequences, pairs)
+			console.log(remainingTiles)
+			let allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1))
+			let possibleMatches = []
+			let possibleSequences = []
+			let testingHand = new Hand()
+			testingHand.contents = remainingTiles.slice(0)
+
+			allTiles.forEach((tile) => {
+			    if (testingHand.removeMatchingTilesFromHand(tile, 3, true)) {
+			    	possibleMatches.push(tile)
+				}
+			})
+
+			allTiles.forEach((tile, index) => {
+			    if (!Sequence.isValidSequence(allTiles.slice(index, index+3))) {
+					return;
+				}
+				let sequence = new Sequence({
+					exposed: false,
+					tiles: allTiles.slice(index, index+3)
+				})
+			    if (testingHand.removeTilesFromHand(sequence, true)) {
+			    	possibleSequences.push(sequence)
+				}
+			})
+
+			//https://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array/39092843#39092843
+			function* generateCombinations(arr, size) {
+			  function* doGenerateCombinations(offset, combo) {
+			    if (combo.length == size) {
+			      yield combo;
+			    } else {
+			      for (let i = offset; i < arr.length; i++) {
+			        yield* doGenerateCombinations(i + 1, combo.concat(arr[i]));
+			      }
+			    }
+			  }
+			  yield* doGenerateCombinations(0, []);
+			}
+
+			let combinations = []
+			let allPossibilities = possibleMatches
+			let neededPongEquivs = 4
+
+			if (unlimitedSequences || sequences === 0) {
+				allPossibilities = allPossibilities.concat(possibleSequences)
+				neededPongEquivs -= sequences
+			}
+			else {
+				neededPongEquivs -= Math.min(sequences, 1)
+			}
+			neededPongEquivs -= pongOrKong
+			console.log(neededPongEquivs)
+
+			for (let combo of generateCombinations(allPossibilities, neededPongEquivs)) {
+				//Remove all combos that result in too many sequences, or that are obviously impossible.
+				let sequenceCount = combo.reduce((total, value) => {return total+Number(value instanceof Sequence)}, 0)
+				let matchCount = neededPongEquivs - sequenceCount
+				sequenceCount += sequences
+				if (!unlimitedSequences && 4-pongOrKong-matchCount > Math.min(1, sequenceCount)) {
+					continue;
+				}
+	  			combinations.push(combo);
+			}
+
+			console.log(possibleMatches)
+			console.log(possibleSequences)
+			console.log(combinations)
+
+			return combinations.find((combo, index) => {
+				let localTestHand = new Hand()
+				localTestHand.contents = testingHand.contents.slice(0)
+				for (let i=0;i<combo.length;i++) {
+					let item = combo[i]
+					if (item instanceof Tile) {
+						if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
+							return 0
+						}
+						localTestHand.add(new Match({type: item.type, value: item.value, exposed: false, amount: 3}))
+					}
+					else if (item instanceof Sequence) {
+						if (!localTestHand.removeTilesFromHand(item)) {
+							return 0
+						}
+						localTestHand.add(item)
+					}
+				}
+				//Check for a pair
+				let tile = (localTestHand.contents.filter((item) => {return item instanceof Tile}))[0]
+				if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
+					return 0
+				}
+				else {
+					localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
+					localTestHand.removeMatchingTilesFromHand(tile, 2)
+					localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
+					return localTestHand
+				}
+			}) || 0
+		}).bind(this)
+
+		this.isCalling = (function(discardPile, unlimitedSequences) {
+			//This determines if, from the player's point of view, they are calling.
+			//We don't access any information that they do not have access to in making this determination.
+
+			let allTilesHand = new Hand()
+			allTilesHand.contents = Wall.getNonPrettyTiles()
+
+			discardPile.forEach((tile) => {
+				allTilesHand.removeMatchingTile(tile)
+			})
+
+			//We don't check inPlacemat, so should be used for server side use only.
+			//Remove the contents of the user's hand from allTilesHand
+			this.contents.forEach((item) => {
+				if (item instanceof Tile) {allTilesHand.removeMatchingTile(item)}
+				else if (item instanceof Sequence) {item.tiles.forEach((tile) => {allTilesHand.removeMatchingTile(tile)})}
+				else if (item instanceof Match) {new Array(item.amount).fill().forEach(() => {allTilesHand.removeMatchingTile(item.getComponentTile())})}
+			})
+
+			while (allTilesHand.contents.length) {
+				let tile = allTilesHand.contents[0]
+				while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
+
+				//isMahjong can be rather slow when called repeatedly. Let's do some quick checking to confirm this tile may actually help.
+				//We either need to have an existing copy of the tile, or the ability for this tile to fill a sequence.
+				let passes = this.contents.some((item, i) => {
+					return tile.matches(item)
+				});
+
+				if (!passes && !isNaN(tile.value)) {
+					let arr = [,,true,,,]
+					this.contents.forEach((item) => {
+						if (item.type === tile.type && Math.abs(item.value - tile.value) <= 2) {
+							arr[2-(item.value - tile.value)] = true
+						}
+					})
+					if (arr[0] && arr[1] || arr[3] && arr[4]) {passes = true}
+				}
+
+				if (!passes) {
+					continue;
+				}
+
+				this.add(tile)
+				if (this.isMahjong(this, unlimitedSequences)) {
+					this.remove(tile)
+					return true
+				}
+				this.remove(tile)
+			}
+			return false
+		}).bind(this)
 
 		this.renderPlacemat = (function(classForFirst) {
 			while (this.tilePlacemat.firstChild) {this.tilePlacemat.firstChild.remove()} //Delete everything currently rendered in the hand.
@@ -436,281 +701,6 @@ class Hand {
 		return tiles.sort(function (tile1, tile2) {
 			return Hand.getTileValue(tile1) - Hand.getTileValue(tile2)
 		})
-	}
-
-	static scoreHand(hand, config = {}) {
-		if (hand instanceof Hand) {hand = hand.contents}
-		//Hand is an array of arrays of Tiles, Matches, and Prettys
-
-		let doubles = 0
-		let score = 0
-		let sequences = false
-
-		if (!config.userWind) {console.warn("scoreHand not provided config.userWind, may result in improper scoring. ")}
-
-		for (let i=0;i<hand.length;i++) {
-			let match = hand[i]
-			doubles += match.isDouble(config.userWind)
-			score += match.getPoints(config.userWind)
-			sequences = sequences || match.isSequence
-		}
-
-		if (config.isMahjong) {
-			score += 20
-			if (config.drewOwnTile) {
-				score += 10
-			}
-			if (!sequences) {
-				score += 10
-			}
-		}
-
-		doubles += Hand.getClearHandDoubles(hand)
-
-		return score * (2**doubles)
-	}
-
-	static getClearHandDoubles(hand) {
-		if (hand instanceof Hand) {hand = hand.contents}
-
-		let suits = {}
-		let honors = false
-		let onesAndNines = true
-
-		hand.forEach((item) => {
-			if (item instanceof Sequence) {
-				suits[item.tiles[0].type] = true
-				onesAndNines = false
-			}
-			else if (!(item instanceof Pretty)){
-				suits[item.type] = true
-				if (item.value !== 1 && item.value !== 9) {
-					onesAndNines = false
-				}
-			}
-		})
-
-		if (suits["wind"] || suits["dragon"]) {
-			delete suits["wind"]
-			delete suits["dragon"]
-			honors = true
-		}
-
-		suits = Object.keys(suits).length
-		if (suits === 0) {
-			//All honors
-			return 3
-		}
-		else if (suits === 1 && !honors) {
-			return 3
-		}
-		else if (suits === 1 && honors) {
-			return 1
-		}
-		else if (onesAndNines && !honors) {
-			return 3
-		}
-		else if (onesAndNines && honors) {
-			return 1
-		}
-
-		return 0
-	}
-
-	static isMahjong(hand, unlimitedSequences) {
-		if (hand instanceof Hand) {hand = hand.contents}
-
-		//Returns 2 for mahjong, and 0 for not mahjong.
-		//If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
-		let pongOrKong = 0
-		let pairs = 0
-		let sequences = 0
-
-		let remainingTiles = []
-		let initialTiles = []
-		for (let i=0;i<hand.length;i++) {
-			let match = hand[i]
-			if (match.isPongOrKong) {
-				pongOrKong++
-				initialTiles.push(match)
-			}
-			else if (match.isPair) {
-				pairs++
-				initialTiles.push(match)
-			}
-			else if (match.isSequence) {
-				sequences++
-				initialTiles.push(match)
-			}
-			else if (match instanceof Pretty) {
-				initialTiles.push(match)
-			}
-			else {remainingTiles.push(match)}
-		}
-
-		if (pairs === 1) {
-			if (unlimitedSequences) {
-				if (sequences + pongOrKong === 4) {return 2}
-			}
-			else {
-				if (Math.min(sequences, 1) + pongOrKong === 4) {return 2}
-			}
-		}
-
-		//Now we need to go through our remaining tiles.
-		console.log(pongOrKong, sequences, pairs)
-		console.log(remainingTiles)
-		let allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1))
-		let possibleMatches = []
-		let possibleSequences = []
-		let testingHand = new Hand()
-		testingHand.contents = remainingTiles.slice(0)
-
-		allTiles.forEach((tile) => {
-		    if (testingHand.removeMatchingTilesFromHand(tile, 3, true)) {
-		    	possibleMatches.push(tile)
-			}
-		})
-
-		allTiles.forEach((tile, index) => {
-		    if (!Sequence.isValidSequence(allTiles.slice(index, index+3))) {
-				return;
-			}
-			let sequence = new Sequence({
-				exposed: false,
-				tiles: allTiles.slice(index, index+3)
-			})
-		    if (testingHand.removeTilesFromHand(sequence, true)) {
-		    	possibleSequences.push(sequence)
-			}
-		})
-
-		//https://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array/39092843#39092843
-		function* generateCombinations(arr, size) {
-		  function* doGenerateCombinations(offset, combo) {
-		    if (combo.length == size) {
-		      yield combo;
-		    } else {
-		      for (let i = offset; i < arr.length; i++) {
-		        yield* doGenerateCombinations(i + 1, combo.concat(arr[i]));
-		      }
-		    }
-		  }
-		  yield* doGenerateCombinations(0, []);
-		}
-
-		let combinations = []
-		let allPossibilities = possibleMatches
-		let neededPongEquivs = 4
-
-		if (unlimitedSequences || sequences === 0) {
-			allPossibilities = allPossibilities.concat(possibleSequences)
-			neededPongEquivs -= sequences
-		}
-		else {
-			neededPongEquivs -= Math.min(sequences, 1)
-		}
-		neededPongEquivs -= pongOrKong
-		console.log(neededPongEquivs)
-
-		for (let combo of generateCombinations(allPossibilities, neededPongEquivs)) {
-			//Remove all combos that result in too many sequences, or that are obviously impossible.
-			let sequenceCount = combo.reduce((total, value) => {return total+Number(value instanceof Sequence)}, 0)
-			let matchCount = neededPongEquivs - sequenceCount
-			sequenceCount += sequences
-			if (!unlimitedSequences && 4-pongOrKong-matchCount > Math.min(1, sequenceCount)) {
-				continue;
-			}
-  			combinations.push(combo);
-		}
-
-		console.log(possibleMatches)
-		console.log(possibleSequences)
-		console.log(combinations)
-
-		return combinations.find((combo, index) => {
-			let localTestHand = new Hand()
-			localTestHand.contents = testingHand.contents.slice(0)
-			for (let i=0;i<combo.length;i++) {
-				let item = combo[i]
-				if (item instanceof Tile) {
-					if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
-						return 0
-					}
-					localTestHand.add(new Match({type: item.type, value: item.value, exposed: false, amount: 3}))
-				}
-				else if (item instanceof Sequence) {
-					if (!localTestHand.removeTilesFromHand(item)) {
-						return 0
-					}
-					localTestHand.add(item)
-				}
-			}
-			//Check for a pair
-			let tile = (localTestHand.contents.filter((item) => {return item instanceof Tile}))[0]
-			if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
-				return 0
-			}
-			else {
-				localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
-				localTestHand.removeMatchingTilesFromHand(tile, 2)
-				localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
-				return localTestHand
-			}
-		}) || 0
-	}
-
-	static isCalling(userHand, discardPile, unlimitedSequences) {
-		//This determines if, from the player's point of view, they are calling.
-		//We don't access any information that they do not have access to in making this determination.
-
-		let allTilesHand = new Hand()
-		allTilesHand.contents = Wall.getNonPrettyTiles()
-
-		discardPile.forEach((tile) => {
-			allTilesHand.removeMatchingTile(tile)
-		})
-
-		//We don't check inPlacemat, so should be used for server side use only.
-		//Remove the contents of the user's hand from allTilesHand
-		userHand.contents.forEach((item) => {
-			if (item instanceof Tile) {allTilesHand.removeMatchingTile(item)}
-			else if (item instanceof Sequence) {item.tiles.forEach((tile) => {allTilesHand.removeMatchingTile(tile)})}
-			else if (item instanceof Match) {new Array(item.amount).fill().forEach(() => {allTilesHand.removeMatchingTile(item.getComponentTile())})}
-		})
-
-		while (allTilesHand.contents.length) {
-			let tile = allTilesHand.contents[0]
-			while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
-
-			//isMahjong can be rather slow when called repeatedly. Let's do some quick checking to confirm this tile may actually help.
-			//We either need to have an existing copy of the tile, or the ability for this tile to fill a sequence.
-			let passes = userHand.contents.some((item, i) => {
-				return tile.matches(item)
-			});
-
-			if (!passes && !isNaN(tile.value)) {
-				let arr = [,,true,,,]
-				userHand.contents.forEach((item) => {
-					if (item.type === tile.type && Math.abs(item.value - tile.value) <= 2) {
-						arr[2-(item.value - tile.value)] = true
-					}
-				})
-				if (arr[0] && arr[1] || arr[3] && arr[4]) {passes = true}
-			}
-
-			if (!passes) {
-				continue;
-			}
-
-			userHand.add(tile)
-			if (Hand.isMahjong(userHand, unlimitedSequences)) {
-				userHand.remove(tile)
-				return true
-			}
-			userHand.remove(tile)
-		}
-		return false
 	}
 
 	static convertStringsToTiles(arr) {

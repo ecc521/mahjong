@@ -6815,6 +6815,381 @@ var Hand = /*#__PURE__*/function () {
       }
     }.bind(this);
 
+    this.score = function scoreHand() {
+      var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+      var doubles = 0;
+      var score = 0;
+      var sequences = false;
+
+      for (var i = 0; i < this.contents.length; i++) {
+        var match = this.contents[i];
+        doubles += match.isDouble(this.wind);
+        score += match.getPoints(this.wind);
+        sequences = sequences || match.isSequence;
+      }
+
+      if (config.isMahjong) {
+        score += 20;
+
+        if (config.drewOwnTile) {
+          score += 10;
+        }
+
+        if (!sequences) {
+          score += 10;
+        }
+      }
+
+      doubles += this.getClearHandDoubles();
+      return score * Math.pow(2, doubles);
+    }.bind(this);
+
+    this.getClearHandDoubles = function getClearHandDoubles() {
+      var suits = {};
+      var honors = false;
+      var onesAndNines = true;
+      this.contents.forEach(function (item) {
+        if (item instanceof Sequence) {
+          suits[item.tiles[0].type] = true;
+          onesAndNines = false;
+        } else if (!(item instanceof Pretty)) {
+          suits[item.type] = true;
+
+          if (item.value !== 1 && item.value !== 9) {
+            onesAndNines = false;
+          }
+        }
+      });
+
+      if (suits["wind"] || suits["dragon"]) {
+        delete suits["wind"];
+        delete suits["dragon"];
+        honors = true;
+      }
+
+      suits = Object.keys(suits).length;
+
+      if (suits === 0) {
+        //All honors
+        return 3;
+      } else if (suits === 1 && !honors) {
+        return 3;
+      } else if (suits === 1 && honors) {
+        return 1;
+      } else if (onesAndNines && !honors) {
+        return 3;
+      } else if (onesAndNines && honors) {
+        return 1;
+      }
+
+      return 0;
+    }.bind(this);
+
+    this.isMahjong = function isMahjong(unlimitedSequences) {
+      var _marked2 = /*#__PURE__*/regeneratorRuntime.mark(generateCombinations);
+
+      //Returns 2 for mahjong, and 0 for not mahjong.
+      //If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
+      var pongOrKong = 0;
+      var pairs = 0;
+      var sequences = 0;
+      var remainingTiles = [];
+      var initialTiles = [];
+
+      for (var i = 0; i < this.contents.length; i++) {
+        var match = this.contents[i];
+
+        if (match.isPongOrKong) {
+          pongOrKong++;
+          initialTiles.push(match);
+        } else if (match.isPair) {
+          pairs++;
+          initialTiles.push(match);
+        } else if (match.isSequence) {
+          sequences++;
+          initialTiles.push(match);
+        } else if (match instanceof Pretty) {
+          initialTiles.push(match);
+        } else {
+          remainingTiles.push(match);
+        }
+      }
+
+      if (pairs === 1) {
+        if (unlimitedSequences) {
+          if (sequences + pongOrKong === 4) {
+            return 2;
+          }
+        } else {
+          if (Math.min(sequences, 1) + pongOrKong === 4) {
+            return 2;
+          }
+        }
+      } //Now we need to go through our remaining tiles.
+
+
+      console.log(pongOrKong, sequences, pairs);
+      console.log(remainingTiles);
+      var allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1));
+      var possibleMatches = [];
+      var possibleSequences = [];
+      var testingHand = new Hand();
+      testingHand.contents = remainingTiles.slice(0);
+      allTiles.forEach(function (tile) {
+        if (testingHand.removeMatchingTilesFromHand(tile, 3, true)) {
+          possibleMatches.push(tile);
+        }
+      });
+      allTiles.forEach(function (tile, index) {
+        if (!Sequence.isValidSequence(allTiles.slice(index, index + 3))) {
+          return;
+        }
+
+        var sequence = new Sequence({
+          exposed: false,
+          tiles: allTiles.slice(index, index + 3)
+        });
+
+        if (testingHand.removeTilesFromHand(sequence, true)) {
+          possibleSequences.push(sequence);
+        }
+      }); //https://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array/39092843#39092843
+
+      function generateCombinations(arr, size) {
+        var _marked, doGenerateCombinations;
+
+        return regeneratorRuntime.wrap(function generateCombinations$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                doGenerateCombinations = function _doGenerateCombinatio(offset, combo) {
+                  var _i3;
+
+                  return regeneratorRuntime.wrap(function doGenerateCombinations$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          if (!(combo.length == size)) {
+                            _context.next = 5;
+                            break;
+                          }
+
+                          _context.next = 3;
+                          return combo;
+
+                        case 3:
+                          _context.next = 11;
+                          break;
+
+                        case 5:
+                          _i3 = offset;
+
+                        case 6:
+                          if (!(_i3 < arr.length)) {
+                            _context.next = 11;
+                            break;
+                          }
+
+                          return _context.delegateYield(doGenerateCombinations(_i3 + 1, combo.concat(arr[_i3])), "t0", 8);
+
+                        case 8:
+                          _i3++;
+                          _context.next = 6;
+                          break;
+
+                        case 11:
+                        case "end":
+                          return _context.stop();
+                      }
+                    }
+                  }, _marked);
+                };
+
+                _marked = /*#__PURE__*/regeneratorRuntime.mark(doGenerateCombinations);
+                return _context2.delegateYield(doGenerateCombinations(0, []), "t0", 3);
+
+              case 3:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _marked2);
+      }
+
+      var combinations = [];
+      var allPossibilities = possibleMatches;
+      var neededPongEquivs = 4;
+
+      if (unlimitedSequences || sequences === 0) {
+        allPossibilities = allPossibilities.concat(possibleSequences);
+        neededPongEquivs -= sequences;
+      } else {
+        neededPongEquivs -= Math.min(sequences, 1);
+      }
+
+      neededPongEquivs -= pongOrKong;
+      console.log(neededPongEquivs);
+
+      var _iterator = _createForOfIteratorHelper(generateCombinations(allPossibilities, neededPongEquivs)),
+          _step;
+
+      try {
+        for (_iterator.s(); !(_step = _iterator.n()).done;) {
+          var combo = _step.value;
+          //Remove all combos that result in too many sequences, or that are obviously impossible.
+          var sequenceCount = combo.reduce(function (total, value) {
+            return total + Number(value instanceof Sequence);
+          }, 0);
+          var matchCount = neededPongEquivs - sequenceCount;
+          sequenceCount += sequences;
+
+          if (!unlimitedSequences && 4 - pongOrKong - matchCount > Math.min(1, sequenceCount)) {
+            continue;
+          }
+
+          combinations.push(combo);
+        }
+      } catch (err) {
+        _iterator.e(err);
+      } finally {
+        _iterator.f();
+      }
+
+      console.log(possibleMatches);
+      console.log(possibleSequences);
+      console.log(combinations);
+      return combinations.find(function (combo, index) {
+        var localTestHand = new Hand();
+        localTestHand.contents = testingHand.contents.slice(0);
+
+        for (var _i4 = 0; _i4 < combo.length; _i4++) {
+          var item = combo[_i4];
+
+          if (item instanceof Tile) {
+            if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
+              return 0;
+            }
+
+            localTestHand.add(new Match({
+              type: item.type,
+              value: item.value,
+              exposed: false,
+              amount: 3
+            }));
+          } else if (item instanceof Sequence) {
+            if (!localTestHand.removeTilesFromHand(item)) {
+              return 0;
+            }
+
+            localTestHand.add(item);
+          }
+        } //Check for a pair
+
+
+        var tile = localTestHand.contents.filter(function (item) {
+          return item instanceof Tile;
+        })[0];
+
+        if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
+          return 0;
+        } else {
+          localTestHand.add(new Match({
+            type: tile.type,
+            value: tile.value,
+            exposed: false,
+            amount: 2
+          }));
+          localTestHand.removeMatchingTilesFromHand(tile, 2);
+          localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0));
+          return localTestHand;
+        }
+      }) || 0;
+    }.bind(this);
+
+    this.isCalling = function (discardPile, unlimitedSequences) {
+      var _this3 = this;
+
+      //This determines if, from the player's point of view, they are calling.
+      //We don't access any information that they do not have access to in making this determination.
+      var allTilesHand = new Hand();
+      allTilesHand.contents = Wall.getNonPrettyTiles();
+      discardPile.forEach(function (tile) {
+        allTilesHand.removeMatchingTile(tile);
+      }); //We don't check inPlacemat, so should be used for server side use only.
+      //Remove the contents of the user's hand from allTilesHand
+
+      this.contents.forEach(function (item) {
+        if (item instanceof Tile) {
+          allTilesHand.removeMatchingTile(item);
+        } else if (item instanceof Sequence) {
+          item.tiles.forEach(function (tile) {
+            allTilesHand.removeMatchingTile(tile);
+          });
+        } else if (item instanceof Match) {
+          new Array(item.amount).fill().forEach(function () {
+            allTilesHand.removeMatchingTile(item.getComponentTile());
+          });
+        }
+      });
+
+      var _loop = function _loop() {
+        var tile = allTilesHand.contents[0];
+
+        while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
+        //isMahjong can be rather slow when called repeatedly. Let's do some quick checking to confirm this tile may actually help.
+        //We either need to have an existing copy of the tile, or the ability for this tile to fill a sequence.
+
+
+        var passes = _this3.contents.some(function (item, i) {
+          return tile.matches(item);
+        });
+
+        if (!passes && !isNaN(tile.value)) {
+          var arr = [,, true,,,];
+
+          _this3.contents.forEach(function (item) {
+            if (item.type === tile.type && Math.abs(item.value - tile.value) <= 2) {
+              arr[2 - (item.value - tile.value)] = true;
+            }
+          });
+
+          if (arr[0] && arr[1] || arr[3] && arr[4]) {
+            passes = true;
+          }
+        }
+
+        if (!passes) {
+          return "continue";
+        }
+
+        _this3.add(tile);
+
+        if (_this3.isMahjong(_this3, unlimitedSequences)) {
+          _this3.remove(tile);
+
+          return {
+            v: true
+          };
+        }
+
+        _this3.remove(tile);
+      };
+
+      while (allTilesHand.contents.length) {
+        var _ret = _loop();
+
+        switch (_ret) {
+          case "continue":
+            continue;
+
+          default:
+            if (_typeof(_ret) === "object") return _ret.v;
+        }
+      }
+
+      return false;
+    }.bind(this);
+
     this.renderPlacemat = function (classForFirst) {
       while (this.tilePlacemat.firstChild) {
         this.tilePlacemat.firstChild.remove();
@@ -6922,32 +7297,32 @@ var Hand = /*#__PURE__*/function () {
       }
 
       var drawTiles = function drawTiles(tiles, type) {
-        var _this3 = this;
+        var _this4 = this;
 
-        var _loop = function _loop(_i3) {
-          var tile = tiles[_i3];
+        var _loop2 = function _loop2(_i5) {
+          var tile = tiles[_i5];
           var elem = document.createElement("img");
           elem.src = tile.imageUrl;
 
-          if (type === "exposed" && _this3.handForExposed) {
-            _this3.handForExposed.appendChild(elem);
+          if (type === "exposed" && _this4.handForExposed) {
+            _this4.handForExposed.appendChild(elem);
           } else if (type === "exposed") {
-            _this3.handToRender.appendChild(elem);
+            _this4.handToRender.appendChild(elem);
           } else if (type === "unexposed") {
-            if (_this3.interactive) {
+            if (_this4.interactive) {
               elem.draggable = true;
               elem.addEventListener("dragstart", dragstart);
-              elem.tileIndex = _this3.contents.findIndex(function (item) {
+              elem.tileIndex = _this4.contents.findIndex(function (item) {
                 return item === tile;
               });
             }
 
-            _this3.handToRender.appendChild(elem);
+            _this4.handToRender.appendChild(elem);
           }
         };
 
-        for (var _i3 = 0; _i3 < tiles.length; _i3++) {
-          _loop(_i3);
+        for (var _i5 = 0; _i5 < tiles.length; _i5++) {
+          _loop2(_i5);
         }
       }.bind(this);
 
@@ -7006,399 +7381,6 @@ var Hand = /*#__PURE__*/function () {
       return tiles.sort(function (tile1, tile2) {
         return Hand.getTileValue(tile1) - Hand.getTileValue(tile2);
       });
-    }
-  }, {
-    key: "scoreHand",
-    value: function scoreHand(hand) {
-      var config = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
-
-      if (hand instanceof Hand) {
-        hand = hand.contents;
-      } //Hand is an array of arrays of Tiles, Matches, and Prettys
-
-
-      var doubles = 0;
-      var score = 0;
-      var sequences = false;
-
-      if (!config.userWind) {
-        console.warn("scoreHand not provided config.userWind, may result in improper scoring. ");
-      }
-
-      for (var i = 0; i < hand.length; i++) {
-        var match = hand[i];
-        doubles += match.isDouble(config.userWind);
-        score += match.getPoints(config.userWind);
-        sequences = sequences || match.isSequence;
-      }
-
-      if (config.isMahjong) {
-        score += 20;
-
-        if (config.drewOwnTile) {
-          score += 10;
-        }
-
-        if (!sequences) {
-          score += 10;
-        }
-      }
-
-      doubles += Hand.getClearHandDoubles(hand);
-      return score * Math.pow(2, doubles);
-    }
-  }, {
-    key: "getClearHandDoubles",
-    value: function getClearHandDoubles(hand) {
-      if (hand instanceof Hand) {
-        hand = hand.contents;
-      }
-
-      var suits = {};
-      var honors = false;
-      var onesAndNines = true;
-      hand.forEach(function (item) {
-        if (item instanceof Sequence) {
-          suits[item.tiles[0].type] = true;
-          onesAndNines = false;
-        } else if (!(item instanceof Pretty)) {
-          suits[item.type] = true;
-
-          if (item.value !== 1 && item.value !== 9) {
-            onesAndNines = false;
-          }
-        }
-      });
-
-      if (suits["wind"] || suits["dragon"]) {
-        delete suits["wind"];
-        delete suits["dragon"];
-        honors = true;
-      }
-
-      suits = Object.keys(suits).length;
-
-      if (suits === 0) {
-        //All honors
-        return 3;
-      } else if (suits === 1 && !honors) {
-        return 3;
-      } else if (suits === 1 && honors) {
-        return 1;
-      } else if (onesAndNines && !honors) {
-        return 3;
-      } else if (onesAndNines && honors) {
-        return 1;
-      }
-
-      return 0;
-    }
-  }, {
-    key: "isMahjong",
-    value: function isMahjong(hand, unlimitedSequences) {
-      var _marked2 = /*#__PURE__*/regeneratorRuntime.mark(generateCombinations);
-
-      if (hand instanceof Hand) {
-        hand = hand.contents;
-      } //Returns 2 for mahjong, and 0 for not mahjong.
-      //If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
-
-
-      var pongOrKong = 0;
-      var pairs = 0;
-      var sequences = 0;
-      var remainingTiles = [];
-      var initialTiles = [];
-
-      for (var i = 0; i < hand.length; i++) {
-        var match = hand[i];
-
-        if (match.isPongOrKong) {
-          pongOrKong++;
-          initialTiles.push(match);
-        } else if (match.isPair) {
-          pairs++;
-          initialTiles.push(match);
-        } else if (match.isSequence) {
-          sequences++;
-          initialTiles.push(match);
-        } else if (match instanceof Pretty) {
-          initialTiles.push(match);
-        } else {
-          remainingTiles.push(match);
-        }
-      }
-
-      if (pairs === 1) {
-        if (unlimitedSequences) {
-          if (sequences + pongOrKong === 4) {
-            return 2;
-          }
-        } else {
-          if (Math.min(sequences, 1) + pongOrKong === 4) {
-            return 2;
-          }
-        }
-      } //Now we need to go through our remaining tiles.
-
-
-      console.log(pongOrKong, sequences, pairs);
-      console.log(remainingTiles);
-      var allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1));
-      var possibleMatches = [];
-      var possibleSequences = [];
-      var testingHand = new Hand();
-      testingHand.contents = remainingTiles.slice(0);
-      allTiles.forEach(function (tile) {
-        if (testingHand.removeMatchingTilesFromHand(tile, 3, true)) {
-          possibleMatches.push(tile);
-        }
-      });
-      allTiles.forEach(function (tile, index) {
-        if (!Sequence.isValidSequence(allTiles.slice(index, index + 3))) {
-          return;
-        }
-
-        var sequence = new Sequence({
-          exposed: false,
-          tiles: allTiles.slice(index, index + 3)
-        });
-
-        if (testingHand.removeTilesFromHand(sequence, true)) {
-          possibleSequences.push(sequence);
-        }
-      }); //https://stackoverflow.com/questions/5752002/find-all-possible-subset-combos-in-an-array/39092843#39092843
-
-      function generateCombinations(arr, size) {
-        var _marked, doGenerateCombinations;
-
-        return regeneratorRuntime.wrap(function generateCombinations$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                doGenerateCombinations = function _doGenerateCombinatio(offset, combo) {
-                  var _i4;
-
-                  return regeneratorRuntime.wrap(function doGenerateCombinations$(_context) {
-                    while (1) {
-                      switch (_context.prev = _context.next) {
-                        case 0:
-                          if (!(combo.length == size)) {
-                            _context.next = 5;
-                            break;
-                          }
-
-                          _context.next = 3;
-                          return combo;
-
-                        case 3:
-                          _context.next = 11;
-                          break;
-
-                        case 5:
-                          _i4 = offset;
-
-                        case 6:
-                          if (!(_i4 < arr.length)) {
-                            _context.next = 11;
-                            break;
-                          }
-
-                          return _context.delegateYield(doGenerateCombinations(_i4 + 1, combo.concat(arr[_i4])), "t0", 8);
-
-                        case 8:
-                          _i4++;
-                          _context.next = 6;
-                          break;
-
-                        case 11:
-                        case "end":
-                          return _context.stop();
-                      }
-                    }
-                  }, _marked);
-                };
-
-                _marked = /*#__PURE__*/regeneratorRuntime.mark(doGenerateCombinations);
-                return _context2.delegateYield(doGenerateCombinations(0, []), "t0", 3);
-
-              case 3:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _marked2);
-      }
-
-      var combinations = [];
-      var allPossibilities = possibleMatches;
-      var neededPongEquivs = 4;
-
-      if (unlimitedSequences || sequences === 0) {
-        allPossibilities = allPossibilities.concat(possibleSequences);
-        neededPongEquivs -= sequences;
-      } else {
-        neededPongEquivs -= Math.min(sequences, 1);
-      }
-
-      neededPongEquivs -= pongOrKong;
-      console.log(neededPongEquivs);
-
-      var _iterator = _createForOfIteratorHelper(generateCombinations(allPossibilities, neededPongEquivs)),
-          _step;
-
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var combo = _step.value;
-          //Remove all combos that result in too many sequences, or that are obviously impossible.
-          var sequenceCount = combo.reduce(function (total, value) {
-            return total + Number(value instanceof Sequence);
-          }, 0);
-          var matchCount = neededPongEquivs - sequenceCount;
-          sequenceCount += sequences;
-
-          if (!unlimitedSequences && 4 - pongOrKong - matchCount > Math.min(1, sequenceCount)) {
-            continue;
-          }
-
-          combinations.push(combo);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
-
-      console.log(possibleMatches);
-      console.log(possibleSequences);
-      console.log(combinations);
-      return combinations.find(function (combo, index) {
-        var localTestHand = new Hand();
-        localTestHand.contents = testingHand.contents.slice(0);
-
-        for (var _i5 = 0; _i5 < combo.length; _i5++) {
-          var item = combo[_i5];
-
-          if (item instanceof Tile) {
-            if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
-              return 0;
-            }
-
-            localTestHand.add(new Match({
-              type: item.type,
-              value: item.value,
-              exposed: false,
-              amount: 3
-            }));
-          } else if (item instanceof Sequence) {
-            if (!localTestHand.removeTilesFromHand(item)) {
-              return 0;
-            }
-
-            localTestHand.add(item);
-          }
-        } //Check for a pair
-
-
-        var tile = localTestHand.contents.filter(function (item) {
-          return item instanceof Tile;
-        })[0];
-
-        if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
-          return 0;
-        } else {
-          localTestHand.add(new Match({
-            type: tile.type,
-            value: tile.value,
-            exposed: false,
-            amount: 2
-          }));
-          localTestHand.removeMatchingTilesFromHand(tile, 2);
-          localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0));
-          return localTestHand;
-        }
-      }) || 0;
-    }
-  }, {
-    key: "isCalling",
-    value: function isCalling(userHand, discardPile, unlimitedSequences) {
-      //This determines if, from the player's point of view, they are calling.
-      //We don't access any information that they do not have access to in making this determination.
-      var allTilesHand = new Hand();
-      allTilesHand.contents = Wall.getNonPrettyTiles();
-      discardPile.forEach(function (tile) {
-        allTilesHand.removeMatchingTile(tile);
-      }); //We don't check inPlacemat, so should be used for server side use only.
-      //Remove the contents of the user's hand from allTilesHand
-
-      userHand.contents.forEach(function (item) {
-        if (item instanceof Tile) {
-          allTilesHand.removeMatchingTile(item);
-        } else if (item instanceof Sequence) {
-          item.tiles.forEach(function (tile) {
-            allTilesHand.removeMatchingTile(tile);
-          });
-        } else if (item instanceof Match) {
-          new Array(item.amount).fill().forEach(function () {
-            allTilesHand.removeMatchingTile(item.getComponentTile());
-          });
-        }
-      });
-
-      var _loop2 = function _loop2() {
-        var tile = allTilesHand.contents[0];
-
-        while (allTilesHand.removeMatchingTile(tile)) {} //Remove all matching tiles from allTilesHand so that we don't call isMahjong with the same tile several times.
-        //isMahjong can be rather slow when called repeatedly. Let's do some quick checking to confirm this tile may actually help.
-        //We either need to have an existing copy of the tile, or the ability for this tile to fill a sequence.
-
-
-        var passes = userHand.contents.some(function (item, i) {
-          return tile.matches(item);
-        });
-
-        if (!passes && !isNaN(tile.value)) {
-          var arr = [,, true,,,];
-          userHand.contents.forEach(function (item) {
-            if (item.type === tile.type && Math.abs(item.value - tile.value) <= 2) {
-              arr[2 - (item.value - tile.value)] = true;
-            }
-          });
-
-          if (arr[0] && arr[1] || arr[3] && arr[4]) {
-            passes = true;
-          }
-        }
-
-        if (!passes) {
-          return "continue";
-        }
-
-        userHand.add(tile);
-
-        if (Hand.isMahjong(userHand, unlimitedSequences)) {
-          userHand.remove(tile);
-          return {
-            v: true
-          };
-        }
-
-        userHand.remove(tile);
-      };
-
-      while (allTilesHand.contents.length) {
-        var _ret = _loop2();
-
-        switch (_ret) {
-          case "continue":
-            continue;
-
-          default:
-            if (_typeof(_ret) === "object") return _ret.v;
-        }
-      }
-
-      return false;
     }
   }, {
     key: "convertStringsToTiles",
