@@ -549,11 +549,17 @@ class Room {
 							}
 						})
 
+						let discardMessage = client.getNickname() + " has thrown a " + placement.value + " " + placement.type
+						//We're also going to check if the discarder is calling.
+						if (!hand.calling && hand.isCalling(this.gameData.discardPile, this.gameData.unlimitedSequences)) {
+							hand.calling = true
+							discardMessage += ", and is calling"
+						}
+
 						//Discard tile.
 						this.gameData.currentTurn.thrown = placement
 						sendStateToClients()
-						this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has thrown a " + placement.value + " " + placement.type, "success")
-
+						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, "success")
 						console.log("Throw")
 					}
 					else {
