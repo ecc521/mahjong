@@ -415,6 +415,7 @@ class Hand {
 				}
 			})
 
+			//TODO: Note that, when unlimitedSequences is true, we can have multiple copies of the same sequence. This code does not cover that scenario.
 			allTiles.forEach((tile, index) => {
 			    if (!Sequence.isValidSequence(allTiles.slice(index, index+3))) {
 					return;
@@ -471,6 +472,7 @@ class Hand {
 			console.log(possibleSequences)
 			console.log(combinations)
 
+			combos:
 			for (let i=0;i<combinations.length;i++) {
 				let combo = combinations[i]
 				let localTestHand = new Hand()
@@ -479,13 +481,13 @@ class Hand {
 					let item = combo[i]
 					if (item instanceof Tile) {
 						if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
-							continue;
+							continue combos; //Continue outer loop
 						}
 						localTestHand.add(new Match({type: item.type, value: item.value, exposed: false, amount: 3}))
 					}
 					else if (item instanceof Sequence) {
 						if (!localTestHand.removeTilesFromHand(item)) {
-							continue;
+							continue combos; //Continue outer loop
 						}
 						localTestHand.add(item)
 					}

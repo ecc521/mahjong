@@ -6959,7 +6959,8 @@ var Hand = /*#__PURE__*/function () {
         if (testingHand.removeMatchingTilesFromHand(tile, 3, true)) {
           possibleMatches.push(tile);
         }
-      });
+      }); //TODO: Note that, when unlimitedSequences is true, we can have multiple copies of the same sequence. This code does not cover that scenario.
+
       allTiles.forEach(function (tile, index) {
         if (!Sequence.isValidSequence(allTiles.slice(index, index + 3))) {
           return;
@@ -7081,7 +7082,7 @@ var Hand = /*#__PURE__*/function () {
       console.log(possibleSequences);
       console.log(combinations);
 
-      for (var _i4 = 0; _i4 < combinations.length; _i4++) {
+      combos: for (var _i4 = 0; _i4 < combinations.length; _i4++) {
         var combo = combinations[_i4];
         var localTestHand = new Hand();
         localTestHand.contents = testingHand.contents.slice(0);
@@ -7091,7 +7092,7 @@ var Hand = /*#__PURE__*/function () {
 
           if (item instanceof Tile) {
             if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
-              continue;
+              continue combos; //Continue outer loop
             }
 
             localTestHand.add(new Match({
@@ -7102,7 +7103,7 @@ var Hand = /*#__PURE__*/function () {
             }));
           } else if (item instanceof Sequence) {
             if (!localTestHand.removeTilesFromHand(item)) {
-              continue;
+              continue combos; //Continue outer loop
             }
 
             localTestHand.add(item);
