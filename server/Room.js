@@ -701,6 +701,9 @@ class Room {
 			if (this.gameData.charleston) {
 				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You can't \"Next\" a charleston. You must choose 3 tiles to pass. ", "error")
 			}
+			if (!this.gameData.currentTurn.thrown) {
+				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "There is currently nothing to next. ", "error")
+			}
 			this.gameData.currentTurn.turnChoices[clientId] = "Next"
 			sendStateToClients()
 		}).bind(this)
