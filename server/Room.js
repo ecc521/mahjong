@@ -156,7 +156,16 @@ class Room {
 
 								if (mahjongHand instanceof Hand) {
 									//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
-									if (!mahjongHand.getStringContents().includes(obj[key].toJSON())) {
+									let stringContents = mahjongHand.getStringContents()
+									//Exposed vs unexposed can cause issues comparing strings. Need a .matches in future. 
+									let previousValue = obj[key].exposed
+									obj[key].exposed = false
+									let unexposed = obj[key].toJSON()
+									obj[key].exposed = true
+									let exposed = obj[key].toJSON()
+									obj[key].exposed = previousValue
+
+									if (!(stringContents.includes(unexposed) || stringContents.includes(exposed))) {
 										wouldMakeMahjong = false
 									}
 								}
