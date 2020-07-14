@@ -144,7 +144,7 @@ class Hand {
 			for (let i=0;i<syncContentsStrings.length;i++) {
 				let item = syncContentsStrings[i]
 				if (item) {
-					if (addAdditionsToPlacematIfOpen && this.inPlacemat.length < 3) {
+					if (addAdditionsToPlacematIfOpen && this.inPlacemat.length < 3 && syncContents[i] instanceof Tile) {
 						this.inPlacemat.push(syncContents[i])
 					}
 					else {

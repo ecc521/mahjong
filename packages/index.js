@@ -6243,7 +6243,8 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
       var _message$currentTurn;
 
       console.log("User hand stuff");
-      var tempHand = Hand.fromString(client.hand);
+      var tempHand = Hand.fromString(client.hand); //TODO: Currently, after refreshing the page during charleston, this results in the first 3 tiles stored on the server being put into the placemat, a very glitchy behavior. 
+
       userHand.syncContents(tempHand.contents, message === null || message === void 0 ? void 0 : (_message$currentTurn = message.currentTurn) === null || _message$currentTurn === void 0 ? void 0 : _message$currentTurn.charleston);
       userWind = tempHand.wind;
     }
@@ -6676,7 +6677,7 @@ var Hand = /*#__PURE__*/function () {
         var _item = syncContentsStrings[_i2];
 
         if (_item) {
-          if (addAdditionsToPlacematIfOpen && this.inPlacemat.length < 3) {
+          if (addAdditionsToPlacematIfOpen && this.inPlacemat.length < 3 && syncContents[_i2] instanceof Tile) {
             this.inPlacemat.push(syncContents[_i2]);
           } else {
             this.add(syncContents[_i2]);
