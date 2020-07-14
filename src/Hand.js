@@ -260,6 +260,7 @@ class Hand {
 
 		this.removeTilesFromHand = (function removeTilesFromHand(tiles, simulated = false) {
 			if (tiles instanceof Sequence) {tiles = tiles.tiles}
+			if (tiles instanceof Tile) {tiles = [tiles]}
 
 			//We will verify that the tiles CAN be removed before removing them.
 			let indexes = []
@@ -470,20 +471,21 @@ class Hand {
 			console.log(possibleSequences)
 			console.log(combinations)
 
-			return combinations.find((combo, index) => {
+			for (let i=0;i<combinations.length;i++) {
+				let combo = combinations[i]
 				let localTestHand = new Hand()
 				localTestHand.contents = testingHand.contents.slice(0)
 				for (let i=0;i<combo.length;i++) {
 					let item = combo[i]
 					if (item instanceof Tile) {
 						if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
-							return 0
+							continue;
 						}
 						localTestHand.add(new Match({type: item.type, value: item.value, exposed: false, amount: 3}))
 					}
 					else if (item instanceof Sequence) {
 						if (!localTestHand.removeTilesFromHand(item)) {
-							return 0
+							continue;
 						}
 						localTestHand.add(item)
 					}
@@ -491,7 +493,7 @@ class Hand {
 				//Check for a pair
 				let tile = (localTestHand.contents.filter((item) => {return item instanceof Tile}))[0]
 				if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
-					return 0
+					continue;
 				}
 				else {
 					localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
@@ -499,7 +501,8 @@ class Hand {
 					localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
 					return localTestHand
 				}
-			}) || 0
+			}
+			return 0
 		}).bind(this)
 
 		this.isCalling = (function(discardPile, unlimitedSequences) {

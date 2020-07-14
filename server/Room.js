@@ -152,7 +152,7 @@ class Room {
 								let wouldMakeMahjong = !!(mahjongHand);
 								hand.remove(this.gameData.currentTurn.thrown)
 
-								if (mahjongHand instanceof Array) {
+								if (mahjongHand instanceof Hand) {
 									//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
 									if (!mahjongHand.getStringContents().includes(obj[key].toJSON())) {
 										wouldMakeMahjong = false

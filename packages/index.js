@@ -6436,8 +6436,6 @@ __webpack_require__(121);
 
 __webpack_require__(158);
 
-__webpack_require__(159);
-
 __webpack_require__(160);
 
 __webpack_require__(20);
@@ -6795,6 +6793,10 @@ var Hand = /*#__PURE__*/function () {
 
       if (tiles instanceof Sequence) {
         tiles = tiles.tiles;
+      }
+
+      if (tiles instanceof Tile) {
+        tiles = [tiles];
       } //We will verify that the tiles CAN be removed before removing them.
 
 
@@ -7052,11 +7054,13 @@ var Hand = /*#__PURE__*/function () {
 
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var combo = _step.value;
+          var _combo = _step.value;
+
           //Remove all combos that result in too many sequences, or that are obviously impossible.
-          var sequenceCount = combo.reduce(function (total, value) {
+          var sequenceCount = _combo.reduce(function (total, value) {
             return total + Number(value instanceof Sequence);
           }, 0);
+
           var matchCount = neededPongEquivs - sequenceCount;
           sequenceCount += sequences;
 
@@ -7064,7 +7068,7 @@ var Hand = /*#__PURE__*/function () {
             continue;
           }
 
-          combinations.push(combo);
+          combinations.push(_combo);
         }
       } catch (err) {
         _iterator.e(err);
@@ -7075,16 +7079,18 @@ var Hand = /*#__PURE__*/function () {
       console.log(possibleMatches);
       console.log(possibleSequences);
       console.log(combinations);
-      return combinations.find(function (combo, index) {
+
+      for (var _i4 = 0; _i4 < combinations.length; _i4++) {
+        var combo = combinations[_i4];
         var localTestHand = new Hand();
         localTestHand.contents = testingHand.contents.slice(0);
 
-        for (var _i4 = 0; _i4 < combo.length; _i4++) {
-          var item = combo[_i4];
+        for (var _i5 = 0; _i5 < combo.length; _i5++) {
+          var item = combo[_i5];
 
           if (item instanceof Tile) {
             if (!localTestHand.removeMatchingTilesFromHand(item, 3)) {
-              return 0;
+              continue;
             }
 
             localTestHand.add(new Match({
@@ -7095,7 +7101,7 @@ var Hand = /*#__PURE__*/function () {
             }));
           } else if (item instanceof Sequence) {
             if (!localTestHand.removeTilesFromHand(item)) {
-              return 0;
+              continue;
             }
 
             localTestHand.add(item);
@@ -7108,7 +7114,7 @@ var Hand = /*#__PURE__*/function () {
         })[0];
 
         if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
-          return 0;
+          continue;
         } else {
           localTestHand.add(new Match({
             type: tile.type,
@@ -7120,7 +7126,9 @@ var Hand = /*#__PURE__*/function () {
           localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0));
           return localTestHand;
         }
-      }) || 0;
+      }
+
+      return 0;
     }.bind(this);
 
     this.isCalling = function (discardPile, unlimitedSequences) {
@@ -7316,8 +7324,8 @@ var Hand = /*#__PURE__*/function () {
       var drawTiles = function drawTiles(tiles, type) {
         var _this4 = this;
 
-        var _loop2 = function _loop2(_i5) {
-          var tile = tiles[_i5];
+        var _loop2 = function _loop2(_i6) {
+          var tile = tiles[_i6];
           var elem = document.createElement("img");
           elem.src = tile.imageUrl;
 
@@ -7338,8 +7346,8 @@ var Hand = /*#__PURE__*/function () {
           }
         };
 
-        for (var _i5 = 0; _i5 < tiles.length; _i5++) {
-          _loop2(_i5);
+        for (var _i6 = 0; _i6 < tiles.length; _i6++) {
+          _loop2(_i6);
         }
       }.bind(this);
 
@@ -10098,37 +10106,7 @@ $({ target: 'Array', proto: true, forced: !HAS_SPECIES_SUPPORT || !USES_TO_LENGT
 
 
 /***/ }),
-/* 159 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var $ = __webpack_require__(0);
-var $find = __webpack_require__(19).find;
-var addToUnscopables = __webpack_require__(34);
-var arrayMethodUsesToLength = __webpack_require__(11);
-
-var FIND = 'find';
-var SKIPS_HOLES = true;
-
-var USES_TO_LENGTH = arrayMethodUsesToLength(FIND);
-
-// Shouldn't skip holes
-if (FIND in []) Array(1)[FIND](function () { SKIPS_HOLES = false; });
-
-// `Array.prototype.find` method
-// https://tc39.github.io/ecma262/#sec-array.prototype.find
-$({ target: 'Array', proto: true, forced: SKIPS_HOLES || !USES_TO_LENGTH }, {
-  find: function find(callbackfn /* , that = undefined */) {
-    return $find(this, callbackfn, arguments.length > 1 ? arguments[1] : undefined);
-  }
-});
-
-// https://tc39.github.io/ecma262/#sec-array.prototype-@@unscopables
-addToUnscopables(FIND);
-
-
-/***/ }),
+/* 159 */,
 /* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
