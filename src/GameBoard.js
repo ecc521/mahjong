@@ -302,6 +302,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)"
 		nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
 		placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
+		if (!message.currentTurn.thrown && message.currentTurn.userTurn === clientId) {placeTilesButton.disabled = ""}
 
 		if (message.currentTurn.charleston) {
 			nextTurnButton.disabled = "disabled"

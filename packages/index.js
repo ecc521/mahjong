@@ -6288,6 +6288,10 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
     nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId) ? "disabled" : "";
     placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId) ? "disabled" : "";
 
+    if (!message.currentTurn.thrown && message.currentTurn.userTurn === clientId) {
+      placeTilesButton.disabled = "";
+    }
+
     if (message.currentTurn.charleston) {
       nextTurnButton.disabled = "disabled";
     }
@@ -6658,7 +6662,8 @@ var Hand = /*#__PURE__*/function () {
         tempContents = tempContents.concat(this.inPlacemat.slice(1));
       } else {
         tempContents = tempContents.concat(this.inPlacemat.slice(0));
-      }
+      } //Everything that matches is now nulled out, so we remove everything remaining in currentContentsStrings, and add everything remaining in syncContentsStrings.
+
 
       for (var _i = 0; _i < currentContentsStrings.length; _i++) {
         var item = currentContentsStrings[_i];
@@ -6666,9 +6671,7 @@ var Hand = /*#__PURE__*/function () {
         if (item) {
           this.remove(tempContents[_i]);
         }
-      } //Everything that matches is now nulled out.
-      //Add the things in syncContents but not in currentContents
-      //We run this after removal so that the placemat can be cleared out for addAdditionsToPlacematIfOpen
+      } //We run this after removal so that the placemat can be cleared out for addAdditionsToPlacematIfOpen
 
 
       for (var _i2 = 0; _i2 < syncContentsStrings.length; _i2++) {
