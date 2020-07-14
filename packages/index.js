@@ -7311,7 +7311,7 @@ var Hand = /*#__PURE__*/function () {
               items[3] = new Tile({
                 faceDown: true
               });
-              exposedTiles.concat(items);
+              exposedTiles = exposedTiles.concat(items);
             } else {
               console.log(items);
               unexposedTiles = unexposedTiles.concat(items);

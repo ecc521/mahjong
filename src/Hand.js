@@ -634,7 +634,7 @@ class Hand {
 						if (item instanceof Match && item.amount === 4) {
 							//In hand kong. Expose with 2 flipped tiles. (One already flipped)
 							items[3] = new Tile({faceDown: true})
-							exposedTiles.concat(items)
+							exposedTiles = exposedTiles.concat(items)
 						}
 						else {
 							console.log(items)
