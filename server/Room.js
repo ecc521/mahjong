@@ -139,7 +139,7 @@ class Room {
 						}
 					}
 					else {
-						this.gameData.currentTurn.previousTurn = this.gameData.currentTurn.userTurn //Used for in-hand mahjong detection.
+						this.gameData.previousTurnPickedUp = true //Used for in-hand mahjong detection.
 
 						//Handle this turn, and begin the next one.
 						let priorityList = []
@@ -157,7 +157,7 @@ class Room {
 								if (mahjongHand instanceof Hand) {
 									//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
 									let stringContents = mahjongHand.getStringContents()
-									//Exposed vs unexposed can cause issues comparing strings. Need a .matches in future. 
+									//Exposed vs unexposed can cause issues comparing strings. Need a .matches in future.
 									let previousValue = obj[key].exposed
 									obj[key].exposed = false
 									let unexposed = obj[key].toJSON()
@@ -286,6 +286,8 @@ class Room {
 						}
 
 						if (utilized === false) {
+							this.gameData.previousTurnPickedUp = false
+
 							//Shift to next player, draw them a tile.
 							let nextWind = windOrder[(windOrder.indexOf(this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind) + 1)%4]
 
@@ -683,13 +685,7 @@ class Room {
 					}
 				}
 				else if (obj.mahjong) {
-					let winds = ["north", "east", "south", "west"]
-					if ((winds.indexOf(this.gameData.playerHands[this.gameData.currentTurn.previousTurn].wind) + 3)%4 === winds.indexOf(hand.wind)) {
-						goMahjong(clientId, true)
-					}
-					else {
-						goMahjong(clientId)
-					}
+					goMahjong(clientId, !this.gameData.previousTurnPickedUp)
 				}
 				else {
 					return client.message(obj.type, "Invalid placement attempt for current game status", "error")
