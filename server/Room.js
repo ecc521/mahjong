@@ -139,6 +139,8 @@ class Room {
 						}
 					}
 					else {
+						this.gameData.currentTurn.previousTurn = this.gameData.currentTurn.userTurn //Used for in-hand mahjong detection.
+
 						//Handle this turn, and begin the next one.
 						let priorityList = []
 						for (let key in obj) {
@@ -673,7 +675,13 @@ class Room {
 					}
 				}
 				else if (obj.mahjong) {
-					goMahjong(clientId, true)
+					let winds = ["north", "east", "south", "west"]
+					if ((winds.indexOf(this.gameData.playerHands[this.gameData.currentTurn.previousTurn].wind) + 3)%4 === winds.indexOf(hand.wind)) {
+						goMahjong(clientId, true)
+					}
+					else {
+						goMahjong(clientId)
+					}
 				}
 				else {
 					return client.message(obj.type, "Invalid placement attempt for current game status", "error")
