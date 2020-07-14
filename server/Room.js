@@ -460,9 +460,7 @@ class Room {
 				this.gameData.playerHands[clientId].add(tile)
 			}
 			if (!doNotMessage) {
-				if (pretty > 0) {
-					global.stateManager.getClient(clientId).message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), "success")
-				}
+				global.stateManager.getClient(clientId).message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), "success")
 			}
 			else if (pretty > 0) {
 				//If doNotMessage is passed, this is beginning of game setup. We won't send anything other than "You drew a pretty" to avoid having multiple overlapping pieces of text.
