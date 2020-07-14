@@ -289,7 +289,7 @@ class Room {
 									hand.contents.forEach((item) => {
 										if (item instanceof Match && item.type === this.gameData.currentTurn.thrown.type && item.value === this.gameData.currentTurn.thrown.value) {
 											utilized = true
-											Match.amount = 4
+											item.amount = 4
 										}
 									})
 
@@ -624,7 +624,7 @@ class Room {
 						//actually be the best idea. We should probably allow this at some point.
 						hand.contents.forEach((item) => {
 							if (item instanceof Match && item.type === placement.type && item.value === placement.value) {
-								Match.amount = 4
+								item.amount = 4
 								return drawTile(clientId, true)
 							}
 						})
