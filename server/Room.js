@@ -22,6 +22,10 @@ class Room {
 			this.gameData.wall = Wall.fromJSON(this.gameData.wall)
 		}
 
+		if (this.gameData.discardPile) {
+			this.gameData.discardPile = this.gameData.discardPile.map((str) => {return Tile.fromJSON(str)})
+		}
+
 		if (this.gameData.playerHands) {
 			for (let clientId in this.gameData.playerHands) {
 				this.gameData.playerHands[clientId] = Hand.fromString(this.gameData.playerHands[clientId])
@@ -583,7 +587,6 @@ class Room {
 				}
 				else {
 					placement = placement[0]
-					this.gameData.charleston = this.gameData.charleston || false
 				}
 			}
 			catch (e) {
