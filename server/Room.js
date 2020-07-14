@@ -68,7 +68,7 @@ class Room {
 			sendStateToClients()
 			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
 
-			this.messageAll([], "roomActionMahjong", getSummary(clientid, drewOwnTile), "success")
+			this.messageAll([], "roomActionMahjong", getSummary(clientId, drewOwnTile), "success")
 			sendStateToClients()
 		}).bind(this)
 
