@@ -158,7 +158,6 @@ class Room {
 									//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
 									if (!mahjongHand.getStringContents().includes(obj[key].toJSON())) {
 										wouldMakeMahjong = false
-										client.message("roomActionPlaceTiles", "You can't go mahjong at this moment with the specified placement. Your placement will be considered without mahjong priority applied. ", "error")
 									}
 								}
 
