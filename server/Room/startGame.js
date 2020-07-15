@@ -1,5 +1,5 @@
 const Wall = require("../../src/Wall.js")
-const Hand = require("../../srcHand.js")
+const Hand = require("../../src/Hand.js")
 
 function startGame(obj) {
 	if (this.clientIds.length !== 4) {return "Not Enough Clients"}
@@ -44,7 +44,7 @@ function startGame(obj) {
 				tileCount = 14
 			}
 			for (let i=0;i<tileCount;i++) {
-				drawTile(clientId, false, true)
+				this.drawTile(clientId, false, true)
 			}
 		}
 
@@ -53,8 +53,8 @@ function startGame(obj) {
 			userTurn: eastWindPlayerId
 		}
 
-		this.gameData.currentTurn.turnChoices = new Proxy({}, turnChoicesProxyHandler);
-		sendStateToClients()
+		this.gameData.currentTurn.turnChoices = new Proxy({}, this.turnChoicesProxyHandler);
+		this.sendStateToClients()
 	}
 }
 

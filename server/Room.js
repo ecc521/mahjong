@@ -67,14 +67,14 @@ class Room {
 
 			//The game is over.
 			this.gameData.isMahjong = true
-			sendStateToClients()
+			this.sendStateToClients()
 			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
 
 			this.messageAll([], "roomActionMahjong", getSummary(clientId, drewOwnTile), "success")
-			sendStateToClients()
+			this.sendStateToClients()
 		}).bind(this)
 
-		let turnChoicesProxyHandler = {
+		this.turnChoicesProxyHandler = {
 			set: (function(obj, prop, value) {
 				obj[prop] = value
 				//The user can never pick up their own discard tile, hence is always "Next", except during charleston
@@ -274,7 +274,7 @@ class Room {
 											}
 											if (placement.amount === 4) {
 												//Draw them another tile.
-												drawTile(clientId, true) //Draw from back of wall.
+												this.drawTile(clientId, true) //Draw from back of wall.
 											}
 											this.gameData.currentTurn.userTurn = clientId
 										}
@@ -310,10 +310,10 @@ class Room {
 									//Switch the turn, and draw the next tile.
 									if (utilized === false) {
 										this.gameData.discardPile.push(this.gameData.currentTurn.thrown)
-										drawTile(clientId)
+										this.drawTile(clientId)
 									}
 									else {
-										drawTile(clientId, true)
+										this.drawTile(clientId, true)
 									}
 
 									this.gameData.currentTurn.userTurn = clientId
@@ -325,7 +325,7 @@ class Room {
 
 					//Clear the object.
 					for (let key in obj) {delete obj[key]}
-					sendStateToClients()
+					this.sendStateToClients()
 				}
 
 				return true
@@ -335,7 +335,7 @@ class Room {
 		if (this.gameData.currentTurn) {
 			if (this.gameData.currentTurn.turnChoices) {
 				//TODO: We need to properly unstrignify turnChoices.
-				this.gameData.currentTurn.turnChoices = new Proxy(this.gameData.currentTurn.turnChoices, turnChoicesProxyHandler)
+				this.gameData.currentTurn.turnChoices = new Proxy(this.gameData.currentTurn.turnChoices, this.turnChoicesProxyHandler)
 			}
 			if (this.gameData.currentTurn.thrown) {this.gameData.currentTurn.thrown = Tile.fromJSON(this.gameData.currentTurn.thrown)}
 		}
@@ -394,7 +394,7 @@ class Room {
 			return state
 		}).bind(this)
 
-		let sendStateToClients = (function sendStateToClients() {
+		this.sendStateToClients = (function sendStateToClients() {
 			this.clientIds.forEach((clientId) => {
 				let client = global.stateManager.getClient(clientId)
 				let state = getState(clientId)
@@ -409,7 +409,7 @@ class Room {
 			if (this.clientIds.includes(clientId)) {return "Already In Room"}
 			if (!this.hostClientId) {this.hostClientId = clientId}
 			this.clientIds.push(clientId)
-			sendStateToClients()
+			this.sendStateToClients()
 			return true
 		}).bind(this)
 
@@ -424,7 +424,7 @@ class Room {
 					//Choose a new host client.
 					this.hostClientId = this.clientIds[0]
 				}
-				sendStateToClients()
+				this.sendStateToClients()
 
 				let clientBeingKicked = global.stateManager.getClient(clientId)
 				if (clientBeingKicked) {
@@ -451,7 +451,7 @@ class Room {
 			})
 		}).bind(this)
 
-		let drawTile = (function drawTile(clientId, last = false, doNotMessage = false) {
+		this.drawTile = (function drawTile(clientId, last = false, doNotMessage = false) {
 			let tile;
 			let pretty = -1
 			while (!(tile instanceof Tile)) {
@@ -472,7 +472,7 @@ class Room {
 							}
 						}
 					}
-					sendStateToClients() //Game over. Wall empty.
+					this.sendStateToClients() //Game over. Wall empty.
 					return
 				}
 				this.gameData.playerHands[clientId].add(tile)
@@ -496,7 +496,7 @@ class Room {
 			this.inGame = false
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
 			this.messageAll([], obj.type, gameEndMessage, "success")
-			sendStateToClients()
+			this.sendStateToClients()
 		}).bind(this)
 
 		this.onPlace = (function(obj, clientId) {
@@ -558,7 +558,7 @@ class Room {
 				if (hand.removeTilesFromHand(placement)) {
 					console.log("Scheduling")
 					this.gameData.currentTurn.turnChoices[clientId] = placement
-					sendStateToClients()
+					this.sendStateToClients()
 				}
 				else {
 					return client.message(obj.type, "You can't pass tiles you don't possess. ", "error")
@@ -579,12 +579,12 @@ class Room {
 						//TODO: Note that it is remotely possible players will want to throw the 4th tile instead, as it is a very safe (if honor, entirely safe), throw.
 						//This would mean sacraficing points and a draw in order to get a safe throw, and I have never seen it done, but there are scenarios where it may
 						//actually be the best idea. We should probably allow this at some point.
-						hand.contents.forEach((item) => {
+						hand.contents.forEach(((item) => {
 							if (item instanceof Match && item.type === placement.type && item.value === placement.value) {
 								item.amount = 4
-								return drawTile(clientId, true)
+								return this.drawTile(clientId, true)
 							}
-						})
+						}).bind(this))
 
 						let discardMessage = client.getNickname() + " has thrown a " + placement.value + " " + placement.type
 						//We're also going to check if the discarder is calling.
@@ -596,7 +596,7 @@ class Room {
 						//Discard tile.
 						this.gameData.currentTurn.thrown = placement
 						this.gameData.currentTurn.turnChoices[clientId] = "Next"
-						sendStateToClients()
+						this.sendStateToClients()
 						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, "success")
 						console.log("Throw")
 					}
@@ -615,8 +615,8 @@ class Room {
 							//This must be an in hand kong, therefore we do not expose, although in hand kongs will be shown.
 							placement.exposed = false
 							//Draw them another tile.
-							drawTile(clientId, true) //Draw from back of wall.
-							sendStateToClients()
+							this.drawTile(clientId, true) //Draw from back of wall.
+							this.sendStateToClients()
 							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed an in-hand kong of " + placement.value + " " + placement.type + "s", "success")
 							console.log("Kong")
 
@@ -650,7 +650,7 @@ class Room {
 				console.log("Scheduling")
 				placement.mahjong = obj.mahjong
 				this.gameData.currentTurn.turnChoices[clientId] = placement
-				sendStateToClients()
+				this.sendStateToClients()
 			}
 		}).bind(this)
 
@@ -662,7 +662,7 @@ class Room {
 				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "There is currently nothing to next. ", "error")
 			}
 			this.gameData.currentTurn.turnChoices[clientId] = "Next"
-			sendStateToClients()
+			this.sendStateToClients()
 		}).bind(this)
 
 		this.onIncomingMessage = (function(clientId, obj) {

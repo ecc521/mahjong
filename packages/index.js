@@ -6746,7 +6746,7 @@ var leftHandContainer = createLeftOrRightHand("leftHand", "leftHandContainer");
 var leftHand = new Hand({
   handToRender: leftHandContainer
 });
-var nametagIds = ["bottomNametag", "leftNametag", "topNametag", "rightNametag"];
+var nametagIds = ["bottomNametag", "rightNametag", "topNametag", "leftNametag"];
 var nametags = nametagIds.map(function (id) {
   var nametag = document.createElement("p");
   nametag.id = id;
