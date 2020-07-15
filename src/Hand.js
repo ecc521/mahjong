@@ -200,16 +200,19 @@ class Hand {
 
 
 		this.removeMatchingTilesFromHand = (function removeMatchingTilesFromHand(obj, amount = 1, simulated = false) {
+			if (!obj instanceof Tile) {throw "You must send a tile. "}
 			return this.removeTilesFromHand(new Array(amount).fill(obj), simulated)
 		}).bind(this)
 
 		this.removeTilesFromHand = (function removeTilesFromHand(tiles, simulated = false) {
 			if (tiles instanceof Sequence) {tiles = tiles.tiles}
 			if (tiles instanceof Tile) {tiles = [tiles]}
+			else if (!tiles instanceof Array) {throw "Must send a Sequence, Tile, or Array. "}
 
 			//We will verify that the tiles CAN be removed before removing them.
 			let indexes = []
 			tiles.forEach((tile, index) => {
+				if (!(tile instanceof Tile)) {throw "Your Sequence of Array contains non-tiles. "}
 				for (let i=this.contents.length-1;i>=0;i--) {
 					if (tile.matches(this.contents[i]) && !indexes.includes(i)) {
 						indexes[index] = i

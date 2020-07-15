@@ -4357,6 +4357,11 @@ var Hand = /*#__PURE__*/function () {
     this.removeMatchingTilesFromHand = function removeMatchingTilesFromHand(obj) {
       var amount = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
       var simulated = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+      if (!obj instanceof Tile) {
+        throw "You must send a tile. ";
+      }
+
       return this.removeTilesFromHand(new Array(amount).fill(obj), simulated);
     }.bind(this);
 
@@ -4371,11 +4376,17 @@ var Hand = /*#__PURE__*/function () {
 
       if (tiles instanceof Tile) {
         tiles = [tiles];
+      } else if (!tiles instanceof Array) {
+        throw "Must send a Sequence, Tile, or Array. ";
       } //We will verify that the tiles CAN be removed before removing them.
 
 
       var indexes = [];
       tiles.forEach(function (tile, index) {
+        if (!(tile instanceof Tile)) {
+          throw "Your Sequence of Array contains non-tiles. ";
+        }
+
         for (var i = _this2.contents.length - 1; i >= 0; i--) {
           if (tile.matches(_this2.contents[i]) && !indexes.includes(i)) {
             indexes[index] = i;
@@ -7223,19 +7234,50 @@ module.exports = syncContents;
 
 /***/ }),
 /* 123 */
-/***/ (function(module, exports) {
+/***/ (function(module, exports, __webpack_require__) {
+
+__webpack_require__(15);
+
+__webpack_require__(116);
 
 function score() {
+  var _this = this;
+
   var config = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
   var doubles = 0;
   var score = 0;
   var sequences = false;
+  var oldContents = this.contents.slice(0);
+
+  var _loop = function _loop(i) {
+    var match = _this.contents[i]; //If we have empty tiles laying around, let's try and create the largest matches possible, as we clearly aren't mahjong.
+    //This may well cause position shifting after this tile in the array, but that shouldn't be a problem.
+
+    if (match instanceof Tile) {
+      [4, 3, 2].forEach(function (amount) {
+        if (!(match instanceof Tile)) {
+          return;
+        } //Already matched.
+
+
+        if (_this.removeMatchingTilesFromHand(match, amount)) {
+          match = new Match({
+            amount: amount,
+            type: match.type,
+            value: match.value,
+            exposed: false
+          });
+        }
+      }.bind(_this));
+    }
+
+    doubles += match.isDouble(_this.wind);
+    score += match.getPoints(_this.wind);
+    sequences = sequences || match.isSequence;
+  };
 
   for (var i = 0; i < this.contents.length; i++) {
-    var match = this.contents[i];
-    doubles += match.isDouble(this.wind);
-    score += match.getPoints(this.wind);
-    sequences = sequences || match.isSequence;
+    _loop(i);
   }
 
   if (config.isMahjong) {
@@ -7251,6 +7293,8 @@ function score() {
   }
 
   doubles += this.getClearHandDoubles();
+  this.contents = oldContents; //Reset any modifications
+
   return score * Math.pow(2, doubles);
 }
 
