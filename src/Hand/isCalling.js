@@ -3,6 +3,7 @@ const Pretty = require("../Pretty.js")
 const Wall = require("../Wall.js")
 const Match = require("../Match.js")
 const Tile = require("../Sequence.js")
+const Hand = require("../Hand.js")
 
 function isCalling(discardPile, unlimitedSequences) {
 	//This determines if, from the player's point of view, they are calling.

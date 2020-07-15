@@ -7837,6 +7837,8 @@ var Match = __webpack_require__(43);
 
 var Tile = __webpack_require__(21);
 
+var Hand = __webpack_require__(81);
+
 function isCalling(discardPile, unlimitedSequences) {
   var _this = this;
 
