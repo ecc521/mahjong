@@ -13,7 +13,7 @@ function getClearHandDoubles() {
 		}
 		else if (!(item instanceof Pretty)){
 			suits[item.type] = true
-			if (item.value !== 1 && item.value !== 9) {
+			if (!["wind", "dragon"].includes(item.type) && item.value !== 1 && item.value !== 9) {
 				onesAndNines = false
 			}
 		}

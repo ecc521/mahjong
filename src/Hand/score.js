@@ -12,11 +12,11 @@ function score(config = {}) {
 		let match = this.contents[i]
 
 		//If we have empty tiles laying around, let's try and create the largest matches possible, as we clearly aren't mahjong.
-		//This may well cause position shifting after this tile in the array, but that shouldn't be a problem.
 		if (match instanceof Tile) {
 			[4,3,2].forEach(((amount) => {
 				if (!(match instanceof Tile)) {return} //Already matched.
 				if (this.removeMatchingTilesFromHand(match, amount)) {
+					i-- //Counteract position shifting. 
 					match = new Match({amount, type: match.type, value: match.value, exposed: false})
 				}
 			}).bind(this))
@@ -37,9 +37,9 @@ function score(config = {}) {
 		}
 	}
 
-	doubles += this.getClearHandDoubles()
-
 	this.contents = oldContents //Reset any modifications
+
+	doubles += this.getClearHandDoubles()
 
 	return score * (2**doubles)
 }

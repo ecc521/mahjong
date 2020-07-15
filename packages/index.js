@@ -7253,18 +7253,20 @@ function score() {
   var sequences = false;
   var oldContents = this.contents.slice(0);
 
-  var _loop = function _loop(i) {
-    var match = _this.contents[i]; //If we have empty tiles laying around, let's try and create the largest matches possible, as we clearly aren't mahjong.
-    //This may well cause position shifting after this tile in the array, but that shouldn't be a problem.
+  var _loop = function _loop(_i) {
+    var match = _this.contents[_i]; //If we have empty tiles laying around, let's try and create the largest matches possible, as we clearly aren't mahjong.
 
     if (match instanceof Tile) {
       [4, 3, 2].forEach(function (amount) {
         if (!(match instanceof Tile)) {
+          i = _i;
           return;
         } //Already matched.
 
 
         if (_this.removeMatchingTilesFromHand(match, amount)) {
+          _i--; //Counteract position shifting. 
+
           match = new Match({
             amount: amount,
             type: match.type,
@@ -7278,6 +7280,7 @@ function score() {
     doubles += match.isDouble(_this.wind);
     score += match.getPoints(_this.wind);
     sequences = sequences || match.isSequence;
+    i = _i;
   };
 
   for (var i = 0; i < this.contents.length; i++) {
@@ -7296,9 +7299,9 @@ function score() {
     }
   }
 
-  doubles += this.getClearHandDoubles();
   this.contents = oldContents; //Reset any modifications
 
+  doubles += this.getClearHandDoubles();
   return score * Math.pow(2, doubles);
 }
 
@@ -7309,6 +7312,8 @@ module.exports = score;
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(15);
+
+__webpack_require__(41);
 
 __webpack_require__(163);
 
@@ -7329,7 +7334,7 @@ function getClearHandDoubles() {
     } else if (!(item instanceof Pretty)) {
       suits[item.type] = true;
 
-      if (item.value !== 1 && item.value !== 9) {
+      if (!["wind", "dragon"].includes(item.type) && item.value !== 1 && item.value !== 9) {
         onesAndNines = false;
       }
     }
