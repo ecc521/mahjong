@@ -135,7 +135,7 @@ class Room {
 						}
 						else {
 							this.messageAll([], "roomActionGameplayAlert", "The charleston is over. Let the games begin! " , "success")
-							delete this.gameData.charleston //The charleston is over.
+							this.gameData.charleston = false//The charleston is over.
 						}
 					}
 					else {
