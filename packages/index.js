@@ -7164,7 +7164,7 @@ __webpack_require__(20);
 
 __webpack_require__(32);
 
-var Tile = __webpack_require__(21);
+var Tile = __webpack_require__(30);
 
 function syncContents(syncContents) {
   var addAdditionsToPlacematIfOpen = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -7411,7 +7411,7 @@ var Wall = __webpack_require__(59);
 
 var Match = __webpack_require__(43);
 
-var Tile = __webpack_require__(21);
+var Tile = __webpack_require__(30);
 
 var Hand = __webpack_require__(81);
 
@@ -7835,7 +7835,7 @@ var Wall = __webpack_require__(59);
 
 var Match = __webpack_require__(43);
 
-var Tile = __webpack_require__(21);
+var Tile = __webpack_require__(30);
 
 var Hand = __webpack_require__(81);
 

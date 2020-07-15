@@ -2,7 +2,7 @@ const Sequence = require("../Sequence.js")
 const Pretty = require("../Pretty.js")
 const Wall = require("../Wall.js")
 const Match = require("../Match.js")
-const Tile = require("../Sequence.js")
+const Tile = require("../Tile.js")
 const Hand = require("../Hand.js")
 
 function isMahjong(unlimitedSequences) {
