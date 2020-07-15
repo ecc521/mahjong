@@ -7240,6 +7240,10 @@ __webpack_require__(15);
 
 __webpack_require__(116);
 
+var Match = __webpack_require__(43);
+
+var Tile = __webpack_require__(30);
+
 function score() {
   var _this = this;
 

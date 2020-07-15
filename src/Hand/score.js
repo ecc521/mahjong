@@ -1,3 +1,6 @@
+const Match = require("../Match.js")
+const Tile = require("../Tile.js")
+
 function score(config = {}) {
 	let doubles = 0
 	let score = 0
