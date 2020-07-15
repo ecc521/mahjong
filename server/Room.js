@@ -599,6 +599,7 @@ class Room {
 				}
 				else {
 					placement = placement[0]
+					this.gameData.charleston = this.gameData.charleston || false
 				}
 			}
 			catch (e) {
