@@ -1,3 +1,6 @@
+const Sequence = require("../Sequence.js")
+const Pretty = require("../Pretty.js")
+
 function getClearHandDoubles() {
 	let suits = {}
 	let honors = false

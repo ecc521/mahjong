@@ -1,3 +1,6 @@
+const Wall = require("../../src/Wall.js")
+const Hand = require("../../srcHand.js")
+
 function startGame(obj) {
 	if (this.clientIds.length !== 4) {return "Not Enough Clients"}
 	else {

@@ -1,4 +1,6 @@
-function(syncContents, addAdditionsToPlacematIfOpen = false) {
+const Tile = require("../Sequence.js")
+
+function syncContents(syncContents, addAdditionsToPlacematIfOpen = false) {
 	//We allow the user to sort their hand by themselves, however it is possible that, due to lag or other reasons, the users hand ends up not matching the server.
 	//This function will sync the contents of the users hand with contents, preserving some user ordering.
 

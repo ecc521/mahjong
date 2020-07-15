@@ -1,3 +1,10 @@
+const Sequence = require("../Sequence.js")
+const Pretty = require("../Pretty.js")
+const Wall = require("../Wall.js")
+const Match = require("../Match.js")
+const Tile = require("../Sequence.js")
+const Hand = require("../Hand.js")
+
 function isMahjong(unlimitedSequences) {
 	//Returns 2 for mahjong, and 0 for not mahjong.
 	//If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.

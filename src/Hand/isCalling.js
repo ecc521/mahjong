@@ -1,4 +1,10 @@
-function(discardPile, unlimitedSequences) {
+const Sequence = require("../Sequence.js")
+const Pretty = require("../Pretty.js")
+const Wall = require("../Wall.js")
+const Match = require("../Match.js")
+const Tile = require("../Sequence.js")
+
+function isCalling(discardPile, unlimitedSequences) {
 	//This determines if, from the player's point of view, they are calling.
 	//We don't access any information that they do not have access to in making this determination.
 
