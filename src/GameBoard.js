@@ -35,15 +35,7 @@ function Compass(config = {}) {
 	gameBoard.appendChild(this.compass)
 
 	this.setDirectionForUserWind = function(userWind) {
-		//There are four compasses - compass-north, compass-south, etc. They specify which direction is at the top of the compass, or for the hand across from the users.
-		//Convert userWind to the direction for the compass.
-		let translations = {
-			"north": "south",
-			"east": "west",
-			"south": "north",
-			"west": "east"
-		}
-		this.compass.src = "assets/compass-" + translations[userWind] + ".svg"
+		this.compass.src = "assets/compass-" + userWind + ".svg"
 	}
 }
 
@@ -252,14 +244,14 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 	let clients = message.clients
 	let winds = ["north", "east", "south", "west"]
-	let hands = [userHand, leftHand, topHand, rightHand]
+	let hands = [userHand, rightHand, topHand, leftHand]
 
 	let userWind;
 	clients.forEach((client) => {
 		if (client.hand) {
 			console.log("User hand stuff")
 			let tempHand = Hand.fromString(client.hand)
-			//TODO: Currently, after refreshing the page during charleston, this results in the first 3 tiles stored on the server being put into the placemat, a very glitchy behavior. 
+			//TODO: Currently, after refreshing the page during charleston, this results in the first 3 tiles stored on the server being put into the placemat, a very glitchy behavior.
 			userHand.syncContents(tempHand.contents,  message?.currentTurn?.charleston)
 			userWind = tempHand.wind
 		}

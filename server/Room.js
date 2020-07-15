@@ -115,9 +115,9 @@ class Room {
 
 						let increment;
 						switch (currentDirection) {
-							case "right": increment = 3; break; //Going all the way around...
+							case "right": increment = 1; break;
 							case "across": increment = 2; break;
-							case "left": increment = 1; break;
+							case "left": increment = 3; break;
 						}
 
 						playerHands.forEach((hand, index) => {

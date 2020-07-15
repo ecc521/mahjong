@@ -6014,15 +6014,7 @@ function Compass() {
   gameBoard.appendChild(this.compass);
 
   this.setDirectionForUserWind = function (userWind) {
-    //There are four compasses - compass-north, compass-south, etc. They specify which direction is at the top of the compass, or for the hand across from the users.
-    //Convert userWind to the direction for the compass.
-    var translations = {
-      "north": "south",
-      "east": "west",
-      "south": "north",
-      "west": "east"
-    };
-    this.compass.src = "assets/compass-" + translations[userWind] + ".svg";
+    this.compass.src = "assets/compass-" + userWind + ".svg";
   };
 }
 
@@ -6236,14 +6228,14 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
 
   var clients = message.clients;
   var winds = ["north", "east", "south", "west"];
-  var hands = [userHand, leftHand, topHand, rightHand];
+  var hands = [userHand, rightHand, topHand, leftHand];
   var userWind;
   clients.forEach(function (client) {
     if (client.hand) {
       var _message$currentTurn;
 
       console.log("User hand stuff");
-      var tempHand = Hand.fromString(client.hand); //TODO: Currently, after refreshing the page during charleston, this results in the first 3 tiles stored on the server being put into the placemat, a very glitchy behavior. 
+      var tempHand = Hand.fromString(client.hand); //TODO: Currently, after refreshing the page during charleston, this results in the first 3 tiles stored on the server being put into the placemat, a very glitchy behavior.
 
       userHand.syncContents(tempHand.contents, message === null || message === void 0 ? void 0 : (_message$currentTurn = message.currentTurn) === null || _message$currentTurn === void 0 ? void 0 : _message$currentTurn.charleston);
       userWind = tempHand.wind;
