@@ -221,7 +221,7 @@ let leftHand = new Hand({
 	handToRender: leftHandContainer
 })
 
-let nametagIds = ["bottomNametag", "leftNametag", "topNametag", "rightNametag"]
+let nametagIds = ["bottomNametag", "rightNametag", "topNametag", "leftNametag"]
 let nametags = nametagIds.map((id) => {
 	let nametag = document.createElement("p")
 	nametag.id = id
