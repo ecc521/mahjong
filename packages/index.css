@@ -614,15 +614,29 @@ This means that something using bottom is off the page - hence we must use top. 
 	font-size: 16px;
 }
 
+@keyframes fadeInAndOut {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  18% {
+	  opacity: 1;
+  }
+  100% {
+	opacity: 0;
+  }
+}
+
 .blocklessAlertCover {
 	position: absolute;
 	width: 100vw;
 	height: 100vh;
 	height: calc(var(--vh) * 100);
-	background-image: radial-gradient(transparent, black);
+	background-image: radial-gradient(transparent, #000000AA);
 	z-index: 98;
 	opacity: 0;
-	transition: opacity .5s;
 	pointer-events: none;
 }
 

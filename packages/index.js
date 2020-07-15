@@ -4646,11 +4646,7 @@ module.exports = Hand;
 
 __webpack_require__(174);
 
-__webpack_require__(128);
-
 __webpack_require__(40);
-
-__webpack_require__(175);
 
 __webpack_require__(120);
 
@@ -4718,17 +4714,11 @@ var BlocklessAlert = /*#__PURE__*/function () {
     document.body.appendChild(cover);
     var message = document.createElement("p");
     message.innerHTML = messageText;
-    window.requestAnimationFrame(function () {
-      cover.style.opacity = 1;
-    });
-    setTimeout(function () {
-      cover.style.transition = "opacity " + duration / 1000 + "s";
-      cover.style.opacity = 0;
-      setTimeout(function () {
-        cover.remove();
-      }, duration);
-    }, Number(window.getComputedStyle(cover).transition.match(/opacity\s(\d+[.]\d+)s/)[1]) * 1000);
     cover.appendChild(message);
+    cover.style.animation = "fadeInAndOut " + duration + "ms linear";
+    setTimeout(function () {
+      cover.remove();
+    }, duration);
   }
 
   return BlocklessAlert;
@@ -10553,57 +10543,7 @@ $({ target: 'Array', proto: true, forced: ES3_STRINGS || !STRICT_METHOD }, {
 
 
 /***/ }),
-/* 175 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-var fixRegExpWellKnownSymbolLogic = __webpack_require__(79);
-var anObject = __webpack_require__(4);
-var toLength = __webpack_require__(11);
-var requireObjectCoercible = __webpack_require__(17);
-var advanceStringIndex = __webpack_require__(121);
-var regExpExec = __webpack_require__(80);
-
-// @@match logic
-fixRegExpWellKnownSymbolLogic('match', 1, function (MATCH, nativeMatch, maybeCallNative) {
-  return [
-    // `String.prototype.match` method
-    // https://tc39.github.io/ecma262/#sec-string.prototype.match
-    function match(regexp) {
-      var O = requireObjectCoercible(this);
-      var matcher = regexp == undefined ? undefined : regexp[MATCH];
-      return matcher !== undefined ? matcher.call(regexp, O) : new RegExp(regexp)[MATCH](String(O));
-    },
-    // `RegExp.prototype[@@match]` method
-    // https://tc39.github.io/ecma262/#sec-regexp.prototype-@@match
-    function (regexp) {
-      var res = maybeCallNative(nativeMatch, regexp, this);
-      if (res.done) return res.value;
-
-      var rx = anObject(regexp);
-      var S = String(this);
-
-      if (!rx.global) return regExpExec(rx, S);
-
-      var fullUnicode = rx.unicode;
-      rx.lastIndex = 0;
-      var A = [];
-      var n = 0;
-      var result;
-      while ((result = regExpExec(rx, S)) !== null) {
-        var matchStr = String(result[0]);
-        A[n] = matchStr;
-        if (matchStr === '') rx.lastIndex = advanceStringIndex(S, toLength(rx.lastIndex), fullUnicode);
-        n++;
-      }
-      return n === 0 ? null : A;
-    }
-  ];
-});
-
-
-/***/ }),
+/* 175 */,
 /* 176 */
 /***/ (function(module, exports, __webpack_require__) {
 
