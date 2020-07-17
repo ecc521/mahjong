@@ -4723,7 +4723,7 @@ mobile_drag_drop_polyfill({
 var url = new URL(window.location);
 url.pathname = "/node";
 
-if (window.location.protocol === "https") {
+if (window.location.protocol === "https:") {
   url.protocol = "wss:";
 } else {
   url.protocol = "ws:";

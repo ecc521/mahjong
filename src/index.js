@@ -16,7 +16,7 @@ mobile_drag_drop_polyfill({
 
 let url = new URL(window.location)
 url.pathname = "/node"
-if (window.location.protocol === "https") {
+if (window.location.protocol === "https:") {
     url.protocol = "wss:"
 }
 else {
