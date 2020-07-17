@@ -1,3 +1,7 @@
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
 const StateManager = require("./StateManager.js")
 
 //Mobile browsers use the touch API - desktop is drag and drop. We'll use a polyfill so we don't have to implement both.
