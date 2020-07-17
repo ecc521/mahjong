@@ -264,6 +264,17 @@ class Room {
 									if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
 										let hand = this.gameData.playerHands[clientId]
 										//We can just verify for on less tile here.
+
+										if (placement.amount === 2) {
+											if (!wouldMakeMahjong) {
+												client.message("roomActionPlaceTiles", "You can't place a pair when it will not make you mahjong. ", "error")
+												continue;
+											}
+											else {
+												placement.mahjong = true //The specified action can only be accomplished through mahjong. 
+											}
+										}
+
 										if (hand.removeMatchingTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
 											utilized = true
 											hand.add(placement)
