@@ -4722,7 +4722,12 @@ mobile_drag_drop_polyfill({
 });
 var url = new URL(window.location);
 url.pathname = "/node";
-url.protocol = "ws:";
+
+if (window.location.protocol === "https") {
+  url.protocol = "wss:";
+} else {
+  url.protocol = "ws:";
+}
 
 if (window.location.hostname === "127.0.0.1") {
   //Local development
@@ -8309,7 +8314,7 @@ document.body.appendChild(roomManager);
 var copyrightNotice = document.createElement("p");
 copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved";
 copyrightNotice.id = "copyrightNotice";
-roomManager.appendChild(copyrightNotice); //In order to get the "with friends" part styled differently, we will need 3 elements for our heading.
+roomManager.appendChild(copyrightNotice); //In order to get the "4 friends" part styled differently, we will need 3 elements for our heading.
 
 var heading = document.createElement("div");
 heading.id = "heading";
@@ -8318,10 +8323,10 @@ var mahjongHeading = document.createElement("h1");
 mahjongHeading.innerHTML = "Mahjong";
 mahjongHeading.id = "mahjongHeading";
 heading.appendChild(mahjongHeading);
-var withFriendsHeading = document.createElement("h1");
-withFriendsHeading.innerHTML = "with Friends";
-withFriendsHeading.id = "withFriendsHeading";
-heading.appendChild(withFriendsHeading); //notInRoomContainer: The stuff to create or join a room.
+var fourFriendsHeading = document.createElement("h1");
+fourFriendsHeading.innerHTML = "4 Friends";
+fourFriendsHeading.id = "fourFriendsHeading";
+heading.appendChild(fourFriendsHeading); //notInRoomContainer: The stuff to create or join a room.
 
 var notInRoomContainer = document.createElement("div");
 notInRoomContainer.id = "notInRoomContainer";

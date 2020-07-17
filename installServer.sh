@@ -1,4 +1,4 @@
-read -n 1 -s -r -p "This file is intended to set up a server to host the mahjongWithFriends website. It may overwrite stuff without asking. Press any key to continue"
+read -n 1 -s -r -p "This file is intended to set up a server to host the Mahjong 4 Friends website. It may overwrite stuff without asking. Press any key to continue"
 
 #Get updates
 sudo apt-get update
@@ -39,21 +39,26 @@ sudo a2enmod proxy_http
 a2enmod proxy_wstunnel
 
 #Enable reverse proxy to /node.
-echo "LoadModule proxy_module modules/mod_proxy.so" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
-echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
-echo "LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
-echo "ProxyPass /node ws://127.0.0.1:3000/node" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf
-echo "ProxyRequests off" >> $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf #Not needed, good practice. 
+echo "LoadModule proxy_module modules/mod_proxy.so" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
+echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
+echo "LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
+echo "ProxyPass /node ws://127.0.0.1:3000/node" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
+echo "ProxyRequests off" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf #Not needed, good practice.
 
-sudo mv $HOME/mahjong/NODEMAHJONGWITHFRIENDS.conf /etc/apache2/conf-available/NODEMAHJONGWITHFRIENDS.conf
-sudo a2enconf NODEMAHJONGWITHFRIENDS #To disable, run sudo a2disconf NODEMAHJONGWITHFRIENDS
+sudo mv $HOME/mahjong/NODEMAHJONG4FRIENDS.conf /etc/apache2/conf-available/NODEMAHJONG4FRIENDS.conf
+sudo a2enconf NODEMAHJONG4FRIENDS #To disable, run sudo a2disconf NODEMAHJONG4FRIENDS
 
 #Restart apache so configuration changes take effect.
 sudo systemctl restart apache2
 
+#Install Certbot
+sudo apt-get install -y certbot python-certbot-apache
+sudo certbot --apache
+
 echo "Run crontab -e (may need sudo). Add the following lines:"
 echo "@reboot node $HOME/mahjong/server.js >> $HOME/mahjong/server/data/server.log"
 echo "0 4   *   *   *    sudo reboot"
+echo "@reboot sudo certbot renew  >> $HOME/mahjong/server/data/logs/updateCertificate.log"
 
-echo "\nExplanation: Run server on reboot. Reboot at 4am every day. "
+echo "\nExplanation: Run server on reboot. Reboot at 4am every day. Check certificate every reboot and renew if needed."
 echo "You can reboot now or start server.js"

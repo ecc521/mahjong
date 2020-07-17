@@ -7,16 +7,17 @@
 	text-align: center;
 }
 
-#roomManager #mahjongHeading, #roomManager #withFriendsHeading {
+#roomManager #mahjongHeading, #roomManager #fourFriendsHeading {
 	font-size: 7vh;
 	color: #ffbd17;
 	display: inline-block;
 }
 
-#roomManager #withFriendsHeading {
+#roomManager #fourFriendsHeading {
 	font-size: 5vh;
 	vertical-align: top;
 	margin-left: 1.5vw;
+	font-style: italic;
 	color: #ffe100;
 }
 

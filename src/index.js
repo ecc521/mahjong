@@ -16,7 +16,12 @@ mobile_drag_drop_polyfill({
 
 let url = new URL(window.location)
 url.pathname = "/node"
-url.protocol = "ws:"
+if (window.location.protocol === "https") {
+    url.protocol = "wss:"
+}
+else {
+    url.protocol = "ws:"
+}
 if (window.location.hostname === "127.0.0.1") {
     //Local development
     url.port = 3000

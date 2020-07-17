@@ -11,7 +11,7 @@ copyrightNotice.id = "copyrightNotice"
 roomManager.appendChild(copyrightNotice)
 
 
-//In order to get the "with friends" part styled differently, we will need 3 elements for our heading.
+//In order to get the "4 friends" part styled differently, we will need 3 elements for our heading.
 let heading = document.createElement("div")
 heading.id = "heading"
 roomManager.appendChild(heading)
@@ -21,10 +21,10 @@ mahjongHeading.innerHTML = "Mahjong"
 mahjongHeading.id = "mahjongHeading"
 heading.appendChild(mahjongHeading)
 
-let withFriendsHeading = document.createElement("h1")
-withFriendsHeading.innerHTML = "with Friends"
-withFriendsHeading.id = "withFriendsHeading"
-heading.appendChild(withFriendsHeading)
+let fourFriendsHeading = document.createElement("h1")
+fourFriendsHeading.innerHTML = "4 Friends"
+fourFriendsHeading.id = "fourFriendsHeading"
+heading.appendChild(fourFriendsHeading)
 
 //notInRoomContainer: The stuff to create or join a room.
 let notInRoomContainer = document.createElement("div")
