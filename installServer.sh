@@ -58,7 +58,7 @@ sudo certbot --apache
 echo "Run crontab -e (may need sudo). Add the following lines:"
 echo "@reboot node $HOME/mahjong/server.js >> $HOME/mahjong/server/data/server.log"
 echo "0 4   *   *   *    sudo reboot"
-echo "@reboot sudo certbot renew  >> $HOME/mahjong/server/data/logs/updateCertificate.log"
+echo "@reboot sudo certbot renew  >> $HOME/mahjong/server/data/updateCertificate.log"
 
 echo "\nExplanation: Run server on reboot. Reboot at 4am every day. Check certificate every reboot and renew if needed."
 echo "You can reboot now or start server.js"

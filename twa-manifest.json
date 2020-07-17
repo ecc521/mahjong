@@ -1,0 +1,25 @@
+{
+  "packageId": "com.mahjong4friends.twa",
+  "host": "mahjong4friends.com",
+  "name": "Mahjong 4 Freinds",
+  "launcherName": "Mahjong",
+  "display": "standalone",
+  "themeColor": "#368A36",
+  "navigationColor": "#000000",
+  "backgroundColor": "#000000",
+  "enableNotifications": false,
+  "startUrl": "/",
+  "iconUrl": "https://mahjong4friends.com/assets/icons/512x512-green-dragon.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "$HOME/android/keystore",
+    "alias": "mahjong"
+  },
+  "appVersionName": "1",
+  "appVersionCode": 1,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://mahjong4friends.com/manifest.json",
+  "fallbackType": "customtabs",
+  "appVersion": "1"
+}
