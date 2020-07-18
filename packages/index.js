@@ -2460,7 +2460,7 @@ var Hand = /*#__PURE__*/function () {
       var indexes = [];
       tiles.forEach(function (tile, index) {
         if (!(tile instanceof Tile)) {
-          throw "Your Sequence of Array contains non-tiles. ";
+          throw "Your Sequence or Array contains non-tiles. ";
         }
 
         for (var i = _this2.contents.length - 1; i >= 0; i--) {
@@ -7680,16 +7680,19 @@ function isMahjong(unlimitedSequences) {
       return item instanceof Tile;
     })[0];
 
-    if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
+    if (pairs === 0 && !localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
       continue;
     } else {
-      localTestHand.add(new Match({
-        type: tile.type,
-        value: tile.value,
-        exposed: false,
-        amount: 2
-      }));
-      localTestHand.removeMatchingTilesFromHand(tile, 2);
+      if (pairs === 0) {
+        localTestHand.add(new Match({
+          type: tile.type,
+          value: tile.value,
+          exposed: false,
+          amount: 2
+        }));
+        localTestHand.removeMatchingTilesFromHand(tile, 2);
+      }
+
       localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0));
       return localTestHand;
     }
@@ -8253,7 +8256,7 @@ function isCalling(discardPile, unlimitedSequences) {
 
     _this.add(tile);
 
-    if (_this.isMahjong(_this, unlimitedSequences)) {
+    if (_this.isMahjong(unlimitedSequences)) {
       _this.remove(tile);
 
       return {

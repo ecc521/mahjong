@@ -49,7 +49,7 @@ function isCalling(discardPile, unlimitedSequences) {
 		}
 
 		this.add(tile)
-		if (this.isMahjong(this, unlimitedSequences)) {
+		if (this.isMahjong(unlimitedSequences)) {
 			this.remove(tile)
 			return true
 		}
