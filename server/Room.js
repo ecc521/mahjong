@@ -599,7 +599,7 @@ class Room {
 							return false
 						}).bind(this))) {
 							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", "success")
-							sendStateToClients()
+							this.sendStateToClients()
 							return;
 						}
 
