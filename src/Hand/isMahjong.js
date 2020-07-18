@@ -137,12 +137,14 @@ function isMahjong(unlimitedSequences) {
 		}
 		//Check for a pair
 		let tile = (localTestHand.contents.filter((item) => {return item instanceof Tile}))[0]
-		if (!localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
+		if (pairs === 0 && !localTestHand.removeMatchingTilesFromHand(tile, 2, true)) {
 			continue;
 		}
 		else {
-			localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
-			localTestHand.removeMatchingTilesFromHand(tile, 2)
+			if (pairs === 0) {
+				localTestHand.add(new Match({type: tile.type, value: tile.value, exposed: false, amount: 2}))
+				localTestHand.removeMatchingTilesFromHand(tile, 2)
+			}
 			localTestHand.contents = localTestHand.contents.concat(initialTiles.slice(0))
 			return localTestHand
 		}

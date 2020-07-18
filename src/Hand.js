@@ -212,7 +212,7 @@ class Hand {
 			//We will verify that the tiles CAN be removed before removing them.
 			let indexes = []
 			tiles.forEach((tile, index) => {
-				if (!(tile instanceof Tile)) {throw "Your Sequence of Array contains non-tiles. "}
+				if (!(tile instanceof Tile)) {throw "Your Sequence or Array contains non-tiles. "}
 				for (let i=this.contents.length-1;i>=0;i--) {
 					if (tile.matches(this.contents[i]) && !indexes.includes(i)) {
 						indexes[index] = i
