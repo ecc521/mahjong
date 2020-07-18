@@ -337,14 +337,14 @@ class Hand {
 					else if (type === "exposed") {
 						if (applyColorShading) {
 							//There is no hand specifically for exposed tiles. We'll apply some style to make it clear this was exposed.
-							elem.style.filter = "brightness(1.15)"
+							elem.style.filter = "brightness(1.2)"
 						}
 						this.handToRender.appendChild(elem)
 					}
 					else if (type === "unexposed"){
 						if (!this.handForExposed && applyColorShading) {
 							//There is no hand for exposed tiles, let's make it clear this is unexposed
-							elem.style.filter = "brightness(0.85)"
+							elem.style.filter = "brightness(0.8)"
 						}
 						if (this.interactive) {
 							elem.draggable = true
@@ -359,10 +359,8 @@ class Hand {
 			console.log(exposedTiles)
 			console.log(unexposedTiles)
 			let applyColorShading = false
-			if (
-				exposedTiles.some((tile) => {return !(tile instanceof Pretty)})
-				&& unexposedTiles.some((tile) => {return !(tile.facedown)})
-			) {
+			//If there are any tiles in unexposedTiles that are not face down, or there are no unexposed tiles. 
+			if (unexposedTiles.some((tile) => {return !(tile.faceDown)}) || unexposedTiles.length === 0) {
 				applyColorShading = true
 			}
 			drawTiles(exposedTiles, "exposed", applyColorShading)

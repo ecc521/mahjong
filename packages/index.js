@@ -2618,14 +2618,14 @@ var Hand = /*#__PURE__*/function () {
           } else if (type === "exposed") {
             if (applyColorShading) {
               //There is no hand specifically for exposed tiles. We'll apply some style to make it clear this was exposed.
-              elem.style.filter = "brightness(1.15)";
+              elem.style.filter = "brightness(1.2)";
             }
 
             _this3.handToRender.appendChild(elem);
           } else if (type === "unexposed") {
             if (!_this3.handForExposed && applyColorShading) {
               //There is no hand for exposed tiles, let's make it clear this is unexposed
-              elem.style.filter = "brightness(0.85)";
+              elem.style.filter = "brightness(0.8)";
             }
 
             if (_this3.interactive) {
@@ -2647,13 +2647,11 @@ var Hand = /*#__PURE__*/function () {
 
       console.log(exposedTiles);
       console.log(unexposedTiles);
-      var applyColorShading = false;
+      var applyColorShading = false; //If there are any tiles in unexposedTiles that are not face down, or there are no unexposed tiles. 
 
-      if (exposedTiles.some(function (tile) {
-        return !(tile instanceof Pretty);
-      }) && unexposedTiles.some(function (tile) {
-        return !tile.facedown;
-      })) {
+      if (unexposedTiles.some(function (tile) {
+        return !tile.faceDown;
+      }) || unexposedTiles.length === 0) {
         applyColorShading = true;
       }
 
