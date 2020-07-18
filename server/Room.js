@@ -185,6 +185,16 @@ class Room {
 									priority -= total
 								}
 								else if (obj[key] instanceof Match) {
+									//Validate that this is not a pair.
+									if (obj[key].amount === 2) {
+										if (!wouldMakeMahjong) {
+											client.message("roomActionPlaceTiles", "You can't place a pair when it will not make you mahjong. ", "error")
+											continue;
+										}
+										else {
+											placement.mahjong = true //The specified action can only be accomplished through mahjong.
+										}
+									}
 									priority = 104;
 									//Add priority based on position to thrower. The closer to the thrower, the highest priority.
 									let total = getBackwardsDistance(placerWind, throwerWind)
@@ -264,16 +274,6 @@ class Room {
 									if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
 										let hand = this.gameData.playerHands[clientId]
 										//We can just verify for on less tile here.
-
-										if (placement.amount === 2) {
-											if (!wouldMakeMahjong) {
-												client.message("roomActionPlaceTiles", "You can't place a pair when it will not make you mahjong. ", "error")
-												continue;
-											}
-											else {
-												placement.mahjong = true //The specified action can only be accomplished through mahjong. 
-											}
-										}
 
 										if (hand.removeMatchingTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
 											utilized = true
