@@ -325,7 +325,7 @@ class Hand {
 				else {console.error("Unknown item " + item)}
 			}
 
-			let drawTiles = (function drawTiles(tiles, type) {
+			let drawTiles = (function drawTiles(tiles, type, applyColorShading = false) {
 				for (let i=0;i<tiles.length;i++) {
 					let tile = tiles[i]
 					let elem = document.createElement("img")
@@ -335,9 +335,17 @@ class Hand {
 						this.handForExposed.appendChild(elem)
 					}
 					else if (type === "exposed") {
+						if (applyColorShading) {
+							//There is no hand specifically for exposed tiles. We'll apply some style to make it clear this was exposed.
+							elem.style.filter = "brightness(1.15)"
+						}
 						this.handToRender.appendChild(elem)
 					}
 					else if (type === "unexposed"){
+						if (!this.handForExposed && applyColorShading) {
+							//There is no hand for exposed tiles, let's make it clear this is unexposed
+							elem.style.filter = "brightness(0.85)"
+						}
 						if (this.interactive) {
 							elem.draggable = true
 							elem.addEventListener("dragstart", dragstart)
@@ -348,8 +356,17 @@ class Hand {
 				}
 			}).bind(this)
 
-			drawTiles(exposedTiles, "exposed")
-			drawTiles(unexposedTiles, "unexposed")
+			console.log(exposedTiles)
+			console.log(unexposedTiles)
+			let applyColorShading = false
+			if (
+				exposedTiles.some((tile) => {return !(tile instanceof Pretty)})
+				&& unexposedTiles.some((tile) => {return !(tile.facedown)})
+			) {
+				applyColorShading = true
+			}
+			drawTiles(exposedTiles, "exposed", applyColorShading)
+			drawTiles(unexposedTiles, "unexposed", applyColorShading)
 			if (this.tilePlacemat) {
 				this.renderPlacemat()
 			}
