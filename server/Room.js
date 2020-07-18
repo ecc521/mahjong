@@ -590,12 +590,18 @@ class Room {
 						//TODO: Note that it is remotely possible players will want to throw the 4th tile instead, as it is a very safe (if honor, entirely safe), throw.
 						//This would mean sacraficing points and a draw in order to get a safe throw, and I have never seen it done, but there are scenarios where it may
 						//actually be the best idea. We should probably allow this at some point.
-						hand.contents.forEach(((item) => {
+						if (hand.contents.some(((item) => {
 							if (item instanceof Match && item.type === placement.type && item.value === placement.value) {
 								item.amount = 4
-								return this.drawTile(clientId, true)
+								this.drawTile(clientId, true)
+								return true
 							}
-						}).bind(this))
+							return false
+						}).bind(this))) {
+							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", "success")
+							sendStateToClients()
+							return;
+						}
 
 						let discardMessage = client.getNickname() + " has thrown a " + placement.value + " " + placement.type
 						//We're also going to check if the discarder is calling.
