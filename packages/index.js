@@ -2359,6 +2359,11 @@ var Hand = /*#__PURE__*/function () {
       if (targetBounds.right - ev.x < targetBounds.width / 2) {
         //Dropped on right side of tile. Insert after.
         targetIndex++;
+      } //Block a bug where a tile dropped where it would land where it is moves second to back, and a bug where a tile overdragged past the front moves to the back.
+
+
+      if (targetIndex === elem.tileIndex || targetIndex === undefined) {
+        return;
       }
 
       var targetTile = this.contents[targetIndex];
@@ -2647,7 +2652,7 @@ var Hand = /*#__PURE__*/function () {
 
       console.log(exposedTiles);
       console.log(unexposedTiles);
-      var applyColorShading = false; //If there are any tiles in unexposedTiles that are not face down, or there are no unexposed tiles. 
+      var applyColorShading = false; //If there are any tiles in unexposedTiles that are not face down, or there are no unexposed tiles.
 
       if (unexposedTiles.some(function (tile) {
         return !tile.faceDown;

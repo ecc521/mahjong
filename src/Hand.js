@@ -125,6 +125,9 @@ class Hand {
 				targetIndex++
 			}
 
+			//Block a bug where a tile dropped where it would land where it is moves second to back, and a bug where a tile overdragged past the front moves to the back.
+			if (targetIndex === elem.tileIndex || targetIndex === undefined) {return}
+
 			let targetTile = this.contents[targetIndex]
 
 			let currentTile;
@@ -144,7 +147,6 @@ class Hand {
 
 			if (targetIndex <= this.contents.length) {
 				let newTargetIndex = this.contents.findIndex((tile) => {return targetTile === tile})
-
 				this.contents.splice(newTargetIndex, 0, currentTile)
 			}
 			else {
@@ -359,7 +361,7 @@ class Hand {
 			console.log(exposedTiles)
 			console.log(unexposedTiles)
 			let applyColorShading = false
-			//If there are any tiles in unexposedTiles that are not face down, or there are no unexposed tiles. 
+			//If there are any tiles in unexposedTiles that are not face down, or there are no unexposed tiles.
 			if (unexposedTiles.some((tile) => {return !(tile.faceDown)}) || unexposedTiles.length === 0) {
 				applyColorShading = true
 			}
