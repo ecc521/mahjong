@@ -357,7 +357,7 @@ class Room {
 			state.inGame = this.inGame
 			state.isHost = (requestingClientId === this.hostClientId);
 			if (this.gameData.wall) {
-				//Pass tiles if mahjong, else number of tiles. 
+				//Pass tiles if mahjong, else number of tiles.
 				state.wallTiles = this.gameData.wall.tiles
 				if (!this.gameData.isMahjong) {
 					state.wallTiles = state.wallTiles.length
@@ -574,6 +574,9 @@ class Room {
 
 			if (placement instanceof Array) {
 				//This should only happen if we are in a charleston. Remove the charleston tiles from their hand.
+				if (this.gameData.currentTurn.turnChoices[clientId]) {
+					return client.message(obj.type, "You have already passed tiles for this charleston round. ", "error")
+				}
 				if (hand.removeTilesFromHand(placement)) {
 					console.log("Scheduling")
 					this.gameData.currentTurn.turnChoices[clientId] = placement
