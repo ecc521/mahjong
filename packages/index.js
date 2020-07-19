@@ -1821,19 +1821,19 @@ var Wall = /*#__PURE__*/function () {
       } //Delete any existing tiles.
 
 
-      for (var i = 0; i < tilesRemaining; i++) {
+      for (var i = 0; i < tilesRemaining.length; i++) {
         var tile = document.createElement("img");
-        tile.src = "assets/tiles/face-down.png";
+        tile.src = tilesRemaining[i].imageUrl;
         div.appendChild(tile);
       }
 
-      if (tilesRemaining === 0) {
+      if (tilesRemaining.length === 0) {
         return;
       } //Don't write "0" to the screen.
       //Write the number of tiles that remain.
 
 
-      var digits = String(tilesRemaining).split("");
+      var digits = String(tilesRemaining.length).split("");
       digits.forEach(function (digit) {
         var elem = document.createElement("p");
         elem.innerHTML = digit;
@@ -6612,7 +6612,15 @@ try {
 /* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(128);
+
+__webpack_require__(131);
+
+__webpack_require__(132);
+
 __webpack_require__(46);
+
+__webpack_require__(81);
 
 __webpack_require__(10);
 
@@ -6620,13 +6628,23 @@ __webpack_require__(23);
 
 __webpack_require__(118);
 
+__webpack_require__(22);
+
 __webpack_require__(47);
 
 __webpack_require__(60);
 
+__webpack_require__(42);
+
 __webpack_require__(160);
 
+__webpack_require__(35);
+
 __webpack_require__(17);
+
+__webpack_require__(43);
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 var Tile = __webpack_require__(15);
 
@@ -6873,6 +6891,19 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
   ;
 
   if (message.wallTiles) {
+    console.log(message.wallTiles);
+
+    if (_typeof(message.wallTiles) === "object") {
+      message.wallTiles = message.wallTiles.map(function (str) {
+        return Tile.fromJSON(str);
+      });
+    } else {
+      message.wallTiles = new Array(message.wallTiles).fill(new Tile({
+        faceDown: true
+      }));
+    }
+
+    console.log(message.wallTiles);
     Wall.renderWall(wallRendering, message.wallTiles);
   }
 

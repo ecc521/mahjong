@@ -357,7 +357,11 @@ class Room {
 			state.inGame = this.inGame
 			state.isHost = (requestingClientId === this.hostClientId);
 			if (this.gameData.wall) {
-				state.wallTiles = this.gameData.wall.tiles.length
+				//Pass tiles if mahjong, else number of tiles. 
+				state.wallTiles = this.gameData.wall.tiles
+				if (!this.gameData.isMahjong) {
+					state.wallTiles = state.wallTiles.length
+				}
 			}
 
 			state.discardPile = this.gameData.discardPile

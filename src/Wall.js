@@ -83,15 +83,15 @@ class Wall {
 	static renderWall(div, tilesRemaining) {
 		while (div.firstChild) {div.firstChild.remove()} //Delete any existing tiles.
 
-		for (let i=0;i<tilesRemaining;i++) {
+		for (let i=0;i<tilesRemaining.length;i++) {
 			let tile = document.createElement("img")
-			tile.src = "assets/tiles/face-down.png"
+			tile.src = tilesRemaining[i].imageUrl
 			div.appendChild(tile)
 		}
 
-		if (tilesRemaining === 0) {return} //Don't write "0" to the screen.
+		if (tilesRemaining.length === 0) {return} //Don't write "0" to the screen.
 		//Write the number of tiles that remain.
-		let digits = String(tilesRemaining).split("")
+		let digits = String(tilesRemaining.length).split("")
 		digits.forEach((digit) => {
 			let elem = document.createElement("p")
 			elem.innerHTML = digit

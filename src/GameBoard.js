@@ -235,6 +235,14 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	if (!message.inGame) {return};
 
 	if (message.wallTiles) {
+		console.log(message.wallTiles)
+		if (typeof message.wallTiles === "object") {
+			message.wallTiles = message.wallTiles.map((str) => {return Tile.fromJSON(str)})
+		}
+		else {
+			message.wallTiles = new Array(message.wallTiles).fill(new Tile({faceDown: true}))
+		}
+		console.log(message.wallTiles)
 		Wall.renderWall(wallRendering, message.wallTiles)
 	}
 
