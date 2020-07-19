@@ -237,7 +237,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	if (message.wallTiles) {
 		console.log(message.wallTiles)
 		if (typeof message.wallTiles === "object") {
-			message.wallTiles = message.wallTiles.map((str) => {return Tile.fromJSON(str)})
+			message.wallTiles = Hand.convertStringsToTiles(message.wallTiles)
 		}
 		else {
 			message.wallTiles = new Array(message.wallTiles).fill(new Tile({faceDown: true}))
