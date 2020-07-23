@@ -108,11 +108,19 @@ gameBoard.appendChild(tilePlacemat)
 
 let placeTilesButton = document.createElement("button")
 placeTilesButton.id = "placeTilesButton"
-placeTilesButton.innerHTML = "Place Tiles"
+placeTilesButton.innerHTML = "Proceed"
 gameBoard.appendChild(placeTilesButton)
 
 placeTilesButton.addEventListener("click", function() {
+
 	let placement = userHand.inPlacemat
+
+	//If the user has 0 tiles in placemat, or 1 tile, which is the thrown one, next turn.
+	if (placement.length === Number(placement.some((obj) => {return obj.evicting}))) {
+		window.stateManager.nextTurn()
+		return;
+	}
+
 	console.log(placement)
 	if (placement.length === 0) {
 		new Popups.Notification("Place Nothing???", "We suggest glasses. ").show()
@@ -140,13 +148,6 @@ window.stateManager.onGameplayAlert = function(obj) {
 	new Popups.BlocklessAlert(obj.message, 4000)
 }
 
-let nextTurnButton = document.createElement("button")
-nextTurnButton.id = "nextTurnButton"
-gameBoard.appendChild(nextTurnButton)
-
-nextTurnButton.addEventListener("click", function() {
-	window.stateManager.nextTurn()
-})
 
 let endGameButton = document.createElement("button")
 endGameButton.id = "endGameButton"
@@ -300,15 +301,15 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	hands.forEach((hand) => {hand.renderTiles()})
 	if (message.currentTurn?.playersReady?.length > 0) {
 		//The person has thrown their tile. Waiting on players to ready.
-		nextTurnButton.innerHTML = "Next Turn (" + message.currentTurn.playersReady.length + "/4)"
-		nextTurnButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
 		placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
-		if (!message.currentTurn.thrown && message.currentTurn.userTurn === clientId) {placeTilesButton.disabled = ""}
-
-		if (message.currentTurn.charleston) {
-			nextTurnButton.disabled = "disabled"
+		goMahjongButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
+		placeTilesButton.innerHTML = "Proceed (" + message.currentTurn.playersReady.length + "/4)"
+		//If you haven't thrown, are not in charleston, and it is your turn, override and enable.
+		if (!message.currentTurn.thrown && !message.currentTurn.charleston && message.currentTurn.userTurn === clientId) {placeTilesButton.disabled = ""}
+		if (message.currentTurn.charleston && message.currentTurn.userTurn !== clientId) {
+			//You have 13 tiles. Mahjong impossible.
+			goMahjongButton.disabled = "disabled"
 		}
-
 		if (message.currentTurn.userTurn !== clientId) {
 			userHand.setEvictingThrownTile(Tile.fromJSON(message.currentTurn.thrown))
 		}
@@ -318,13 +319,26 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		userHand.renderPlacemat()
 	}
 	else {
-		nextTurnButton.disabled = "disabled"
-		nextTurnButton.innerHTML = ""
 		placeTilesButton.disabled = ""
+		goMahjongButton.disabled = ""
+		placeTilesButton.innerHTML = "Proceed"
 		userHand.setEvictingThrownTile() //Clear evictingThrownTile
 		//The person has not yet thrown a tile.
+
+		if (message.currentTurn.charleston) {
+			//TODO: Not sure if East wind is allowed to go Mahjong during a charleston. As of now, Room.js will treat mahjong just like place tiles during charleston,
+			//so we'll disable the option
+			goMahjongButton.disabled = "disabled"
+		}
+		
 		if (message.currentTurn.userTurn === window.clientId) {
 			userHand.renderPlacemat("pending")
+		}
+		else {
+			if (!message.currentTurn.charleston) {
+				placeTilesButton.disabled = "disabled"
+				goMahjongButton.disabled = "disabled"
+			}
 		}
 	}
 })
