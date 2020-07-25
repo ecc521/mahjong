@@ -359,7 +359,7 @@ class Room {
 			if (this.gameData.wall) {
 				//Pass tiles if mahjong, else number of tiles.
 				state.wallTiles = this.gameData.wall.tiles
-				if (!this.gameData.isMahjong) {
+				if (!this.gameData.isMahjong && state.wallTiles.length !== 0) {
 					state.wallTiles = state.wallTiles.length
 				}
 			}
