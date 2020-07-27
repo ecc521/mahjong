@@ -160,6 +160,15 @@ class StateManager {
 			}))
 		}
 
+		this.addBot = function(botName) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionAddBot",
+				clientId: window.clientId,
+				roomId: window.stateManager.roomId,
+				botName: botName
+			}))
+		}
+
 		this.getCurrentRoom = (function() {
 			//Get our room.
 			this.sendMessage(JSON.stringify({

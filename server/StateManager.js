@@ -1,5 +1,6 @@
 const Room = require("./Room.js")
 const Client = require("./Client.js")
+const Bot = require("./Bot.js")
 
 class StateManager {
 	constructor(rooms = {}, clients = {}) {
@@ -43,6 +44,11 @@ class StateManager {
 
 		this.createClient = function(clientId, websocket) {
 			clients[clientId] = new Client(clientId, websocket)
+			return clients[clientId]
+		}
+
+		this.createBot = function(clientId) {
+			clients[clientId] = new Bot(clientId)
 			return clients[clientId]
 		}
 

@@ -33,6 +33,7 @@ class Room {
 		}
 
 		this.startGame = (require("./Room/startGame.js")).bind(this)
+		this.addBot = (require("./Room/addBot.js")).bind(this)
 
 		let getSummary = (function(mahjongClientId, drewOwnTile) {
 			let summary = ""
@@ -436,8 +437,14 @@ class Room {
 			else {
 				this.clientIds.splice(clientIdIndex, 1)
 				if (this.hostClientId === clientId) {
-					//Choose a new host client.
-					this.hostClientId = this.clientIds[0]
+					//Choose a new host client. Make sure NOT to pick a bot. 
+					this.hostClientId = null;
+					this.clientIds.forEach(((clientId) => {
+						if (this.hostClientId) {return}
+						if (!global.stateManager.getClient(clientId).isBot) {
+							this.hostClientId = clientId
+						}
+					}).bind(this))
 				}
 				this.sendStateToClients()
 
@@ -447,7 +454,7 @@ class Room {
 					//The client is going to change their client Id. We can now delete the old client.
 					global.stateManager.deleteClient(clientId)
 				}
-				if (this.clientIds.length === 0) {
+				if (this.hostClientId === null) {
 					//We have no clients. Delete this room.
 					//Note that this code shouldn't be called, unless there is a bug or lag. The client will not show the Leave Room button if they are the
 					//only player and host (which they should be if they are the only player), and therefore roomActionCloseRoom will be sent instead.
@@ -752,6 +759,12 @@ class Room {
 			else if (obj.type === "roomActionNextTurn") {
 				//Action to state next turn.
 				return this.onNext(obj, clientId)
+			}
+			else if (obj.type === "roomActionAddBot") {
+				if (!isHost) {
+					return client.message(obj.type, "Only Host Can Add Bots", "error")
+				}
+				return this.addBot(obj)
 			}
 			else if (obj.type === "roomActionState") {
 				return client.message(obj.type, getState(clientId), "success")

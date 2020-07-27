@@ -1,3 +1,5 @@
+let Bot; //Don't want them both scripts importing each other.
+
 class Client {
 	constructor(clientId, websocket) {
 		this.clientId = clientId
@@ -33,7 +35,10 @@ class Client {
 
 
 		this.delete = (function(message) {
-			websocket.close(1000) //Status code: Normal close.
+			try {
+				websocket.close(1000) //Status code: Normal close.
+			}
+			catch(e) {}
 			global.stateManager.deleteClient(clientId)
 		}).bind(this)
 
@@ -58,7 +63,8 @@ class Client {
 			let obj = {
 				clientId: this.clientId,
 				nickname: this.nickname,
-				roomId: this.roomId
+				roomId: this.roomId,
+				isBot: this.isBot
 			}
 			console.log("Called")
 			console.log(JSON.stringify(obj))
@@ -70,7 +76,14 @@ class Client {
 		//Create client from a string.
 
 		let obj = JSON.parse(str)
-		let client = new Client(obj.clientId)
+		let client;
+		if (obj.isBot) {
+			if (!Bot) {Bot = require("./Bot.js")}
+			client = new Bot(obj.clientId)
+		}
+		else {
+			client = new Client(obj.clientId)
+		}
 		client.setNickname(obj.nickname)
 
 		client.setRoomId(obj.roomId)

@@ -109,7 +109,7 @@
 	cursor: pointer;
 }
 
-#roomManager #startGameButton {
+#roomManager #startGameButton, #roomManager #addBotButton  {
 	width: 30vw;
 	height: 5vh;
 	font-size: 3vh;

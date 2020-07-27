@@ -4388,6 +4388,15 @@ var StateManager = /*#__PURE__*/function () {
       }));
     };
 
+    this.addBot = function (botName) {
+      this.sendMessage(JSON.stringify({
+        type: "roomActionAddBot",
+        clientId: window.clientId,
+        roomId: window.stateManager.roomId,
+        botName: botName
+      }));
+    };
+
     this.getCurrentRoom = function () {
       //Get our room.
       this.sendMessage(JSON.stringify({
@@ -8596,6 +8605,14 @@ inRoomContainer.appendChild(startGameButton);
 startGameButton.addEventListener("click", function () {
   window.stateManager.startGame();
 });
+var addBotButton = document.createElement("button");
+addBotButton.innerHTML = "Add Bot";
+addBotButton.id = "addBotButton";
+addBotButton.style.display = "none";
+inRoomContainer.appendChild(addBotButton);
+addBotButton.addEventListener("click", function () {
+  window.stateManager.addBot(prompt("Please enter a name for the bot: "));
+});
 
 function renderPlayerView() {
   var clientList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -8685,23 +8702,24 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
   console.log(obj);
   playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present";
 
-  if (obj.message.clients.length === 4 && window.stateManager.isHost) {
-    startGameButton.style.display = "";
-  } else {
-    startGameButton.style.display = "none";
-  }
-
   if (window.stateManager.isHost) {
+    startGameButton.style.display = "none";
+    addBotButton.style.display = "";
     closeRoomButton.style.display = "";
-  } else {
-    closeRoomButton.style.display = "none";
-  }
+    leaveRoomButton.style.display = "";
 
-  if (obj.message.clients.length === 1 && window.stateManager.isHost) {
-    //This player is the only one in the room. (So if they aren't host, there's a bug)
-    //If they leave, the room closes. Hide the leave room button.
-    leaveRoomButton.style.display = "none";
+    if (obj.message.clients.length === 1) {
+      //This player is the only one in the room. (So if they aren't host, there's a bug)
+      //If they leave, the room closes. Hide the leave room button.
+      leaveRoomButton.style.display = "none";
+    } else if (obj.message.clients.length === 4) {
+      startGameButton.style.display = "";
+      addBotButton.style.display = "none";
+    }
   } else {
+    addBotButton.style.display = "none";
+    closeRoomButton.style.display = "none";
+    startGameButton.style.display = "none";
     leaveRoomButton.style.display = "";
   }
 
