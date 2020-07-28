@@ -159,7 +159,7 @@ function evaluateNextMove() {
 
 		if (strategy.throwSuit === strategy.suit && strategy.honors === false) {strategy.throwSuit = "honor"}
 
-		strategy.throw = breakdown[strategy.throwSuit].contents[0]
+		strategy.throw = breakdown[strategy.throwSuit]?.contents[0]
 
 		breakdown.tiles = []
 		breakdown.contents = []
