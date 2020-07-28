@@ -45,8 +45,8 @@ class Match {
 			return points
 		}
 
-		this.isDouble = function(userWind) {
-			if (this.amount === 2) {return false} //Pairs never give doubles.
+		this.isDouble = function(userWind, assumeNotPair = false) {
+			if (this.amount === 2 && !assumeNotPair) {return false} //Pairs never give doubles.
 			if (this.type === "dragon") {return true}
 			if (this.type === "wind" && this.value === userWind) {return true}
 			return false

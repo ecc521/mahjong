@@ -896,7 +896,9 @@ var Match = /*#__PURE__*/function () {
     };
 
     this.isDouble = function (userWind) {
-      if (this.amount === 2) {
+      var assumeNotPair = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+      if (this.amount === 2 && !assumeNotPair) {
         return false;
       } //Pairs never give doubles.
 

@@ -12,7 +12,7 @@ cd $HOME
 git clone https://github.com/ecc521/mahjong.git
 
 #Install NodeJS
-curl -sL https://deb.nodesource.com/setup_12.x | sudo bash -
+curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
 sudo apt-get install -y nodejs
 
 #Build mahjong

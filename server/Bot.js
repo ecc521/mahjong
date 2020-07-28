@@ -19,10 +19,20 @@ class Bot extends Client {
 
 			if (type === "roomActionState") {
 				//This should be the only type of message we need to listen to.
+
+				//So that we can restore if bot crashes weirdly. Only a problem if there are 3+ bots, as otherwise, the turn can't proceed before this executes.
+				let turnState = this.getRoom()?.gameData?.currentTurn?.turnChoices?.[clientId]
+				let handState = this.getRoom()?.gameData?.playerHands?.[clientId]
+
+				console.log(turnState, handState)
+
 				try {
 					this.evaluateNextMove()
 				}
 				catch (e) {
+					if (turnState) {this.getRoom().gameData.currentTurn.turnChoices[clientId] = turnState}
+					if (handState) {this.getRoom().gameData.playerHands[clientId] = handState}
+
 					console.log("FATAL BOT ERROR: " + e)
 					console.log(e.stack)
 					//Only send the message once every 60 seconds at most.
