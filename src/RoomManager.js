@@ -56,7 +56,7 @@ joinRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	if (nicknameInput.value.length > 20
+	if (nicknameInput.value.length > 18
 		&& !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")
 	) {return}
 	window.stateManager.joinRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
@@ -70,7 +70,7 @@ createRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	if (nicknameInput.value.length > 20
+	if (nicknameInput.value.length > 18
 		&& !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")
 	) {return}
 	window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
@@ -137,7 +137,9 @@ addBotButton.style.display = "none"
 inRoomContainer.appendChild(addBotButton)
 
 addBotButton.addEventListener("click", function() {
-	window.stateManager.addBot(prompt("Please enter a name for the bot: "))
+	let name = prompt("Please enter a name for the bot: ")
+	if (name.length > 18 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {return}
+	window.stateManager.addBot(name)
 })
 
 function renderPlayerView(clientList = [], kickUserCallback) {

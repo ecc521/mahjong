@@ -8569,7 +8569,7 @@ joinRoom.addEventListener("click", function () {
     return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show();
   }
 
-  if (nicknameInput.value.length > 20 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
+  if (nicknameInput.value.length > 18 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
     return;
   }
 
@@ -8584,7 +8584,7 @@ createRoom.addEventListener("click", function () {
     return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show();
   }
 
-  if (nicknameInput.value.length > 20 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
+  if (nicknameInput.value.length > 18 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
     return;
   }
 
@@ -8637,7 +8637,13 @@ addBotButton.id = "addBotButton";
 addBotButton.style.display = "none";
 inRoomContainer.appendChild(addBotButton);
 addBotButton.addEventListener("click", function () {
-  window.stateManager.addBot(prompt("Please enter a name for the bot: "));
+  var name = prompt("Please enter a name for the bot: ");
+
+  if (name.length > 18 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
+    return;
+  }
+
+  window.stateManager.addBot(name);
 });
 
 function renderPlayerView() {
