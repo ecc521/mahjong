@@ -41,9 +41,8 @@ function isCalling(discardPile, unlimitedSequences) {
 					arr[2-(item.value - tile.value)] = true
 				}
 			})
-			if (arr[0] && arr[1] || arr[3] && arr[4]) {passes = true}
+			if (arr[0] && arr[1] || arr[1] && arr[3] || arr[3] && arr[4]) {passes = true}
 		}
-
 		if (!passes) {
 			continue;
 		}

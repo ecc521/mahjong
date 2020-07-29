@@ -8458,7 +8458,7 @@ function isCalling(discardPile, unlimitedSequences) {
         }
       });
 
-      if (arr[0] && arr[1] || arr[3] && arr[4]) {
+      if (arr[0] && arr[1] || arr[1] && arr[3] || arr[3] && arr[4]) {
         passes = true;
       }
     }
