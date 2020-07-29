@@ -45,21 +45,32 @@ class Notification {
 	}
 }
 
+let previousMessagePromise = new Promise((resolve) =>{resolve()});
+
 class BlocklessAlert {
-	constructor(messageText, duration = 4000) {
+	constructor(messageText, duration = 3200) {
 		let cover = document.createElement("div")
 		cover.classList.add("blocklessAlertCover")
+		cover.style.display = "none"
 		document.body.appendChild(cover)
 
 		let message = document.createElement("p")
 		message.innerHTML = messageText
 		cover.appendChild(message)
 
-		cover.style.animation = "fadeInAndOut " + duration + "ms linear"
+		cover.style.animation = "fadeInAndOut " + duration + "ms ease-in"
 
-		setTimeout(function() {
-			cover.remove()
-		}, duration)
+		previousMessagePromise = new Promise((resolve) => {
+			previousMessagePromise.then(() => {
+				cover.style.display = ""
+				setTimeout(function() {
+					resolve()
+					cover.remove()
+				}, duration)
+			})
+		})
+
+		return previousMessagePromise
 	}
 }
 

@@ -5020,6 +5020,10 @@ $({ target: 'Array', proto: true, forced: !STRICT_METHOD || !USES_TO_LENGTH }, {
 
 __webpack_require__(174);
 
+__webpack_require__(36);
+
+__webpack_require__(149);
+
 __webpack_require__(45);
 
 __webpack_require__(131);
@@ -5075,24 +5079,36 @@ var Notification = function Notification(errorText, messageText) {
   };
 };
 
+var previousMessagePromise = new Promise(function (resolve) {
+  resolve();
+});
+
 var BlocklessAlert = /*#__PURE__*/function () {
   "use strict";
 
   function BlocklessAlert(messageText) {
-    var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 4000;
+    var duration = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 3200;
 
     _classCallCheck(this, BlocklessAlert);
 
     var cover = document.createElement("div");
     cover.classList.add("blocklessAlertCover");
+    cover.style.display = "none";
     document.body.appendChild(cover);
     var message = document.createElement("p");
     message.innerHTML = messageText;
     cover.appendChild(message);
-    cover.style.animation = "fadeInAndOut " + duration + "ms linear";
-    setTimeout(function () {
-      cover.remove();
-    }, duration);
+    cover.style.animation = "fadeInAndOut " + duration + "ms ease-in";
+    previousMessagePromise = new Promise(function (resolve) {
+      previousMessagePromise.then(function () {
+        cover.style.display = "";
+        setTimeout(function () {
+          resolve();
+          cover.remove();
+        }, duration);
+      });
+    });
+    return previousMessagePromise;
   }
 
   return BlocklessAlert;
@@ -8553,6 +8569,10 @@ joinRoom.addEventListener("click", function () {
     return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show();
   }
 
+  if (nicknameInput.value.length > 20 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
+    return;
+  }
+
   window.stateManager.joinRoom(roomIdInput.value.toLowerCase(), nicknameInput.value);
 });
 joinOrCreateRoom.appendChild(joinRoom);
@@ -8562,6 +8582,10 @@ createRoom.innerHTML = "Create Room";
 createRoom.addEventListener("click", function () {
   if (roomIdInput.value.trim().length === 0) {
     return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show();
+  }
+
+  if (nicknameInput.value.length > 20 && !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")) {
+    return;
   }
 
   window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value);

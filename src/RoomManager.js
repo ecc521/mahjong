@@ -56,6 +56,9 @@ joinRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show()
 	}
+	if (nicknameInput.value.length > 20
+		&& !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")
+	) {return}
 	window.stateManager.joinRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(joinRoom)
@@ -67,6 +70,9 @@ createRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
+	if (nicknameInput.value.length > 20
+		&& !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")
+	) {return}
 	window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(createRoom)
