@@ -34,7 +34,7 @@ function evaluateNextMove() {
 		//TODO: Need support for clearing to terminals (1s and 9s), even though it is somewhat rare.
 		//TODO: Also need to weigh 1s and 9s more highly than other tiles when choosing suits and what to throw.
 		//TODO: Also need to weigh dragons and own wind above other winds.
-		//TODO: Need to throw dead or nearly dead tiles sooner. 
+		//TODO: Need to throw dead or nearly dead tiles sooner.
 
 		let config = {
 			looseTileCost: 5, //We should cut this dramatically if we have yet to charleston. Probably pass around 2.
@@ -234,7 +234,7 @@ function evaluateNextMove() {
 
 		//Nothing we can do. Next.
 		currentHand.remove(gameData.currentTurn.thrown)
-		room.onNext({}, this.clientId)
+		placeTiles([])
 	}
 }
 

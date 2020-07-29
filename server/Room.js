@@ -17,6 +17,10 @@ class Room {
 		this.gameData = options.gameData || {}
 		this.hostClientId = options.hostClientId
 
+		this.state = {
+			moves: []
+		}
+
 		//If these are passed, they will be in a stringified form. Convert them back to normal.
 		if (this.gameData.wall) {
 			this.gameData.wall = Wall.fromJSON(this.gameData.wall)
@@ -437,7 +441,7 @@ class Room {
 			else {
 				this.clientIds.splice(clientIdIndex, 1)
 				if (this.hostClientId === clientId) {
-					//Choose a new host client. Make sure NOT to pick a bot. 
+					//Choose a new host client. Make sure NOT to pick a bot.
 					this.hostClientId = null;
 					this.clientIds.forEach(((clientId) => {
 						if (this.hostClientId) {return}
@@ -530,6 +534,8 @@ class Room {
 			console.log(obj, clientId)
 			let client = global.stateManager.getClient(clientId)
 			let hand = this.gameData.playerHands[clientId]
+
+			this.state.moves.push([obj, clientId])
 
 			let placement;
 			try {
@@ -671,6 +677,13 @@ class Room {
 					return client.message(obj.type, "Invalid placement attempt for current game status", "error")
 				}
 			}
+			else if (placement === undefined) {
+				if (this.gameData.charleston) {
+					return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You must choose 3 tiles to pass during charleston. ", "error")
+				}
+				this.gameData.currentTurn.turnChoices[clientId] = "Next"
+				this.sendStateToClients()
+			}
 			else {
 				//This is not a discard, and it related to a throw, so must either be a pong, kong, sequence, or a pair if the user is going mahjong.
 				if (!(placement instanceof Match || placement instanceof Sequence)) {
@@ -687,17 +700,6 @@ class Room {
 				this.gameData.currentTurn.turnChoices[clientId] = placement
 				this.sendStateToClients()
 			}
-		}).bind(this)
-
-		this.onNext = (function(obj, clientId) {
-			if (this.gameData.charleston) {
-				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "You can't \"Next\" a charleston. You must choose 3 tiles to pass. ", "error")
-			}
-			if (!this.gameData.currentTurn.thrown) {
-				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "There is currently nothing to next. ", "error")
-			}
-			this.gameData.currentTurn.turnChoices[clientId] = "Next"
-			this.sendStateToClients()
 		}).bind(this)
 
 		this.onIncomingMessage = (function(clientId, obj) {
@@ -755,10 +757,6 @@ class Room {
 				//Action to place tiles.
 				//Only current turn user can place.
 				return this.onPlace(obj, clientId)
-			}
-			else if (obj.type === "roomActionNextTurn") {
-				//Action to state next turn.
-				return this.onNext(obj, clientId)
 			}
 			else if (obj.type === "roomActionAddBot") {
 				if (!isHost) {

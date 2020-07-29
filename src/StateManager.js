@@ -152,14 +152,6 @@ class StateManager {
 			}))
 		}
 
-		this.nextTurn = function() {
-			this.sendMessage(JSON.stringify({
-				type: "roomActionNextTurn",
-				clientId: window.clientId,
-				roomId: window.stateManager.roomId
-			}))
-		}
-
 		this.addBot = function(botName) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionAddBot",

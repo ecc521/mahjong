@@ -117,13 +117,7 @@ placeTilesButton.addEventListener("click", function() {
 
 	//If the user has 0 tiles in placemat, or 1 tile, which is the thrown one, next turn.
 	if (placement.length === Number(placement.some((obj) => {return obj.evicting}))) {
-		window.stateManager.nextTurn()
-		return;
-	}
-
-	console.log(placement)
-	if (placement.length === 0) {
-		new Popups.Notification("Place Nothing???", "We suggest glasses. ").show()
+		window.stateManager.placeTiles([])
 		return;
 	}
 
@@ -330,7 +324,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 			//so we'll disable the option
 			goMahjongButton.disabled = "disabled"
 		}
-		
+
 		if (message.currentTurn.userTurn === window.clientId) {
 			userHand.renderPlacemat("pending")
 		}

@@ -4382,14 +4382,6 @@ var StateManager = /*#__PURE__*/function () {
       }));
     };
 
-    this.nextTurn = function () {
-      this.sendMessage(JSON.stringify({
-        type: "roomActionNextTurn",
-        clientId: window.clientId,
-        roomId: window.stateManager.roomId
-      }));
-    };
-
     this.addBot = function (botName) {
       this.sendMessage(JSON.stringify({
         type: "roomActionAddBot",
@@ -7218,14 +7210,7 @@ placeTilesButton.addEventListener("click", function () {
   if (placement.length === Number(placement.some(function (obj) {
     return obj.evicting;
   }))) {
-    window.stateManager.nextTurn();
-    return;
-  }
-
-  console.log(placement);
-
-  if (placement.length === 0) {
-    new Popups.Notification("Place Nothing???", "We suggest glasses. ").show();
+    window.stateManager.placeTiles([]);
     return;
   }
 
