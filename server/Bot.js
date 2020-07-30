@@ -17,6 +17,8 @@ class Bot extends Client {
 				_message(type, message, status)
 			}
 
+			if (!this.getRoom()) {return} //Room state adjustments. 
+
 			if (type === "roomActionState") {
 				//This should be the only type of message we need to listen to.
 
