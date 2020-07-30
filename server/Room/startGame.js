@@ -7,7 +7,19 @@ function startGame(obj) {
 		this.inGame = true
 		this.messageAll([], obj.type, "Game Started", "success")
 		//Build the wall.
-		this.gameData.wall = new Wall()
+		if (this.state.wall) {
+			this.gameData.wall = Wall.fromJSON(this.state.wall)
+		}
+		else {
+			this.gameData.wall = new Wall()
+		}
+
+		this.state.wall = this.gameData.wall.toJSON()
+		this.state.moves = []
+		this.state.clientIds = this.clientIds
+		this.state.hostClientId = this.hostClientId
+
+
 		this.gameData.discardPile = []
 		this.gameData.settings = {}
 		this.gameData.settings.unlimitedSequences = false
@@ -24,6 +36,8 @@ function startGame(obj) {
 			winds.splice(winds.indexOf("east"), 1) //Delete east wind option
 		}
 
+		let windAssignments = {}
+
 		for (let i=0;i<this.clientIds.length;i++) {
 			let clientId = this.clientIds[i]
 
@@ -35,8 +49,16 @@ function startGame(obj) {
 			else {
 				wind = winds.splice(Math.floor(Math.random() * winds.length), 1)[0]
 			}
+
+			//Overrule wind assignment from state.
+			if (this.state.windAssignments) {
+				wind = this.state.windAssignments[clientId]
+			}
+
 			let hand = new Hand({wind})
 			this.gameData.playerHands[clientId] = hand
+
+			windAssignments[clientId] = wind
 
 			let tileCount = 13
 			if (wind === "east") {
@@ -47,6 +69,8 @@ function startGame(obj) {
 				this.drawTile(clientId, false, true)
 			}
 		}
+
+		this.state.windAssignments = windAssignments
 
 		this.gameData.currentTurn = {
 			thrown: false,

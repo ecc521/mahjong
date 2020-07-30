@@ -179,7 +179,7 @@ function evaluateNextMove() {
 		if (strategy.throw instanceof Match) {strategy.throw = strategy.throw.getComponentTile()}
 
 		breakdown.strategy = strategy
-		console.log(breakdown)
+		//console.log(breakdown)
 		return breakdown
 	}
 

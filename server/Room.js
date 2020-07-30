@@ -6,23 +6,39 @@ const Pretty = require("../src/Pretty.js")
 const Sequence = require("../src/Sequence.js")
 
 class Room {
-	constructor(roomId, options = {}) {
+	constructor(roomId, state = {}) {
 		this.roomId = roomId
+
+		this.state = state
+		this.state.roomId = roomId
 
 		//TODO: Currently, clientId of other users is shown to users in the same room, allowing for impersonation. This needs to be fixed by using different identifiers.
 
-		this.clientIds = options.clientIds || []
-		this.inGame = options.inGame || false
-		this.roomCreated = options.roomCreated || Date.now()
-		this.gameData = options.gameData || {}
-		this.hostClientId = options.hostClientId
+		this.clientIds = this.state.clientIds || []
+		this.inGame = false
+		this.roomCreated = this.state.roomCreated || Date.now()
+		this.gameData = {}
+		this.hostClientId = this.state.hostClientId
 
-		this.state = {
-			moves: []
-		}
+		this.state.roomCreated = this.roomCreated
+
+		let loadState = (function loadState() {
+			//Called once all methods initialied.
+			if (this.state.wall) {
+				console.time("Loading Room State... ")
+				let _moves = this.state.moves
+				this.startGame({type: "roomActionStartGame"})
+				console.log(_moves)
+				//These moves are going to get added back in...
+				_moves.forEach((move) => {
+					this.onPlace(...move)
+				})
+				console.timeEnd("Loading Room State... ")
+			}
+		}).bind(this)
 
 		//If these are passed, they will be in a stringified form. Convert them back to normal.
-		if (this.gameData.wall) {
+		/*if (this.gameData.wall) {
 			this.gameData.wall = Wall.fromJSON(this.gameData.wall)
 		}
 
@@ -34,7 +50,7 @@ class Room {
 			for (let clientId in this.gameData.playerHands) {
 				this.gameData.playerHands[clientId] = Hand.fromString(this.gameData.playerHands[clientId])
 			}
-		}
+		}*/
 
 		this.startGame = (require("./Room/startGame.js")).bind(this)
 		this.addBot = (require("./Room/addBot.js")).bind(this)
@@ -348,13 +364,13 @@ class Room {
 			}).bind(this)
 		}
 
-		if (this.gameData.currentTurn) {
+		/*if (this.gameData.currentTurn) {
 			if (this.gameData.currentTurn.turnChoices) {
 				//TODO: We need to properly unstrignify turnChoices.
 				this.gameData.currentTurn.turnChoices = new Proxy(this.gameData.currentTurn.turnChoices, this.turnChoicesProxyHandler)
 			}
 			if (this.gameData.currentTurn.thrown) {this.gameData.currentTurn.thrown = Tile.fromJSON(this.gameData.currentTurn.thrown)}
-		}
+		}*/
 
 		let getState = (function getState(requestingClientId) {
 			//Generate the game state visible to requestingClientId
@@ -532,10 +548,11 @@ class Room {
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
 			console.log(obj, clientId)
+			this.state.moves.push([obj, clientId])
+			console.log(this.state.moves)
+
 			let client = global.stateManager.getClient(clientId)
 			let hand = this.gameData.playerHands[clientId]
-
-			this.state.moves.push([obj, clientId])
 
 			let placement;
 			try {
@@ -769,7 +786,7 @@ class Room {
 			}
 		}).bind(this)
 
-		this.toJSON = (function() {
+		/*this.toJSON = (function() {
 			let obj = {
 				roomId: this.roomId,
 				options: {
@@ -783,10 +800,18 @@ class Room {
 			console.log("Called")
 			console.log(JSON.stringify(obj))
 			return JSON.stringify(obj)
+		}).bind(this)*/
+
+		this.toJSON = (function() {
+			console.log("Called")
+			//console.log(JSON.stringify(this.state))
+			return JSON.stringify(this.state)
 		}).bind(this)
+
+		loadState()
 	}
 
-	static fromJSON(str, options = {}) {
+	/*static fromJSON(str, options = {}) {
 		let obj = JSON.parse(str)
 
 		if (!options.preverseRoomCreated) {
@@ -795,6 +820,11 @@ class Room {
 		}
 
 		return new Room(obj.roomId, obj.options)
+	}*/
+
+	static fromJSON(str) {
+		let obj = JSON.parse(str)
+		return new Room(obj.roomId, obj)
 	}
 }
 

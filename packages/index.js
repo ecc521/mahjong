@@ -8166,8 +8166,6 @@ function isMahjong(unlimitedSequences) {
   } //Now we need to go through our remaining tiles.
 
 
-  console.log(pongOrKong, sequences, pairs);
-  console.log(remainingTiles);
   var allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1));
   var possibleMatches = [];
   var possibleSequences = [];
@@ -8267,7 +8265,6 @@ function isMahjong(unlimitedSequences) {
   }
 
   neededPongEquivs -= pongOrKong;
-  console.log(neededPongEquivs);
 
   var _iterator = _createForOfIteratorHelper(generateCombinations(allPossibilities, neededPongEquivs)),
       _step;
@@ -8295,10 +8292,6 @@ function isMahjong(unlimitedSequences) {
   } finally {
     _iterator.f();
   }
-
-  console.log(possibleMatches);
-  console.log(possibleSequences);
-  console.log(combinations);
 
   combos: for (var _i2 = 0; _i2 < combinations.length; _i2++) {
     var combo = combinations[_i2];

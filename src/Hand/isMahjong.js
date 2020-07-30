@@ -44,8 +44,6 @@ function isMahjong(unlimitedSequences) {
 	}
 
 	//Now we need to go through our remaining tiles.
-	console.log(pongOrKong, sequences, pairs)
-	console.log(remainingTiles)
 	let allTiles = Hand.sortTiles(Wall.getNonPrettyTiles(1))
 	let possibleMatches = []
 	let possibleSequences = []
@@ -98,7 +96,6 @@ function isMahjong(unlimitedSequences) {
 		neededPongEquivs -= Math.min(sequences, 1)
 	}
 	neededPongEquivs -= pongOrKong
-	console.log(neededPongEquivs)
 
 	for (let combo of generateCombinations(allPossibilities, neededPongEquivs)) {
 		//Remove all combos that result in too many sequences, or that are obviously impossible.
@@ -110,10 +107,6 @@ function isMahjong(unlimitedSequences) {
 		}
 		combinations.push(combo);
 	}
-
-	console.log(possibleMatches)
-	console.log(possibleSequences)
-	console.log(combinations)
 
 	combos:
 	for (let i=0;i<combinations.length;i++) {

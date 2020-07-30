@@ -18,17 +18,14 @@ const Room = require("./server/Room.js")
 const Client = require("./server/Client.js")
 const StateManager = require("./server/StateManager.js")
 
-
+global.stateManager = new StateManager()
 if (process.argv.includes("--loadState")) {
 	let filePath = process.argv[process.argv.indexOf("--loadState") + 1]
 	if (filePath) {
 		let inputPath = path.join(serverDataDirectory, filePath) + ".mahjongServerState"
 		console.log("Loading state from " + inputPath)
-		global.stateManager = StateManager.fromJSON(fs.readFileSync(inputPath))
+		global.stateManager.init(fs.readFileSync(inputPath))
 	}
-}
-else {
-	global.stateManager = new StateManager()
 }
 
 function getMessage(type, message, status) {
@@ -106,8 +103,7 @@ websocketServer.on('connection', function connection(websocket) {
 				//The user did not specify a valid room to use, and was not in a room.
 				return websocket.send(getMessage(obj.type, "Room Does Not Exist", "error"))
 			}
-			console.log(room)
-			console.log(room.onIncomingMessage)
+			//console.log(room)
 			return room.onIncomingMessage(clientId, obj)
 		}
 

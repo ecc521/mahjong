@@ -24,7 +24,7 @@ class Bot extends Client {
 				let turnState = this.getRoom()?.gameData?.currentTurn?.turnChoices?.[clientId]
 				let handState = this.getRoom()?.gameData?.playerHands?.[clientId]
 
-				console.log(turnState, handState)
+				//console.log(turnState, handState)
 
 				try {
 					this.evaluateNextMove()

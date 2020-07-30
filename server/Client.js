@@ -20,7 +20,10 @@ class Client {
 		this.getNickname = function() {return this.nickname}
 
 		this.message = (function message(type, message, status) {
-			if (!this.websocket) {console.error("Error in Client.message - Client.websocket is undefined")} //This should only happen if we loaded from state, as we would for testing.
+			if (!this.websocket) {
+				//This should only happen if we loaded from state, as we would for testing.
+				return //console.error("Error in Client.message - Client.websocket is undefined")
+			}
 			try {
 				//Handle errors where the websocket connection has closed.
 				//We can probably do this simply by not sending the message, as the client should sync state if they disconnected.

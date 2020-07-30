@@ -56,6 +56,23 @@ class StateManager {
 			delete clients[clientId]
 		}
 
+		this.init = (function fromJSON(str) {
+			//Load clients and rooms from a saved state.
+			console.time("Initializing server state... ")
+			let obj = JSON.parse(str)
+			let loadClients = obj.clients
+			let loadRooms = obj.rooms
+
+			for (let clientId in loadClients) {
+				clients[clientId] = Client.fromJSON(loadClients[clientId])
+			}
+
+			for (let roomId in loadRooms) {
+				rooms[roomId] = Room.fromJSON(loadRooms[roomId])
+			}
+			console.timeEnd("Initializing server state... ")
+		}).bind(this)
+
 		this.toJSON = (function() {
 			//Convert our state to a string.
 			//Since both room and client objects have a toString method, we can do this quite easily with JSON.stringify
@@ -64,24 +81,6 @@ class StateManager {
 				clients
 			})
 		}).bind(this)
-	}
-
-	static fromJSON(str) {
-		//Create stateManager from a saved state.
-
-		let obj = JSON.parse(str)
-		let rooms = obj.rooms
-		let clients = obj.clients
-
-		for (let roomId in rooms) {
-			rooms[roomId] = Room.fromJSON(rooms[roomId])
-		}
-
-		for (let clientId in clients) {
-			clients[clientId] = Client.fromJSON(clients[clientId])
-		}
-
-		return new StateManager(rooms, clients)
 	}
 }
 
