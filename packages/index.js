@@ -4399,6 +4399,14 @@ var StateManager = /*#__PURE__*/function () {
       }));
     }.bind(this);
 
+    this.revertState = function (turns) {
+      this.sendMessage(JSON.stringify({
+        type: "roomActionRevertState",
+        message: turns,
+        clientId: window.clientId
+      }));
+    }.bind(this);
+
     this.getState = function (roomId) {
       console.log("Getting state...");
       this.sendMessage(JSON.stringify({
@@ -7200,6 +7208,17 @@ function createTilePlacemat() {
 
 var tilePlacemat = createTilePlacemat();
 gameBoard.appendChild(tilePlacemat);
+var revertStateButton = document.createElement("button");
+revertStateButton.id = "revertStateButton";
+revertStateButton.innerHTML = "Revert";
+gameBoard.appendChild(revertStateButton);
+revertStateButton.addEventListener("click", function () {
+  var res = prompt("How many moves (4 moves per turn) would you like to revert? You can always revert more if needed, but can't undo a revert. ");
+
+  if (res !== null && confirm("Are you sure you would like to revert the game state? Other players will be notified, so you should clear the revert with them. ")) {
+    window.stateManager.revertState(res);
+  }
+});
 var placeTilesButton = document.createElement("button");
 placeTilesButton.id = "placeTilesButton";
 placeTilesButton.innerHTML = "Proceed";

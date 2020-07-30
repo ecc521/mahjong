@@ -19,7 +19,12 @@ class Client {
 
 		this.getNickname = function() {return this.nickname}
 
+		this.suppressed = false
+		this.suppress = function() {this.suppressed = true}
+		this.unsuppress = function() {this.suppressed = false}
+
 		this.message = (function message(type, message, status) {
+			if (this.suppressed) {return}
 			if (!this.websocket) {
 				//This should only happen if we loaded from state, as we would for testing.
 				return //console.error("Error in Client.message - Client.websocket is undefined")

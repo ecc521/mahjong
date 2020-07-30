@@ -28,10 +28,9 @@ class StateManager {
 			return rooms[roomId]
 		}
 
-		this.createRoom = function(roomId) {
+		this.createRoom = function(roomId, room = new Room(roomId)) {
 			if (rooms[roomId]) {return false} //Room already exists.
-			rooms[roomId] = new Room(roomId)
-			return rooms[roomId]
+			return rooms[roomId] = room
 		}
 
 		this.deleteRoom = function(roomId) {

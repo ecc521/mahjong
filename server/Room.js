@@ -26,6 +26,12 @@ class Room {
 			//Called once all methods initialied.
 			if (this.state.wall) {
 				console.time("Loading Room State... ")
+
+				//Make sure we don't blast all the clients with repeat messages.
+				this.clientIds.forEach((clientId) => {
+					global.stateManager.getClient(clientId).suppress()
+				})
+
 				let _moves = this.state.moves
 				this.startGame({type: "roomActionStartGame"})
 				console.log(_moves)
@@ -33,24 +39,15 @@ class Room {
 				_moves.forEach((move) => {
 					this.onPlace(...move)
 				})
+				
+				this.clientIds.forEach((clientId) => {
+					global.stateManager.getClient(clientId).unsuppress()
+				})
+
+				this.sendStateToClients()
 				console.timeEnd("Loading Room State... ")
 			}
 		}).bind(this)
-
-		//If these are passed, they will be in a stringified form. Convert them back to normal.
-		/*if (this.gameData.wall) {
-			this.gameData.wall = Wall.fromJSON(this.gameData.wall)
-		}
-
-		if (this.gameData.discardPile) {
-			this.gameData.discardPile = this.gameData.discardPile.map((str) => {return Tile.fromJSON(str)})
-		}
-
-		if (this.gameData.playerHands) {
-			for (let clientId in this.gameData.playerHands) {
-				this.gameData.playerHands[clientId] = Hand.fromString(this.gameData.playerHands[clientId])
-			}
-		}*/
 
 		this.startGame = (require("./Room/startGame.js")).bind(this)
 		this.addBot = (require("./Room/addBot.js")).bind(this)
@@ -93,6 +90,13 @@ class Room {
 
 			this.messageAll([], "roomActionMahjong", getSummary(clientId, drewOwnTile), "success")
 			this.sendStateToClients()
+		}).bind(this)
+
+		this.revertState = (function(moveCount) {
+			//Reverts state, removing moveCount moves
+			global.stateManager.deleteRoom(this.roomId)
+			this.state.moves = this.state.moves.slice(0, -moveCount)
+			global.stateManager.createRoom(this.roomId, new Room(this.roomId, this.state))
 		}).bind(this)
 
 		this.turnChoicesProxyHandler = {
@@ -363,14 +367,6 @@ class Room {
 				return true
 			}).bind(this)
 		}
-
-		/*if (this.gameData.currentTurn) {
-			if (this.gameData.currentTurn.turnChoices) {
-				//TODO: We need to properly unstrignify turnChoices.
-				this.gameData.currentTurn.turnChoices = new Proxy(this.gameData.currentTurn.turnChoices, this.turnChoicesProxyHandler)
-			}
-			if (this.gameData.currentTurn.thrown) {this.gameData.currentTurn.thrown = Tile.fromJSON(this.gameData.currentTurn.thrown)}
-		}*/
 
 		let getState = (function getState(requestingClientId) {
 			//Generate the game state visible to requestingClientId
@@ -781,26 +777,17 @@ class Room {
 				}
 				return this.addBot(obj)
 			}
+			else if (obj.type === "roomActionRevertState") {
+				if (!isNaN(obj.message)) {
+					this.messageAll([], "roomActionGameplayAlert", client.getNickname() + " is reverting the state " + Number(obj.message) + " moves. ", "success" )
+					return this.revertState(Number(obj.message))
+				}
+				return client.message("roomActionGameplayAlert", "Invalid Reversion Amount", "error")
+			}
 			else if (obj.type === "roomActionState") {
 				return client.message(obj.type, getState(clientId), "success")
 			}
 		}).bind(this)
-
-		/*this.toJSON = (function() {
-			let obj = {
-				roomId: this.roomId,
-				options: {
-					gameData: this.gameData,
-					roomCreated: this.roomCreated,
-					inGame: this.inGame,
-					clientIds: this.clientIds,
-					hostClientId: this.hostClientId
-				}
-			}
-			console.log("Called")
-			console.log(JSON.stringify(obj))
-			return JSON.stringify(obj)
-		}).bind(this)*/
 
 		this.toJSON = (function() {
 			console.log("Called")
@@ -810,17 +797,6 @@ class Room {
 
 		loadState()
 	}
-
-	/*static fromJSON(str, options = {}) {
-		let obj = JSON.parse(str)
-
-		if (!options.preverseRoomCreated) {
-			//Default is to not preserve the game created time.
-			delete obj.options.roomCreated
-		}
-
-		return new Room(obj.roomId, obj.options)
-	}*/
 
 	static fromJSON(str) {
 		let obj = JSON.parse(str)

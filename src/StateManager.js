@@ -169,6 +169,14 @@ class StateManager {
 			}))
 		}).bind(this)
 
+		this.revertState = (function(turns) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionRevertState",
+				message: turns,
+				clientId: window.clientId
+			}))
+		}).bind(this)
+
 		this.getState = function(roomId) {
 			console.log("Getting state...")
 			this.sendMessage(JSON.stringify({
