@@ -12,12 +12,12 @@ class Bot extends Client {
 
 		let lastSent;
 		this.message = (function message(type, message, status) {
+			if (this.suppressed) {return} //Isn't really neccessary, as the bot should never receive roomActionState while suppressed, however a good measure. 
+
 			if (this.websocket) {
 				//Bot being manually controlled.
 				_message(type, message, status)
 			}
-
-			if (!this.getRoom()) {return} //Room state adjustments. 
 
 			if (type === "roomActionState") {
 				//This should be the only type of message we need to listen to.

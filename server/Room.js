@@ -7,6 +7,7 @@ const Sequence = require("../src/Sequence.js")
 
 class Room {
 	constructor(roomId, state = {}) {
+		//Note: If loading from state, this.init() must be called.
 		this.roomId = roomId
 
 		this.state = state
@@ -23,7 +24,6 @@ class Room {
 		this.state.roomCreated = this.roomCreated
 
 		let loadState = (function loadState() {
-			//Called once all methods initialied.
 			if (this.state.wall) {
 				console.time("Loading Room State... ")
 
@@ -39,15 +39,18 @@ class Room {
 				_moves.forEach((move) => {
 					this.onPlace(...move)
 				})
-				
+
 				this.clientIds.forEach((clientId) => {
 					global.stateManager.getClient(clientId).unsuppress()
 				})
 
 				this.sendStateToClients()
+				delete this.init
 				console.timeEnd("Loading Room State... ")
 			}
 		}).bind(this)
+
+		this.init = loadState
 
 		this.startGame = (require("./Room/startGame.js")).bind(this)
 		this.addBot = (require("./Room/addBot.js")).bind(this)
@@ -96,7 +99,9 @@ class Room {
 			//Reverts state, removing moveCount moves
 			global.stateManager.deleteRoom(this.roomId)
 			this.state.moves = this.state.moves.slice(0, -moveCount)
-			global.stateManager.createRoom(this.roomId, new Room(this.roomId, this.state))
+			let room = new Room(this.roomId, this.state)
+			global.stateManager.createRoom(this.roomId, room)
+			room.init()
 		}).bind(this)
 
 		this.turnChoicesProxyHandler = {
@@ -794,8 +799,6 @@ class Room {
 			//console.log(JSON.stringify(this.state))
 			return JSON.stringify(this.state)
 		}).bind(this)
-
-		loadState()
 	}
 
 	static fromJSON(str) {

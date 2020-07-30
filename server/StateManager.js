@@ -68,6 +68,7 @@ class StateManager {
 
 			for (let roomId in loadRooms) {
 				rooms[roomId] = Room.fromJSON(loadRooms[roomId])
+				rooms[roomId].init()
 			}
 			console.timeEnd("Initializing server state... ")
 		}).bind(this)
