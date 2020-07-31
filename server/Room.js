@@ -66,7 +66,7 @@ class Room {
 					global.stateManager.getClient(clientId).suppress()
 				})
 
-				let _moves = this.state.moves
+				let _moves = this.state.moves.slice(0)
 				this.startGame({type: "roomActionStartGame"})
 				console.log(_moves)
 				//These moves are going to get added back in...
