@@ -8642,6 +8642,9 @@ addBotButton.addEventListener("click", function () {
 
   window.stateManager.addBot(name);
 });
+var roomSaveIdElem = document.createElement("p");
+roomSaveIdElem.id = "roomSaveIdElem";
+inRoomContainer.appendChild(roomSaveIdElem);
 
 function renderPlayerView() {
   var clientList = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
@@ -8730,6 +8733,7 @@ window.stateManager.onLeaveRoom = function (obj) {
 window.stateManager.addEventListener("onStateUpdate", function (obj) {
   console.log(obj);
   playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present";
+  roomSaveIdElem.innerHTML = "Game progress will be saved at " + obj.message.saveId;
 
   if (window.stateManager.isHost) {
     startGameButton.style.display = "none";

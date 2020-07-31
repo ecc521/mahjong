@@ -2,6 +2,10 @@ const Room = require("./Room.js")
 const Client = require("./Client.js")
 const Bot = require("./Bot.js")
 
+//For state saving.
+const fs = require("fs")
+const path = require("path")
+
 class StateManager {
 	constructor(rooms = {}, clients = {}) {
 
@@ -32,6 +36,18 @@ class StateManager {
 			if (rooms[roomId]) {return false} //Room already exists.
 			return rooms[roomId] = room
 		}
+
+		this.writeRoomState = (function(roomId) {
+			if (!this.serverDataDirectory) {console.warn("No server data directory. ")}
+			let room = rooms[roomId]
+			try {
+				//Write state to disk.
+				let filePath = path.join(this.serverDataDirectory, room.saveId + ".room.json")
+				console.log("Saved room to " + filePath)
+				fs.writeFileSync(filePath, JSON.stringify(room))
+			}
+			catch(e) {console.error(e)}
+		}).bind(this)
 
 		this.deleteRoom = function(roomId) {
 			delete rooms[roomId]
@@ -69,6 +85,7 @@ class StateManager {
 			for (let roomId in loadRooms) {
 				rooms[roomId] = Room.fromJSON(loadRooms[roomId])
 				rooms[roomId].init()
+				console.log(global.stateManager.getRoom(roomId))
 			}
 			console.timeEnd("Initializing server state... ")
 		}).bind(this)

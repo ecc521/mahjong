@@ -142,6 +142,10 @@ addBotButton.addEventListener("click", function() {
 	window.stateManager.addBot(name)
 })
 
+let roomSaveIdElem = document.createElement("p")
+roomSaveIdElem.id = "roomSaveIdElem"
+inRoomContainer.appendChild(roomSaveIdElem)
+
 function renderPlayerView(clientList = [], kickUserCallback) {
 	while (playerView.firstChild) {playerView.firstChild.remove()}
 
@@ -232,6 +236,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	console.log(obj)
 
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
+	roomSaveIdElem.innerHTML = "Game progress will be saved at " + obj.message.saveId
 
 	if (window.stateManager.isHost) {
 		startGameButton.style.display = "none"

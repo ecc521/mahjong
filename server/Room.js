@@ -12,16 +12,50 @@ class Room {
 
 		this.state = state
 		this.state.roomId = roomId
-
+		console.log(state)
 		//TODO: Currently, clientId of other users is shown to users in the same room, allowing for impersonation. This needs to be fixed by using different identifiers.
 
 		this.clientIds = this.state.clientIds || []
 		this.inGame = false
-		this.roomCreated = this.state.roomCreated || Date.now()
+		this.state.gameReady = this.gameReady = this.state.gameReady || Date.now() //For save key
 		this.gameData = {}
+
+		Object.defineProperty(this, "saveId", {
+			get: (function() {
+				return this.roomId + "-" + this.gameReady
+			}).bind(this)
+		})
+
+		let updateState = (function update() {
+			this.state.clientIds = this.clientIds
+			global.stateManager.writeRoomState(this.roomId)
+		}).bind(this)
+
+		let updateStateProxy = {
+			deleteProperty: (function(target, property) {
+				updateState()
+				return true;
+			}).bind(this),
+			set: (function(target, property, value, receiver) {
+				target[property] = value;
+				updateState()
+				return true;
+			}).bind(this)
+		}
+
+		let _hostClientId;
+		Object.defineProperty(this, "hostClientId", {
+			set: function(id) {
+				_hostClientId = id
+				this.state.hostClientId = id
+				updateState()
+			},
+			get: function() {return _hostClientId}
+		})
 		this.hostClientId = this.state.hostClientId
 
-		this.state.roomCreated = this.roomCreated
+		this.state.moves = new Proxy(this.state.moves || [], updateStateProxy);
+		this.clientIds = new Proxy(this.clientIds, updateStateProxy);
 
 		let loadState = (function loadState() {
 			if (this.state.wall) {
@@ -387,6 +421,7 @@ class Room {
 			}
 
 			state.discardPile = this.gameData.discardPile
+			state.saveId = this.saveId
 
 			if (this.gameData.currentTurn) {
 				state.currentTurn = {
@@ -541,6 +576,7 @@ class Room {
 				gameEndMessage = "The game has been ended by " + clientId + ", who goes by the name of " + client.getNickname() + "."
 			}
 			this.inGame = false
+			this.state.gameReady = this.gameReady = Date.now() //Adjust save key.
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
 			this.messageAll([], obj.type, gameEndMessage, "success")
 			this.sendStateToClients()
@@ -767,6 +803,7 @@ class Room {
 					return client.message(obj.type, "Only Host Can Close Room", "error")
 				}
 				this.clientIds.slice(0).forEach((clientId) => {
+					//Clone array to avoid shifting.
 					this.removeClient(clientId, "The room has been closed. ")
 				})
 				global.stateManager.deleteRoom(this.roomId)
@@ -801,8 +838,9 @@ class Room {
 		}).bind(this)
 	}
 
-	static fromJSON(str) {
+	static fromJSON(str, keepGameStarted = false) {
 		let obj = JSON.parse(str)
+		if (!keepGameStarted) {delete obj.gameReady}
 		return new Room(obj.roomId, obj)
 	}
 }

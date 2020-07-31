@@ -19,10 +19,11 @@ const Client = require("./server/Client.js")
 const StateManager = require("./server/StateManager.js")
 
 global.stateManager = new StateManager()
+global.stateManager.serverDataDirectory = serverDataDirectory
 if (process.argv.includes("--loadState")) {
 	let filePath = process.argv[process.argv.indexOf("--loadState") + 1]
 	if (filePath) {
-		let inputPath = path.join(serverDataDirectory, filePath) + ".mahjongServerState"
+		let inputPath = path.join(serverDataDirectory, filePath) + ".server.json"
 		console.log("Loading state from " + inputPath)
 		global.stateManager.init(fs.readFileSync(inputPath))
 	}
@@ -92,6 +93,7 @@ websocketServer.on('connection', function connection(websocket) {
 			}
 		}
 		else if (obj.type === "getCurrentRoom") {
+			console.log(client.getRoomId())
 			let roomId = client.getRoomId()
 			client.message(obj.type, roomId, "success")
 			return websocket.send(getMessage(obj.type, roomId, "success"))
@@ -115,7 +117,7 @@ websocketServer.on('connection', function connection(websocket) {
 process.stdin.on("data", function(data) {
 	let command = data.toString()
 	if (command.startsWith("save ")) {
-		let filePath = command.trim().slice(5) + ".mahjongServerState"
+		let filePath = command.trim().slice(5) + ".server.json"
 		let outputPath = path.join(serverDataDirectory, filePath)
 		fs.writeFileSync(outputPath, stateManager.toJSON())
 		console.log("State saved to " + outputPath)

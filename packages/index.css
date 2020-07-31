@@ -119,6 +119,10 @@
 	text-align: center;
 }
 
+#roomManager #roomSaveIdElem {
+	text-align: center; 
+}
+
 #roomManager .playerViewKickButton {
 	background: linear-gradient(45deg, #f23f3f,#eeb972);
 	border-radius: 10vh;
