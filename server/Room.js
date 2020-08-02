@@ -62,7 +62,7 @@ class Room {
 		let loadState = (function loadState() {
 			if (this.state.wall) {
 				console.time("Loading Room State... ")
-				writeStateSuspend = true //Suspend disk writes while loading. 
+				writeStateSuspend = true //Suspend disk writes while loading.
 
 				//Make sure we don't blast all the clients with repeat messages.
 				this.clientIds.forEach(((clientId) => {
@@ -423,7 +423,7 @@ class Room {
 			if (this.gameData.wall) {
 				//Pass tiles if mahjong, else number of tiles.
 				state.wallTiles = this.gameData.wall.tiles
-				if (!this.gameData.isMahjong && state.wallTiles.length !== 0) {
+				if (!this.gameData.isMahjong) {
 					state.wallTiles = state.wallTiles.length
 				}
 			}
@@ -457,7 +457,7 @@ class Room {
 						visibleClientState.hand = hand
 					}
 					else {
-						if (!this.gameData.isMahjong) {
+						if (!this.gameData.isMahjong && !this.gameData.wall.isEmpty) {
 							//One can only see exposed tiles of other players. True says to include other tiles as face down.
 							visibleClientState.visibleHand = hand.getExposedTiles(true)
 						}
@@ -558,6 +558,7 @@ class Room {
 							}
 						}
 					}
+					this.gameData.wall.isEmpty = true
 					this.sendStateToClients() //Game over. Wall empty.
 					return
 				}
