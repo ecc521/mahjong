@@ -4333,7 +4333,6 @@ var StateManager = /*#__PURE__*/function () {
       this.sendMessage(JSON.stringify({
         type: "roomActionKickFromRoom",
         clientId: window.clientId,
-        roomId: roomId,
         id: userId ///id of user to kick.
 
       }));
@@ -4342,32 +4341,28 @@ var StateManager = /*#__PURE__*/function () {
     this.leaveRoom = function (roomId) {
       this.sendMessage(JSON.stringify({
         type: "roomActionLeaveRoom",
-        clientId: window.clientId,
-        roomId: roomId
+        clientId: window.clientId
       }));
     };
 
     this.closeRoom = function (roomId) {
       this.sendMessage(JSON.stringify({
         type: "roomActionCloseRoom",
-        clientId: window.clientId,
-        roomId: roomId
+        clientId: window.clientId
       }));
     };
 
     this.startGame = function (roomId) {
       this.sendMessage(JSON.stringify({
         type: "roomActionStartGame",
-        clientId: window.clientId,
-        roomId: roomId
+        clientId: window.clientId
       }));
     };
 
     this.endGame = function () {
       this.sendMessage(JSON.stringify({
         type: "roomActionEndGame",
-        clientId: window.clientId,
-        roomId: window.stateManager.roomId
+        clientId: window.clientId
       }));
     };
 
@@ -4376,7 +4371,6 @@ var StateManager = /*#__PURE__*/function () {
       this.sendMessage(JSON.stringify({
         type: "roomActionPlaceTiles",
         clientId: window.clientId,
-        roomId: window.stateManager.roomId,
         mahjong: mahjong,
         message: tiles
       }));
@@ -4386,7 +4380,6 @@ var StateManager = /*#__PURE__*/function () {
       this.sendMessage(JSON.stringify({
         type: "roomActionAddBot",
         clientId: window.clientId,
-        roomId: window.stateManager.roomId,
         botName: botName
       }));
     };
@@ -4407,12 +4400,20 @@ var StateManager = /*#__PURE__*/function () {
       }));
     }.bind(this);
 
+    this.createRoomFromState = function (saveId) {
+      //Intended for developer use.
+      this.sendMessage(JSON.stringify({
+        type: "createRoomFromState",
+        saveId: saveId,
+        clientId: window.clientId
+      }));
+    }.bind(this);
+
     this.getState = function (roomId) {
       console.log("Getting state...");
       this.sendMessage(JSON.stringify({
         type: "roomActionState",
-        clientId: window.clientId,
-        roomId: roomId
+        clientId: window.clientId
       }));
     };
 

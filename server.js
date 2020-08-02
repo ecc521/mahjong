@@ -56,7 +56,13 @@ websocketServer.on('connection', function connection(websocket) {
 		else {
 			clientId = obj.clientId
 			if (!global.stateManager.getClient(clientId)) {
-				client = global.stateManager.createClient(clientId, websocket)
+				if (clientId.startsWith("bot")) {
+					//Intended for dev use. 
+					client = global.stateManager.createBot(clientId, websocket)
+				}
+				else {
+					client = global.stateManager.createClient(clientId, websocket)
+				}
 			}
 			else {
 				client = global.stateManager.getClient(clientId)
@@ -97,6 +103,22 @@ websocketServer.on('connection', function connection(websocket) {
 			let roomId = client.getRoomId()
 			client.message(obj.type, roomId, "success")
 			return websocket.send(getMessage(obj.type, roomId, "success"))
+		}
+		else if (obj.type === "createRoomFromState") {
+			//Intended for developer use.
+			try {
+				let roomFilePath = path.join(serverDataDirectory, obj.saveId + ".room.json")
+
+				if (fs.existsSync(roomFilePath)) {
+					//Technically roomPath could be a ../ path, however this kind of "hacking" shouldn't do any damage here. We don't write or expose non-mahjong data.
+					let room = Room.fromJSON(fs.readFileSync(roomFilePath, {encoding: "utf8"}))
+					let roomId = room.roomId
+					if (!global.stateManager.createRoom(roomId, room)) {return console.warn("Room already exists. ")}
+					room.init()
+				}
+			}
+			catch(e) {console.error(e)}
+			return;
 		}
 		else if (obj.type.includes("roomAction")) {
 			//The user is in a room, and this action will be handled by the room.

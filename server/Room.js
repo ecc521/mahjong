@@ -26,8 +26,10 @@ class Room {
 			}).bind(this)
 		})
 
+		let writeStateSuspend = false //Suspend disk writes
 		let updateState = (function update() {
 			this.state.clientIds = this.clientIds
+			if (writeStateSuspend) {return}
 			global.stateManager.writeRoomState(this.roomId)
 		}).bind(this)
 
@@ -60,16 +62,20 @@ class Room {
 		let loadState = (function loadState() {
 			if (this.state.wall) {
 				console.time("Loading Room State... ")
+				writeStateSuspend = true //Suspend disk writes while loading. 
 
 				//Make sure we don't blast all the clients with repeat messages.
-				this.clientIds.forEach((clientId) => {
-					global.stateManager.getClient(clientId).suppress()
-				})
+				this.clientIds.forEach(((clientId) => {
+					let client = global.stateManager.getClient(clientId)
+					client.suppress()
+					if (client.getRoomId() === undefined) {client.setRoomId(this.roomId)}
+				}).bind(this))
 
 				let _moves = this.state.moves.slice(0)
 				this.startGame({type: "roomActionStartGame"})
 				console.log(_moves)
 				//These moves are going to get added back in...
+
 				_moves.forEach((move) => {
 					this.onPlace(...move)
 				})
@@ -77,6 +83,8 @@ class Room {
 				this.clientIds.forEach((clientId) => {
 					global.stateManager.getClient(clientId).unsuppress()
 				})
+
+				writeStateSuspend = false
 
 				this.sendStateToClients()
 				delete this.init
@@ -577,6 +585,9 @@ class Room {
 			}
 			this.inGame = false
 			this.state.gameReady = this.gameReady = Date.now() //Adjust save key.
+			this.state.moves = []
+			delete this.state.wall
+			delete this.state.windAssignments
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
 			this.messageAll([], obj.type, gameEndMessage, "success")
 			this.sendStateToClients()
@@ -840,6 +851,7 @@ class Room {
 
 	static fromJSON(str, keepGameStarted = false) {
 		let obj = JSON.parse(str)
+		if (typeof obj === "string") {obj = JSON.parse(obj)} //Allow loading state files created with leading quotes.
 		if (!keepGameStarted) {delete obj.gameReady}
 		return new Room(obj.roomId, obj)
 	}

@@ -1,8 +1,8 @@
 const Client = require("./Client.js")
 
 class Bot extends Client {
-	constructor(clientId) {
-		super(clientId)
+	constructor(clientId, websocket) {
+		super(clientId, websocket)
 
 		this.isBot = true
 
@@ -12,7 +12,7 @@ class Bot extends Client {
 
 		let lastSent;
 		this.message = (function message(type, message, status) {
-			if (this.suppressed) {return} //Isn't really neccessary, as the bot should never receive roomActionState while suppressed, however a good measure. 
+			if (this.suppressed) {return} //Isn't really neccessary, as the bot should never receive roomActionState while suppressed, however a good measure.
 
 			if (this.websocket) {
 				//Bot being manually controlled.
@@ -21,6 +21,10 @@ class Bot extends Client {
 
 			if (type === "roomActionState") {
 				//This should be the only type of message we need to listen to.
+
+				if (this.getRoom().gameData.isMahjong) {
+					return //The room is mahjong, nothing we should do.
+				}
 
 				//So that we can restore if bot crashes weirdly. Only a problem if there are 3+ bots, as otherwise, the turn can't proceed before this executes.
 				let turnState = this.getRoom()?.gameData?.currentTurn?.turnChoices?.[clientId]

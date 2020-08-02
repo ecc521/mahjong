@@ -105,7 +105,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionKickFromRoom",
 				clientId: window.clientId,
-				roomId,
 				id: userId ///id of user to kick.
 			}))
 		}
@@ -114,7 +113,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionLeaveRoom",
 				clientId: window.clientId,
-				roomId,
 			}))
 		}
 
@@ -122,7 +120,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionCloseRoom",
 				clientId: window.clientId,
-				roomId,
 			}))
 		}
 
@@ -130,7 +127,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionStartGame",
 				clientId: window.clientId,
-				roomId,
 			}))
 		}
 
@@ -138,7 +134,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionEndGame",
 				clientId: window.clientId,
-				roomId: window.stateManager.roomId,
 			}))
 		}
 
@@ -146,7 +141,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionPlaceTiles",
 				clientId: window.clientId,
-				roomId: window.stateManager.roomId,
 				mahjong,
 				message: tiles,
 			}))
@@ -156,7 +150,6 @@ class StateManager {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionAddBot",
 				clientId: window.clientId,
-				roomId: window.stateManager.roomId,
 				botName: botName
 			}))
 		}
@@ -177,12 +170,21 @@ class StateManager {
 			}))
 		}).bind(this)
 
+		this.createRoomFromState = (function(saveId) {
+			//Intended for developer use.
+			this.sendMessage(JSON.stringify({
+				type: "createRoomFromState",
+				saveId: saveId,
+				clientId: window.clientId
+			}))
+		}).bind(this)
+
+
 		this.getState = function(roomId) {
 			console.log("Getting state...")
 			this.sendMessage(JSON.stringify({
 				type: "roomActionState",
 				clientId: window.clientId,
-				roomId,
 			}))
 		}
 
