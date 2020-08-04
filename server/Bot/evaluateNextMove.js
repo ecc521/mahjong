@@ -156,18 +156,25 @@ function evaluateNextMove() {
 					key, standardTypes[key].value + standardTypes[key].weight
 				])
 			}
-			strategy.results = results
-			results.sort((a, b) => {return b[1] - a[1]}) //Highest value suits first.
-			strategy.suit = results[0][0]
-			strategy.throwSuit = results[results.length - 1][0]
+			if (results.length !== 0) {
+				strategy.results = results
+				results.sort((a, b) => {return b[1] - a[1]}) //Highest value suits first.
+				strategy.suit = results[0][0]
+				strategy.throwSuit = results[results.length - 1][0]
 
-			//TODO: Only choose secondary suit if it would NOT result in breaking up a pong, etc.
-			if (config.chooseSecondarySuit && results.length === 3) {
-				strategy.throwSuit = results[1][0]
+				//TODO: Only choose secondary suit if it would NOT result in breaking up a pong, etc.
+				if (config.chooseSecondarySuit && results.length === 3) {
+					strategy.throwSuit = results[1][0]
+				}
+			}
+			else {
+				//We have no normal suits. Honors for now.
+				strategy.suit = "honor"
+				strategy.throwSuit = "honor"
 			}
 		}
 
-		if (breakdown.honor.value + breakdown.honor.weight > standardTypes[strategy.suit].value / 2) {strategy.honors = true}
+		if (strategy.suit !== "honor" && breakdown.honor.value + breakdown.honor.weight > standardTypes[strategy.suit].value / 2) {strategy.honors = true}
 
 		if (strategy.throwSuit === strategy.suit && strategy.honors === false) {strategy.throwSuit = "honor"}
 
