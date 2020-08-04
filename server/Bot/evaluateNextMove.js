@@ -64,7 +64,14 @@ function evaluateNextMove() {
 			arr.sort((a, b) => {
 				return getValue(a) - getValue(b)
 			})
-			arr = arr.filter((a) => {return !a.exposed})
+			arr = arr.filter((a) => {
+				if (!a.isGenerated && a instanceof Match) {return false}
+				else {
+					delete a.isGenerated
+					return true;
+				}
+			})
+			return arr
 		}
 
 		for (let type in breakdown) {
@@ -79,7 +86,9 @@ function evaluateNextMove() {
 				;[4,3,2].forEach(((amount) => {
 					if (generationHand.removeMatchingTilesFromHand(tile, amount)) {
 						i-- //Counteract position shifting.
-						generationHand.contents.push(new Match({amount, type: tile.type, value: tile.value, exposed: false}))
+						let item = new Match({amount, type: tile.type, value: tile.value, exposed: false})
+						item.isGenerated = true
+						generationHand.contents.push(item)
 					}
 				}).bind(this))
 			}
@@ -123,7 +132,7 @@ function evaluateNextMove() {
 				contents: generationHand.contents
 			})
 
-			prepForSelection(obj.contents)
+			obj.contents = prepForSelection(obj.contents)
 
 			breakdown[type] = obj
 		}
@@ -141,6 +150,8 @@ function evaluateNextMove() {
 		else {
 			let results = []
 			for (let key in standardTypes) {
+				//If contents does not exist, or is empty, omit type from consideration. There is nothing we can throw, as all tiles are exposed.
+				if (standardTypes[key].contents.length === 0) {continue}
 				results.push([
 					key, standardTypes[key].value + standardTypes[key].weight
 				])
@@ -156,11 +167,11 @@ function evaluateNextMove() {
 			}
 		}
 
-		if (breakdown.honor.value > standardTypes[strategy.suit] / 3) {strategy.honors = true}
+		if (breakdown.honor.value + breakdown.honor.weight > standardTypes[strategy.suit].value / 2) {strategy.honors = true}
 
 		if (strategy.throwSuit === strategy.suit && strategy.honors === false) {strategy.throwSuit = "honor"}
 
-		strategy.throw = breakdown[strategy.throwSuit]?.contents[0]
+		strategy.throw = breakdown[strategy.throwSuit]?.contents?.[0]
 
 		breakdown.tiles = []
 		breakdown.contents = []
@@ -172,14 +183,13 @@ function evaluateNextMove() {
 
 		if (!strategy.throw) {
 			console.warn("WARNING: A throw was not found through normal measures. Picking tile to avoid crash. ")
-			prepForSelection(breakdown.contents)
+			breakdown.contents = prepForSelection(breakdown.contents)
 			strategy.throw = breakdown.contents[0]
 		}
 
 		if (strategy.throw instanceof Match) {strategy.throw = strategy.throw.getComponentTile()}
 
 		breakdown.strategy = strategy
-		//console.log(breakdown)
 		return breakdown
 	}
 

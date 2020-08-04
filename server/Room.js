@@ -598,7 +598,6 @@ class Room {
 			//Obj.message - a Tile, Match, or Sequence
 			console.log(obj, clientId)
 			this.state.moves.push([obj, clientId])
-			console.log(this.state.moves)
 
 			let client = global.stateManager.getClient(clientId)
 			let hand = this.gameData.playerHands[clientId]
