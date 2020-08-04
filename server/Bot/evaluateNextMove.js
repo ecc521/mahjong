@@ -209,11 +209,6 @@ function evaluateNextMove() {
 		return breakdown
 	}
 
-
-
-	////Tiles in the hand - this is what we control.
-	//let tiles = currentHand.contents.filter((item) => {return (item})
-
 	function getCharlestonTiles() {
 		let tiles = []
 		for (let i=0;i<3;i++) {

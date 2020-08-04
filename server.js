@@ -57,7 +57,7 @@ websocketServer.on('connection', function connection(websocket) {
 			clientId = obj.clientId
 			if (!global.stateManager.getClient(clientId)) {
 				if (clientId.startsWith("bot")) {
-					//Intended for dev use. 
+					//Intended for dev use.
 					client = global.stateManager.createBot(clientId, websocket)
 				}
 				else {
@@ -128,7 +128,14 @@ websocketServer.on('connection', function connection(websocket) {
 				return websocket.send(getMessage(obj.type, "Room Does Not Exist", "error"))
 			}
 			//console.log(room)
-			return room.onIncomingMessage(clientId, obj)
+			try {
+				return room.onIncomingMessage(clientId, obj)
+			}
+			catch(e) {
+				console.error(e)
+				console.error(e.stack)
+				return;
+			}
 		}
 
 		console.log("Nothing happened. ")

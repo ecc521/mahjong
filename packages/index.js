@@ -7747,7 +7747,7 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
 
   ;
 
-  if (message.wallTiles) {
+  if (message.wallTiles !== undefined) {
     console.log(message.wallTiles);
 
     if (_typeof(message.wallTiles) === "object") {

@@ -600,6 +600,10 @@ class Room {
 			let client = global.stateManager.getClient(clientId)
 			let hand = this.gameData.playerHands[clientId]
 
+			if (this.gameData.isMahjong || this.gameData.wall.isEmpty) {
+				return client.message(obj.type, "The game is over. If you wish to continue playing, you can end the game and start a new one, or revert the current game and see how it works playing a different way. ", "error")
+			}
+
 			let placement;
 			try {
 				placement = Hand.convertStringsToTiles(obj.message)

@@ -242,7 +242,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 	if (!message.inGame) {return};
 
-	if (message.wallTiles) {
+	if (message.wallTiles !== undefined) {
 		console.log(message.wallTiles)
 		if (typeof message.wallTiles === "object") {
 			message.wallTiles = Hand.convertStringsToTiles(message.wallTiles)

@@ -22,7 +22,7 @@ class Bot extends Client {
 			if (type === "roomActionState") {
 				//This should be the only type of message we need to listen to.
 
-				if (this.getRoom().gameData.isMahjong) {
+				if (this.getRoom()?.gameData?.isMahjong || this.getRoom()?.gameData?.wall?.isEmpty) {
 					return //The room is mahjong, nothing we should do.
 				}
 
