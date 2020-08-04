@@ -531,7 +531,6 @@ class Room {
 			console.log(this.clientIds.length)
 			this.clientIds.forEach((clientId) => {
 				if (exclude.includes(clientId)) {return}
-				console.log("Messaging client " + clientId)
 				let client = global.stateManager.getClient(clientId)
 				client.message(...args)
 			})
@@ -596,7 +595,6 @@ class Room {
 
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
-			console.log(obj, clientId)
 			this.state.moves.push([obj, clientId])
 
 			let client = global.stateManager.getClient(clientId)
@@ -843,7 +841,6 @@ class Room {
 		}).bind(this)
 
 		this.toJSON = (function() {
-			console.log("Called")
 			return this.state
 		}).bind(this)
 	}

@@ -39,7 +39,8 @@ function evaluateNextMove() {
 		let config = {
 			looseTileCost: 5, //We should cut this dramatically if we have yet to charleston. Probably pass around 2.
 			possibleDoubleRatio: 0.4, //Should be no more than 1. Reduction in double value for first pair that might result in doubles.
-			chooseSecondarySuit: false //Intended for charleston, don't suggest weakest suit, suggest next weakest, if there are all 3.
+			chooseSecondarySuit: false, //Intended for charleston, don't suggest weakest suit, suggest next weakest, if there are all 3.
+			charleston: false //Used to determine in hand kong placements.
 		}
 		Object.assign(config, customConfig)
 
@@ -67,7 +68,6 @@ function evaluateNextMove() {
 			arr = arr.filter((a) => {
 				if (!a.isGenerated && a instanceof Match) {return false}
 				else {
-					delete a.isGenerated
 					return true;
 				}
 			})
@@ -196,6 +196,15 @@ function evaluateNextMove() {
 
 		if (strategy.throw instanceof Match) {strategy.throw = strategy.throw.getComponentTile()}
 
+		//One last check... If we have an in hand kong, place it.
+		if (config.charleston === false) {
+			breakdown.contents.forEach((item => {
+				if (item.amount === 4) {
+					strategy.throw = new Array(4).fill(item.getComponentTile())
+				}
+			}))
+		}
+
 		breakdown.strategy = strategy
 		return breakdown
 	}
@@ -208,7 +217,7 @@ function evaluateNextMove() {
 	function getCharlestonTiles() {
 		let tiles = []
 		for (let i=0;i<3;i++) {
-			let breakdown = computeHandBreakdown(currentHand.contents, currentHand.wind, {chooseSecondarySuit: Boolean(i%2), looseTileCost: 2}) //TODO: Base looseTileCost off of round.
+			let breakdown = computeHandBreakdown(currentHand.contents, currentHand.wind, {chooseSecondarySuit: Boolean(i%2), looseTileCost: 2, charleston: true}) //TODO: Base looseTileCost off of round.
 			let strategy = breakdown.strategy
 			currentHand.removeMatchingTile(strategy.throw)
 			tiles.push(strategy.throw)
