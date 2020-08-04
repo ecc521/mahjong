@@ -845,8 +845,7 @@ class Room {
 
 		this.toJSON = (function() {
 			console.log("Called")
-			//console.log(JSON.stringify(this.state))
-			return JSON.stringify(this.state)
+			return this.state
 		}).bind(this)
 	}
 
