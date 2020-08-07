@@ -123,10 +123,11 @@ class StateManager {
 			}))
 		}
 
-		this.startGame = function(roomId) {
+		this.startGame = function(settings = {}) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionStartGame",
 				clientId: window.clientId,
+				settings: settings
 			}))
 		}
 

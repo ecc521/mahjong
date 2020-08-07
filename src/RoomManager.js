@@ -1,4 +1,5 @@
 const Popups = require("./Popups.js")
+const SettingsMenu = require("./RoomManager/SettingsMenu.js")
 
 //Allow the user to join and create rooms.
 let roomManager = document.createElement("div")
@@ -126,8 +127,9 @@ startGameButton.id = "startGameButton"
 startGameButton.style.display = "none"
 inRoomContainer.appendChild(startGameButton)
 
+let gameSettings;
 startGameButton.addEventListener("click", function() {
-	window.stateManager.startGame()
+	window.stateManager.startGame(gameSettings.getChoices())
 })
 
 let addBotButton = document.createElement("button")
@@ -142,6 +144,13 @@ addBotButton.addEventListener("click", function() {
 	window.stateManager.addBot(name)
 })
 
+let gameSettingsElem = document.createElement("div")
+gameSettingsElem.id = "gameSettingsElem"
+inRoomContainer.appendChild(gameSettingsElem)
+gameSettings = new SettingsMenu(gameSettingsElem)
+window.gameSettings = gameSettings //For TESTING!!!
+
+inRoomContainer.appendChild(document.createElement("br"))
 let roomSaveIdElem = document.createElement("p")
 roomSaveIdElem.id = "roomSaveIdElem"
 inRoomContainer.appendChild(roomSaveIdElem)
@@ -236,13 +245,14 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	console.log(obj)
 
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
-	roomSaveIdElem.innerHTML = "Game progress will be saved at " + obj.message.saveId
+	roomSaveIdElem.innerHTML = "In-Game Debugging ID: " + obj.message.saveId
 
 	if (window.stateManager.isHost) {
 		startGameButton.style.display = "none"
 		addBotButton.style.display = ""
 		closeRoomButton.style.display = ""
 		leaveRoomButton.style.display = ""
+		gameSettingsElem.style.display = ""
 
 		if (obj.message.clients.length === 1) {
 			//This player is the only one in the room. (So if they aren't host, there's a bug)
@@ -260,6 +270,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		closeRoomButton.style.display = "none"
 		startGameButton.style.display = "none"
 		leaveRoomButton.style.display = ""
+		gameSettingsElem.style.display = "none"
 	}
 
 	renderPlayerView(obj.message.clients, function kickUserCallback(userId) {

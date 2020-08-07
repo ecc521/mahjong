@@ -63,7 +63,7 @@ class StateManager {
 		}
 
 		this.createBot = function(clientId, websocket) {
-			//Websocket intended for dev use. 
+			//Websocket intended for dev use.
 			clients[clientId] = new Bot(clientId, websocket)
 			return clients[clientId]
 		}

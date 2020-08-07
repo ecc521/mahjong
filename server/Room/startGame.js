@@ -15,13 +15,13 @@ function startGame(obj) {
 		}
 
 		this.state.wall = this.gameData.wall.toJSON()
+
 		this.state.hostClientId = this.hostClientId
 		this.state.moves.length = 0 //Delete elements, without overwriting proxy.
 
 		this.gameData.discardPile = []
-		this.gameData.settings = {}
-		this.gameData.settings.unlimitedSequences = false
-		this.gameData.settings.charleston = ["right", "across", "left"] //Note that charleston is not mandatory. East wind gets the choice.
+		this.gameData.settings = obj.settings
+		this.state.settings = obj.settings
 
 		this.gameData.playerHands = {}
 

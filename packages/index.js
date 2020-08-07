@@ -4352,10 +4352,12 @@ var StateManager = /*#__PURE__*/function () {
       }));
     };
 
-    this.startGame = function (roomId) {
+    this.startGame = function () {
+      var settings = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
       this.sendMessage(JSON.stringify({
         type: "roomActionStartGame",
-        clientId: window.clientId
+        clientId: window.clientId,
+        settings: settings
       }));
     };
 
@@ -8919,7 +8921,9 @@ __webpack_require__(37);
 
 __webpack_require__(78);
 
-var Popups = __webpack_require__(86); //Allow the user to join and create rooms.
+var Popups = __webpack_require__(86);
+
+var SettingsMenu = __webpack_require__(177); //Allow the user to join and create rooms.
 
 
 var roomManager = document.createElement("div");
@@ -9026,8 +9030,9 @@ startGameButton.innerHTML = "Start Game";
 startGameButton.id = "startGameButton";
 startGameButton.style.display = "none";
 inRoomContainer.appendChild(startGameButton);
+var gameSettings;
 startGameButton.addEventListener("click", function () {
-  window.stateManager.startGame();
+  window.stateManager.startGame(gameSettings.getChoices());
 });
 var addBotButton = document.createElement("button");
 addBotButton.innerHTML = "Add Bot";
@@ -9043,6 +9048,13 @@ addBotButton.addEventListener("click", function () {
 
   window.stateManager.addBot(name);
 });
+var gameSettingsElem = document.createElement("div");
+gameSettingsElem.id = "gameSettingsElem";
+inRoomContainer.appendChild(gameSettingsElem);
+gameSettings = new SettingsMenu(gameSettingsElem);
+window.gameSettings = gameSettings; //For TESTING!!!
+
+inRoomContainer.appendChild(document.createElement("br"));
 var roomSaveIdElem = document.createElement("p");
 roomSaveIdElem.id = "roomSaveIdElem";
 inRoomContainer.appendChild(roomSaveIdElem);
@@ -9134,13 +9146,14 @@ window.stateManager.onLeaveRoom = function (obj) {
 window.stateManager.addEventListener("onStateUpdate", function (obj) {
   console.log(obj);
   playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present";
-  roomSaveIdElem.innerHTML = "Game progress will be saved at " + obj.message.saveId;
+  roomSaveIdElem.innerHTML = "In-Game Debugging ID: " + obj.message.saveId;
 
   if (window.stateManager.isHost) {
     startGameButton.style.display = "none";
     addBotButton.style.display = "";
     closeRoomButton.style.display = "";
     leaveRoomButton.style.display = "";
+    gameSettingsElem.style.display = "";
 
     if (obj.message.clients.length === 1) {
       //This player is the only one in the room. (So if they aren't host, there's a bug)
@@ -9155,6 +9168,7 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
     closeRoomButton.style.display = "none";
     startGameButton.style.display = "none";
     leaveRoomButton.style.display = "";
+    gameSettingsElem.style.display = "none";
   }
 
   renderPlayerView(obj.message.clients, function kickUserCallback(userId) {
@@ -10387,6 +10401,7 @@ var map = {
 	"./Popups.js": 86,
 	"./Pretty.js": 38,
 	"./RoomManager.js": 138,
+	"./RoomManager/SettingsMenu.js": 177,
 	"./Sequence.js": 29,
 	"./StateManager.js": 80,
 	"./Tile.js": 15,
@@ -10787,6 +10802,82 @@ module.exports = function (METHOD_NAME) {
   });
 };
 
+
+/***/ }),
+/* 177 */
+/***/ (function(module, exports) {
+
+function SettingsMenu(settingsDiv) {
+  //Construct header.
+  var header = document.createElement("h2");
+  header.innerHTML = "Game Settings";
+  settingsDiv.appendChild(header);
+  var options = {
+    unlimitedSequences: new UnlimitedSequencesSelector(),
+    charleston: new CharlestonSelector()
+  };
+
+  for (var option in options) {
+    settingsDiv.appendChild(options[option].elem);
+  }
+
+  this.getChoices = function () {
+    var obj = {};
+
+    for (var _option in options) {
+      obj[_option] = options[_option].get();
+    }
+
+    return obj;
+  };
+
+  this.setChoices = function () {
+    var obj = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    for (var _option2 in obj) {
+      options[_option2].set(obj[_option2]);
+    }
+  };
+
+  this.setChoices(); //Sets default choices.
+}
+
+function CharlestonSelector() {
+  var elem = document.createElement("div");
+  elem.id = "charlestonSelectorDiv";
+  this.elem = elem;
+
+  this.get = function () {
+    return ["right", "across", "left"];
+  };
+
+  this.set = function () {};
+}
+
+function UnlimitedSequencesSelector() {
+  var elem = document.createElement("div");
+  elem.id = "unlimitedSequencesSelectorDiv";
+  var checkbox = document.createElement("input");
+  checkbox.id = "unlimitedSequencesSelectorCheckbox";
+  checkbox.type = "checkbox";
+  var label = document.createElement("label");
+  label.for = "unlimitedSequencesSelectorCheckbox";
+  label.innerHTML = "Allow Unlimited Sequences (WARNING: Some minor bugs)";
+  this.elem = elem;
+  elem.appendChild(checkbox);
+  elem.appendChild(label);
+
+  this.get = function () {
+    return checkbox.checked;
+  };
+
+  this.set = function () {
+    var boolean = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+    checkbox.checked = boolean;
+  };
+}
+
+module.exports = SettingsMenu;
 
 /***/ })
 /******/ ]);

@@ -72,7 +72,7 @@ class Room {
 				}).bind(this))
 
 				let _moves = this.state.moves.slice(0)
-				this.startGame({type: "roomActionStartGame"})
+				this.startGame({type: "roomActionStartGame", settings: this.state.settings})
 				console.log(_moves)
 				//These moves are going to get added back in...
 
@@ -849,8 +849,7 @@ class Room {
 		}).bind(this)
 	}
 
-	static fromJSON(str, keepGameStarted = false) {
-		let obj = JSON.parse(str)
+	static fromJSON(obj, keepGameStarted = false) {
 		if (typeof obj === "string") {obj = JSON.parse(obj)} //Allow loading state files created with leading quotes.
 		if (!keepGameStarted) {delete obj.gameReady}
 		return new Room(obj.roomId, obj)
