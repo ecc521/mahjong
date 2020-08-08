@@ -174,7 +174,7 @@ function evaluateNextMove() {
 			}
 		}
 
-		if (strategy.suit !== "honor" && breakdown.honor.value + breakdown.honor.weight > standardTypes[strategy.suit].value / 2) {strategy.honors = true}
+		if (strategy.suit !== "honor" && breakdown.honor && breakdown.honor.value + breakdown.honor.weight > standardTypes[strategy.suit].value / 2) {strategy.honors = true}
 
 		if (strategy.throwSuit === strategy.suit && strategy.honors === false) {strategy.throwSuit = "honor"}
 
