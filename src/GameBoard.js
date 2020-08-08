@@ -151,8 +151,31 @@ window.stateManager.onWallEmpty = function(obj) {
 }
 
 window.stateManager.onGameplayAlert = function(obj) {
+	console.log(obj)
 	console.log(obj.message)
-	new Popups.BlocklessAlert(obj.message, 4000)
+	let alert = new Popups.BlocklessAlert(obj.message, 3200)
+	console.log(alert)
+	alert.onStart.then(() => {
+		if (window.voiceChoices[obj?.status?.clientId] && obj?.status?.speech) {
+			//TODO: SPEAK!!!
+			let utterance = new SpeechSynthesisUtterance(obj.status.speech)
+			let voice = window.voiceChoices[obj.status.clientId].get()
+			console.log(window.voiceChoices[obj.status.clientId])
+			console.log(window.voiceChoices[obj.status.clientId].get())
+			console.log(voice)
+			if (typeof voice !== "string") {
+				try {
+					utterance.voice = voice
+				}
+				catch(e) {console.error(e)}
+			}
+			if (voice !== "none") {
+				speechSynthesis.speak(utterance)
+				console.log("Tried to speak")
+			}
+			console.log(utterance)
+		}
+	})
 }
 
 

@@ -1,4 +1,6 @@
-function SettingsMenu(settingsDiv) {
+function SettingsMenu(settingsDiv, isHost = false) {
+	while (settingsDiv.firstChild) {settingsDiv.firstChild.remove()}
+
 	//Construct header.
 	let header = document.createElement("h2")
 	header.innerHTML = "Game Settings"
@@ -7,14 +9,21 @@ function SettingsMenu(settingsDiv) {
 
 	let options = {
 		unlimitedSequences: new UnlimitedSequencesSelector(),
-		charleston: new CharlestonSelector()
+		charleston: new CharlestonSelector(),
 	}
 
 	for (let option in options) {
-		settingsDiv.appendChild(options[option].elem)
+		let item = options[option]
+		if (item.isHost && !isHost) {
+			delete options[option];
+			continue;
+		}
+		settingsDiv.appendChild(item.elem)
 	}
 
-	this.getChoices = function() {
+	if (Object.keys(options).length === 0) {header.remove()} //No settings to show.
+
+	this.getChoices = function(excludeClient = true) {
 		let obj = {}
 		for (let option in options) {
 			obj[option] = options[option].get()
@@ -23,7 +32,9 @@ function SettingsMenu(settingsDiv) {
 	}
 	this.setChoices = function(obj = {}) {
 		for (let option in obj) {
-			options[option].set(obj[option])
+			if (options[option]) {
+				options[option].set(obj[option])
+			}
 		}
 	}
 	this.setChoices() //Sets default choices.
@@ -42,6 +53,7 @@ function CharlestonSelector() {
 	this.set = function() {
 
 	}
+	this.isHost = true
 }
 
 function UnlimitedSequencesSelector() {
@@ -55,6 +67,7 @@ function UnlimitedSequencesSelector() {
 	let label = document.createElement("label")
 	label.for = "unlimitedSequencesSelectorCheckbox"
 	label.innerHTML = "Allow Unlimited Sequences (WARNING: Some minor bugs)"
+	label.addEventListener("click", function() {checkbox.click()})
 
 	this.elem = elem
 	elem.appendChild(checkbox)
@@ -66,7 +79,7 @@ function UnlimitedSequencesSelector() {
 	this.set = function(boolean = false) {
 		checkbox.checked = boolean
 	}
+	this.isHost = true
 }
-
 
 module.exports = SettingsMenu

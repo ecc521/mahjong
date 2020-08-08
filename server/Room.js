@@ -118,6 +118,8 @@ class Room {
 
 		let goMahjong = (function goMahjong(clientId, drewOwnTile = false) {
 			//First, verify the user can go mahjong.
+			let client = global.stateManager.getClient(clientId)
+
 			let hand = this.gameData.playerHands[clientId]
 			let isMahjong = hand.isMahjong(this.gameData.settings.unlimitedSequences)
 			if (isMahjong instanceof Hand) {
@@ -125,7 +127,7 @@ class Room {
 			}
 
 			if (!isMahjong) {
-				return global.stateManager.getClient(clientId).message("roomActionPlaceTiles", "Unable to go mahjong with this hand. ", "error")
+				return client.message("roomActionPlaceTiles", "Unable to go mahjong with this hand. ", "error")
 			}
 
 			//The game is over.
@@ -133,6 +135,7 @@ class Room {
 			this.sendStateToClients()
 			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
 
+			this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + "has gone mahjong" , {clientId, speech: "Mahjong"})
 			this.messageAll([], "roomActionMahjong", getSummary(clientId, drewOwnTile), "success")
 			this.sendStateToClients()
 		}).bind(this)
@@ -326,7 +329,7 @@ class Room {
 											utilized = true
 											hand.add(placement)
 											placement.exposed = true
-											this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a sequence of " + placement.tiles[0].type + "s" , "success")
+											this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a sequence of " + placement.tiles[0].type + "s" , {clientId, speech: "Chow"})
 											if (placement.mahjong) {
 												goMahjong(clientId)
 											}
@@ -351,7 +354,8 @@ class Room {
 											utilized = true
 											hand.add(placement)
 											placement.exposed = true
-											this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a " + [,,"pair","pong","kong"][placement.amount] + " of " + placement.value + " " + placement.type + "s", "success")
+											let matchType = [,,"pair","pong","kong"][placement.amount]
+											this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a " + matchType + " of " + placement.value + " " + placement.type + "s", {clientId, speech: matchType})
 											if (placement.mahjong) {
 												goMahjong(clientId)
 											}
@@ -567,7 +571,7 @@ class Room {
 			if (!doNotMessage) {
 				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), "success")
 				if (pretty > 0) {
-					this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " drew " + ((pretty === 1)?"a pretty!":pretty + " prettys!"))
+					this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " drew " + ((pretty === 1)?"a pretty!":pretty + " prettys!"), {clientId, speech: "I'm pretty!"})
 				}
 			}
 			else if (pretty > 0) {
@@ -689,12 +693,13 @@ class Room {
 							}
 							return false
 						}).bind(this))) {
-							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", "success")
+							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", {clientId, speech: "Make that a kong"})
 							this.sendStateToClients()
 							return;
 						}
 
-						let discardMessage = client.getNickname() + " has thrown a " + placement.value + " " + placement.type
+						let tileName = placement.value + " " + placement.type
+						let discardMessage = client.getNickname() + " has thrown a " + tileName
 						//We're also going to check if the discarder is calling.
 						if (!hand.calling && hand.isCalling(this.gameData.discardPile, this.gameData.settings.unlimitedSequences)) {
 							hand.calling = true
@@ -705,7 +710,7 @@ class Room {
 						this.gameData.currentTurn.thrown = placement
 						this.gameData.currentTurn.turnChoices[clientId] = "Next"
 						this.sendStateToClients()
-						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, "success")
+						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, {clientId, speech: tileName})
 						console.log("Throw")
 					}
 					else {
@@ -725,7 +730,7 @@ class Room {
 							//Draw them another tile.
 							this.drawTile(clientId, true) //Draw from back of wall.
 							this.sendStateToClients()
-							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed an in-hand kong of " + placement.value + " " + placement.type + "s", "success")
+							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed an in-hand kong of " + placement.value + " " + placement.type + "s", {clientId, speech: "kong"})
 							console.log("Kong")
 
 						}

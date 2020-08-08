@@ -102,8 +102,22 @@
 #roomManager .playerViewNameSpan {
 	font-size: 4vh;
 	font-size: calc(var(--vh) * 4);
-	width: 70%;
+	width: 40%;
 	display: inline-block;
+}
+
+#roomManager .playerViewVoiceChoice {
+	font-size: 4vh;
+	font-size: calc(var(--vh) * 4);
+	width: 30%;
+	display: inline-block;
+	text-align: center;
+}
+
+#roomManager .playerViewVoiceChoice select{
+	font-size: 2vh;
+	font-size: calc(var(--vh) * 2);
+	max-width: 100%;
 }
 
 #roomManager .playerViewIdSpan {
@@ -120,7 +134,7 @@
 }
 
 #roomManager #roomSaveIdElem {
-	text-align: center; 
+	text-align: center;
 }
 
 #roomManager .playerViewKickButton {

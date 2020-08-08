@@ -22,7 +22,7 @@ if (window.location.protocol === "https:") {
 else {
     url.protocol = "ws:"
 }
-if (window.location.hostname === "127.0.0.1") {
+if (window.location.hostname === "127.0.0.1" || window.location.hostname.startsWith("192.168.1")) {
     //Local development
     url.port = 3000
 }

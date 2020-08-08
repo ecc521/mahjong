@@ -147,13 +147,57 @@ addBotButton.addEventListener("click", function() {
 let gameSettingsElem = document.createElement("div")
 gameSettingsElem.id = "gameSettingsElem"
 inRoomContainer.appendChild(gameSettingsElem)
-gameSettings = new SettingsMenu(gameSettingsElem)
-window.gameSettings = gameSettings //For TESTING!!!
 
 inRoomContainer.appendChild(document.createElement("br"))
 let roomSaveIdElem = document.createElement("p")
 roomSaveIdElem.id = "roomSaveIdElem"
 inRoomContainer.appendChild(roomSaveIdElem)
+
+
+//TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
+//TODO: Also need a way to deal with reloads.
+speechSynthesis.getVoices() //Not a no-op, Google Chrome bug causes very first call from loaded page to return empty, some sort of delay with it.
+
+let voiceChoices = {}
+window.voiceChoices = voiceChoices
+
+function VoiceSelector() {
+	let voiceOptionsSelect = document.createElement("select")
+	let availableVoices = speechSynthesis.getVoices()
+	console.log(availableVoices)
+
+	//We need to have a default, as some browsers (firefox) return an empty array for getVoices, but work.
+	let noneChoice = document.createElement("option")
+	noneChoice.value = "none"
+	noneChoice.innerHTML = "No Voice"
+	noneChoice.selected = true
+	voiceOptionsSelect.appendChild(noneChoice)
+
+	let defaultChoice = document.createElement("option")
+	defaultChoice.value = "default"
+	defaultChoice.innerHTML = "Default Voice"
+	//defaultChoice.selected = true
+	voiceOptionsSelect.appendChild(defaultChoice)
+
+	availableVoices.forEach((voice, index) => {
+		let choice = document.createElement("option")
+		choice.value = index
+		choice.innerHTML = voice.lang + "(" + voice.name + ")"
+		voiceOptionsSelect.appendChild(choice)
+	})
+
+	this.elem = voiceOptionsSelect
+
+	this.get = function() {
+		return  availableVoices[Number(voiceOptionsSelect.value)] || voiceOptionsSelect.value
+	}
+	this.set = function(voiceSelection = "none") {
+		voiceOptionsSelect.value = voiceSelection
+		if (availableVoices.indexOf(voiceSelection) !== -1) {
+			voiceOptionsSelect.value = availableVoices.indexOf(voiceSelection)
+		}
+	}
+}
 
 function renderPlayerView(clientList = [], kickUserCallback) {
 	while (playerView.firstChild) {playerView.firstChild.remove()}
@@ -171,12 +215,18 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 		card.className = "playerViewCard"
 		row.appendChild(card)
 
+		let voiceChoice = document.createElement("span")
+		voiceChoice.className = "playerViewVoiceChoice"
+		row.appendChild(voiceChoice)
+
 		let idSpan = document.createElement("span")
 		idSpan.className = "playerViewIdSpan"
 		idSpan.innerHTML = "User ID: " + obj.id
 		row.appendChild(idSpan)
 
 		if (obj.id === window.clientId) {
+			voiceChoice.innerHTML = "N/A"
+			
 			if (window.stateManager.isHost) {
 				card.innerHTML = "You (Host)"
 			}
@@ -184,21 +234,27 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 				card.innerHTML = "You"
 			}
 		}
-		else if (obj.isHost) {
-			card.innerHTML = "Host"
-		}
-		else if (window.stateManager.isHost) {
-			card.innerHTML = "Kick " + obj.nickname
-			card.classList.add("playerViewKickButton")
-			card.addEventListener("click", function() {
-				if (confirm("Are you sure you want to kick " + obj.nickname)) {
-					kickUserCallback(obj.id)
-				}
-			})
-		}
 		else {
-			card.innerHTML = "Player"
+			voiceChoices[obj.id] = voiceChoices[obj.id] || new VoiceSelector()
+			voiceChoice.appendChild(voiceChoices[obj.id].elem)
+
+			if (obj.isHost) {
+				card.innerHTML = "Host"
+			}
+			else if (window.stateManager.isHost) {
+				card.innerHTML = "Kick " + obj.nickname
+				card.classList.add("playerViewKickButton")
+				card.addEventListener("click", function() {
+					if (confirm("Are you sure you want to kick " + obj.nickname)) {
+						kickUserCallback(obj.id)
+					}
+				})
+			}
+			else {
+				card.innerHTML = "Player"
+			}
 		}
+
 		playerView.appendChild(row)
 	})
 }
@@ -247,12 +303,16 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
 	roomSaveIdElem.innerHTML = "In-Game Debugging ID: " + obj.message.saveId
 
+	let choices = gameSettings?.getChoices()
+
 	if (window.stateManager.isHost) {
 		startGameButton.style.display = "none"
 		addBotButton.style.display = ""
 		closeRoomButton.style.display = ""
 		leaveRoomButton.style.display = ""
-		gameSettingsElem.style.display = ""
+
+		gameSettings = new SettingsMenu(gameSettingsElem, true)
+		gameSettings.setChoices(choices)
 
 		if (obj.message.clients.length === 1) {
 			//This player is the only one in the room. (So if they aren't host, there's a bug)
@@ -270,8 +330,12 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		closeRoomButton.style.display = "none"
 		startGameButton.style.display = "none"
 		leaveRoomButton.style.display = ""
-		gameSettingsElem.style.display = "none"
+
+		gameSettings = new SettingsMenu(gameSettingsElem, false)
+		gameSettings.setChoices(choices)
 	}
+
+	window.gameSettings = gameSettings //For TESTING!!!
 
 	renderPlayerView(obj.message.clients, function kickUserCallback(userId) {
 		window.stateManager.kickUser(window.stateManager.roomId, userId)

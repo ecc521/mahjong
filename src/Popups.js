@@ -60,6 +60,7 @@ class BlocklessAlert {
 
 		cover.style.animation = "fadeInAndOut " + duration + "ms ease-in"
 
+		let onStart = previousMessagePromise
 		previousMessagePromise = new Promise((resolve) => {
 			previousMessagePromise.then(() => {
 				cover.style.display = ""
@@ -70,7 +71,11 @@ class BlocklessAlert {
 			})
 		})
 
-		return previousMessagePromise
+		let onEnd = previousMessagePromise
+		return {
+			onStart,
+			onEnd
+		}
 	}
 }
 
