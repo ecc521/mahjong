@@ -9428,6 +9428,7 @@ function SettingsMenu(settingsDiv) {
     }
 
     settingsDiv.appendChild(item.elem);
+    item.set(); //Set default choice.
   }
 
   if (Object.keys(options).length === 0) {
@@ -9455,8 +9456,6 @@ function SettingsMenu(settingsDiv) {
       }
     }
   };
-
-  this.setChoices(); //Sets default choices.
 }
 
 function CharlestonSelector() {

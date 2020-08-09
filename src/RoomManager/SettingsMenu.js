@@ -20,6 +20,7 @@ function SettingsMenu(settingsDiv, isHost = false) {
 			continue;
 		}
 		settingsDiv.appendChild(item.elem)
+		item.set() //Set default choice.
 	}
 
 	if (Object.keys(options).length === 0) {header.remove()} //No settings to show.
@@ -38,7 +39,6 @@ function SettingsMenu(settingsDiv, isHost = false) {
 			}
 		}
 	}
-	this.setChoices() //Sets default choices.
 }
 
 function CharlestonSelector() {

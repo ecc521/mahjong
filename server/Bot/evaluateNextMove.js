@@ -231,7 +231,7 @@ function evaluateNextMove() {
 
 		let breakdown = computeHandBreakdown(currentHand.contents, currentHand.wind, {chooseSecondarySuit: false, looseTileCost: 5})
 
-		if (currentHand.wind === "east" && gameData.settings.charleston.length > 0 && gameData.charleston !== false) {
+		if (currentHand.wind === "east" && gameData.settings.charleston.length > 0 && gameData.charleston !== false && gameData.settings.botSettings.canCharleston) {
 			let values = ["circle", "character", "bamboo", "honor"].map((str) => {
 				return breakdown[str]?.value || 0
 			})
