@@ -9042,6 +9042,8 @@ __webpack_require__(25);
 
 __webpack_require__(123);
 
+__webpack_require__(151);
+
 __webpack_require__(177);
 
 __webpack_require__(17);
@@ -9180,6 +9182,13 @@ addBotButton.addEventListener("click", function () {
 var gameSettingsElem = document.createElement("div");
 gameSettingsElem.id = "gameSettingsElem";
 inRoomContainer.appendChild(gameSettingsElem);
+var joinRoomLinkElem = document.createElement("p");
+joinRoomLinkElem.id = "joinRoomLinkElem";
+joinRoomLinkElem.innerHTML = "Link to this room: ";
+var joinRoomLink = document.createElement("a");
+joinRoomLink.target = "_blank";
+joinRoomLinkElem.appendChild(joinRoomLink);
+inRoomContainer.appendChild(joinRoomLinkElem);
 inRoomContainer.appendChild(document.createElement("br"));
 var roomSaveIdElem = document.createElement("p");
 roomSaveIdElem.id = "roomSaveIdElem";
@@ -9288,6 +9297,8 @@ function renderPlayerView() {
 function enterRoom() {
   inRoomContainer.style.display = "block";
   notInRoomContainer.style.display = "none";
+  joinRoomLink.href = "?roomId=" + stateManager.inRoom;
+  joinRoomLink.innerHTML = joinRoomLink.href;
 }
 
 function exitRoom() {
@@ -9386,10 +9397,10 @@ if (params.has("roomId")) {
 
 if (params.has("name")) {
   nicknameInput.value = params.get("name");
-} //This feature is for development use only. Show a warning.
+} //This feature is intended for development use only. Show a warning.
 
 
-if (params.has("clientId")) {
+if (params.has("clientId") && !params.get("clientId").startsWith("bot")) {
   isDevMode = true;
   new Popups.MessageBar("This page is in development mode due to the clientId parameter. ").show(8000);
 }

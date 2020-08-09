@@ -148,6 +148,15 @@ let gameSettingsElem = document.createElement("div")
 gameSettingsElem.id = "gameSettingsElem"
 inRoomContainer.appendChild(gameSettingsElem)
 
+let joinRoomLinkElem = document.createElement("p")
+joinRoomLinkElem.id = "joinRoomLinkElem"
+joinRoomLinkElem.innerHTML = "Link to this room: "
+
+let joinRoomLink = document.createElement("a")
+joinRoomLink.target = "_blank"
+joinRoomLinkElem.appendChild(joinRoomLink)
+inRoomContainer.appendChild(joinRoomLinkElem)
+
 inRoomContainer.appendChild(document.createElement("br"))
 let roomSaveIdElem = document.createElement("p")
 roomSaveIdElem.id = "roomSaveIdElem"
@@ -226,7 +235,7 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 
 		if (obj.id === window.clientId) {
 			voiceChoice.innerHTML = "N/A"
-			
+
 			if (window.stateManager.isHost) {
 				card.innerHTML = "You (Host)"
 			}
@@ -262,6 +271,8 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 function enterRoom() {
 	inRoomContainer.style.display = "block"
 	notInRoomContainer.style.display = "none"
+	joinRoomLink.href = "?roomId=" + stateManager.inRoom
+	joinRoomLink.innerHTML = joinRoomLink.href
 }
 
 function exitRoom() {
@@ -369,8 +380,8 @@ if (params.has("name")) {
 	nicknameInput.value = params.get("name")
 }
 
-//This feature is for development use only. Show a warning.
-if (params.has("clientId")) {
+//This feature is intended for development use only. Show a warning.
+if (params.has("clientId") && !params.get("clientId").startsWith("bot")) {
 	isDevMode = true
 	new Popups.MessageBar("This page is in development mode due to the clientId parameter. ").show(8000)
 }
