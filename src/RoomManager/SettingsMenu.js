@@ -10,6 +10,7 @@ function SettingsMenu(settingsDiv, isHost = false) {
 	let options = {
 		unlimitedSequences: new UnlimitedSequencesSelector(),
 		charleston: new CharlestonSelector(),
+		botSettings: new BotSettings()
 	}
 
 	for (let option in options) {
@@ -78,6 +79,34 @@ function UnlimitedSequencesSelector() {
 	}
 	this.set = function(boolean = false) {
 		checkbox.checked = boolean
+	}
+	this.isHost = true
+}
+
+function BotSettings() {
+	let elem = document.createElement("div")
+	elem.id = "botSelectorDiv"
+
+	let checkbox = document.createElement("input")
+	checkbox.id = "botSelectorCheckbox"
+	checkbox.type = "checkbox"
+
+	let label = document.createElement("label")
+	label.for = "botSelectorCheckbox"
+	label.innerHTML = "Allow bot to charleston"
+	label.addEventListener("click", function() {checkbox.click()})
+
+	this.elem = elem
+	elem.appendChild(checkbox)
+	elem.appendChild(label)
+
+	this.get = function() {
+		return {
+			canCharleston: checkbox.checked
+		}
+	}
+	this.set = function(obj = {}) {
+		checkbox.checked = obj?.canCharleston ?? 2
 	}
 	this.isHost = true
 }

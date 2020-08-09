@@ -29,7 +29,7 @@ class Room {
 		let writeStateSuspend = false //Suspend disk writes
 		let updateState = (function update() {
 			this.state.clientIds = this.clientIds
-			if (writeStateSuspend) {return}
+			if (writeStateSuspend) {console.log("Write suspended");return}
 			global.stateManager.writeRoomState(this.roomId)
 		}).bind(this)
 
@@ -135,7 +135,7 @@ class Room {
 			this.sendStateToClients()
 			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
 
-			this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + "has gone mahjong" , {clientId, speech: "Mahjong"})
+			this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has gone mahjong" , {clientId, speech: "Mahjong"})
 			this.messageAll([], "roomActionMahjong", getSummary(clientId, drewOwnTile), "success")
 			this.sendStateToClients()
 		}).bind(this)
@@ -187,21 +187,25 @@ class Room {
 							playerHands[position] = hand
 							placements[position] = obj[clientId]
 						}
-
 						let currentDirection = this.gameData.charleston.directions.shift()
 
 						let increment;
+						console.log(currentDirection)
 						switch (currentDirection) {
 							case "right": increment = 1; break;
 							case "across": increment = 2; break;
 							case "left": increment = 3; break;
+							case undefined: increment = 0; console.error("Charleston increment 0");break;
 						}
 
 						playerHands.forEach((hand, index) => {
 							let placement = placements[index]
+							console.log(index, increment)
 							let passToIndex = (index+increment)%4
 
 							placement.forEach((tile) => {
+								console.log(playerHands)
+								console.log(passToIndex)
 								playerHands[passToIndex].add(tile)
 							})
 						})
@@ -212,7 +216,7 @@ class Room {
 						}
 						else {
 							this.messageAll([], "roomActionGameplayAlert", "The charleston is over. Let the games begin! " , "success")
-							this.gameData.charleston = false//The charleston is over.
+							this.gameData.charleston = false //The charleston is over.
 						}
 					}
 					else {
@@ -614,10 +618,10 @@ class Room {
 				console.log(obj.message)
 
 				//The very first throw will determine if we charleston or not. Throwing one tile will start the game, throwing 3 will initiate charleston.
-				if (this.gameData.settings.charleston && this.gameData.charleston === undefined && placement.length !== 1 && hand.wind === "east") {
+				if (this.gameData.settings.charleston.length > 0 && this.gameData.charleston === undefined && placement.length !== 1 && hand.wind === "east") {
 					if (placement.length === 3) {
 						this.gameData.charleston = {
-							directions: this.gameData.settings.charleston
+							directions: this.gameData.settings.charleston.slice(0)
 						}
 						this.messageAll([], "roomActionGameplayAlert", "A charleston has begun. The first pass is going " + this.gameData.charleston.directions[0] , "success")
 					}

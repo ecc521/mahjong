@@ -230,7 +230,22 @@ function evaluateNextMove() {
 		//TODO: We need to check if we should, and can, charleston (as of, we are east).
 
 		let breakdown = computeHandBreakdown(currentHand.contents, currentHand.wind, {chooseSecondarySuit: false, looseTileCost: 5})
-		placeTiles(breakdown.strategy.throw)
+
+		if (currentHand.wind === "east" && gameData.settings.charleston.length > 0 && gameData.charleston !== false) {
+			let values = ["circle", "character", "bamboo", "honor"].map((str) => {
+				return breakdown[str]?.value || 0
+			})
+			let max = Math.max(...values)
+			if (max > 80) { //Very high bar for not charlestoning, as east charlestons with an extra tile, which extends advantage.
+				placeTiles(breakdown.strategy.throw)
+			}
+			else {
+				placeTiles(getCharlestonTiles())
+			}
+		}
+		else {
+			placeTiles(breakdown.strategy.throw)
+		}
 	}
 	else if (gameData.currentTurn.thrown) {
 		//We need to evaluate if we pick up the thrown tile.
