@@ -5139,6 +5139,8 @@ if (isForced(NUMBER, !NativeNumber(' 0o1') || !NativeNumber('0b1') || NativeNumb
 /* 88 */
 /***/ (function(module, exports, __webpack_require__) {
 
+__webpack_require__(46);
+
 __webpack_require__(176);
 
 __webpack_require__(24);
@@ -5203,6 +5205,7 @@ var Notification = function Notification(errorText, messageText) {
 var previousMessagePromise = new Promise(function (resolve) {
   resolve();
 });
+var counter = 0;
 
 var BlocklessAlert = /*#__PURE__*/function () {
   "use strict";
@@ -5219,14 +5222,21 @@ var BlocklessAlert = /*#__PURE__*/function () {
     var message = document.createElement("p");
     message.innerHTML = messageText;
     cover.appendChild(message);
-    cover.style.animation = "fadeInAndOut " + duration + "ms ease-in";
     var onStart = previousMessagePromise;
     previousMessagePromise = new Promise(function (resolve) {
+      counter++;
       previousMessagePromise.then(function () {
+        console.log(counter + " messages remaining to be posted. "); //Exponentation be below 1, or NaN, so be careful to assure newDuration is no longer. Also, clamp to max speedup of 3x (currently 15 left)
+
+        var newDuration = duration / Math.min(Math.max(1, Math.pow(counter, 0.4)) || 1, 3);
+        console.log("Adjusting duration from ".concat(duration, " to ").concat(newDuration));
+        duration = newDuration;
+        cover.style.animation = "fadeInAndOut " + duration + "ms ease-in";
         cover.style.display = "";
         setTimeout(function () {
-          resolve();
           cover.remove();
+          counter--;
+          resolve();
         }, duration);
       });
     });

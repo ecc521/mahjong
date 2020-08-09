@@ -46,6 +46,7 @@ class Notification {
 }
 
 let previousMessagePromise = new Promise((resolve) =>{resolve()});
+let counter = 0
 
 class BlocklessAlert {
 	constructor(messageText, duration = 3200) {
@@ -58,15 +59,21 @@ class BlocklessAlert {
 		message.innerHTML = messageText
 		cover.appendChild(message)
 
-		cover.style.animation = "fadeInAndOut " + duration + "ms ease-in"
-
 		let onStart = previousMessagePromise
 		previousMessagePromise = new Promise((resolve) => {
+			counter++
 			previousMessagePromise.then(() => {
+				console.log(counter + " messages remaining to be posted. ")
+				//Exponentation be below 1, or NaN, so be careful to assure newDuration is no longer. Also, clamp to max speedup of 3x (currently 15 left)
+				let newDuration = duration / Math.min((Math.max(1, counter ** 0.4) || 1), 3)
+				console.log(`Adjusting duration from ${duration} to ${newDuration}`)
+				duration = newDuration
+				cover.style.animation = "fadeInAndOut " + duration + "ms ease-in"
 				cover.style.display = ""
 				setTimeout(function() {
-					resolve()
 					cover.remove()
+					counter--
+					resolve()
 				}, duration)
 			})
 		})
