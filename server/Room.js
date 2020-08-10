@@ -752,6 +752,7 @@ class Room {
 					goMahjong(clientId, !this.gameData.previousTurnPickedUp)
 				}
 				else {
+					//TODO: This triggers attempting to place an in hand sequence. This is the wrong error message, although it is an error. 
 					return client.message(obj.type, "Invalid placement attempt for current game status", "error")
 				}
 			}

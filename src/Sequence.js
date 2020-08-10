@@ -53,6 +53,8 @@ class Sequence {
 			if (Math.abs(tiles[i-1].value - tile.value) !== 1) {return false} //Tiles are not in a sequence. There is a difference between the values that is not 1.
 		}
 
+		if (tiles.length !== 3) {return false}
+
 		return true
 	}
 

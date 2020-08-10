@@ -1106,6 +1106,10 @@ var Sequence = /*#__PURE__*/function () {
 
       }
 
+      if (tiles.length !== 3) {
+        return false;
+      }
+
       return true;
     }
   }, {
