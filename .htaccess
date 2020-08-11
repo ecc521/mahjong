@@ -1,0 +1,18 @@
+#Make sure .htaccess files aren't disabled.
+
+#Apache will serve files with a different charset, and break unicode characters, unless this is set.
+AddDefaultCharset UTF-8
+
+#Block access to .git files
+RedirectMatch 403 /\.git
+
+#Block access to node_modules directory
+RedirectMatch 403 ^/node_modules/.*$
+
+#Block all access to data and logs directory.
+RedirectMatch 403 ^/server/data/.*$
+
+#Images can be cached for 10 days. Serve up to 100 days old if errors.
+<FilesMatch "\.(png)$">
+Header set Cache-Control "max-age=864000, immutable, public, stale-if-error=8640000"
+</FilesMatch>
