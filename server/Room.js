@@ -595,7 +595,7 @@ class Room {
 			}
 			this.inGame = false
 			this.state.gameReady = this.gameReady = Date.now() //Adjust save key.
-			this.state.moves = []
+			this.state.moves.length = 0 //Clear without resetting proxy. 
 			delete this.state.wall
 			delete this.state.windAssignments
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
@@ -752,7 +752,7 @@ class Room {
 					goMahjong(clientId, !this.gameData.previousTurnPickedUp)
 				}
 				else {
-					//TODO: This triggers attempting to place an in hand sequence. This is the wrong error message, although it is an error. 
+					//TODO: This triggers attempting to place an in hand sequence. This is the wrong error message, although it is an error.
 					return client.message(obj.type, "Invalid placement attempt for current game status", "error")
 				}
 			}
