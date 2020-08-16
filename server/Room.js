@@ -97,7 +97,7 @@ class Room {
 		this.startGame = (require("./Room/startGame.js")).bind(this)
 		this.addBot = (require("./Room/addBot.js")).bind(this)
 
-		let getSummary = (function(mahjongClientId, drewOwnTile) {
+		this.getSummary = (function(mahjongClientId, drewOwnTile) {
 			let summary = ""
 			for (let id in this.gameData.playerHands) {
 				summary += global.stateManager.getClient(id).getNickname()
@@ -116,7 +116,7 @@ class Room {
 			return summary
 		}).bind(this)
 
-		let goMahjong = (function goMahjong(clientId, drewOwnTile = false) {
+		this.goMahjong = (function goMahjong(clientId, drewOwnTile = false, override = false) {
 			//First, verify the user can go mahjong.
 			let client = global.stateManager.getClient(clientId)
 
@@ -126,17 +126,17 @@ class Room {
 				hand.contents = isMahjong.contents //Autocomplete the mahjong.
 			}
 
-			if (!isMahjong) {
-				return client.message("roomActionPlaceTiles", "Unable to go mahjong with this hand. ", "error")
+			if (!isMahjong && !override) {
+				return client.message("roomActionPlaceTiles", "Unable to go mahjong with this hand. If you play by different rules, try again to override. ", "error")
 			}
 
 			//The game is over.
 			this.gameData.isMahjong = true
 			this.sendStateToClients()
-			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game./
+			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game.
 
 			this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has gone mahjong" , {clientId, speech: "Mahjong"})
-			this.messageAll([], "roomActionMahjong", getSummary(clientId, drewOwnTile), "success")
+			this.messageAll([], "roomActionMahjong", this.getSummary(clientId, drewOwnTile), "success")
 			this.sendStateToClients()
 		}).bind(this)
 
@@ -150,277 +150,7 @@ class Room {
 		}).bind(this)
 
 		this.turnChoicesProxyHandler = {
-			set: (function(obj, prop, value) {
-				obj[prop] = value
-				//The user can never pick up their own discard tile, hence is always "Next", except during charleston
-				if (!this.gameData.charleston) {
-					obj[this.gameData.currentTurn.userTurn] = "Next"
-				}
-
-				let windOrder = ["north", "east", "south", "west"]
-				let throwerWind = this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind
-
-				function getBackwardsDistance(placerWind, throwerWind) {
-					//total is the distance backwards from the placer to the thrower.
-					let i = windOrder.indexOf(placerWind)
-					let total = 0;
-					while (windOrder[i] !== throwerWind) {
-						total++;
-						i--;
-						if (i===-1) {
-							i=windOrder.length-1
-						}
-					}
-					return total
-				}
-
-				if (Object.keys(obj).length === 4) {
-
-					if (this.gameData.charleston) {
-						//Note that the tiles being passed have already been removed from respective hands.
-						let winds = ["north", "east", "south", "west"]
-						let playerHands = []
-						let placements = []
-						for (let clientId in this.gameData.playerHands) {
-							let hand = this.gameData.playerHands[clientId]
-							let position = winds.indexOf(hand.wind)
-							playerHands[position] = hand
-							placements[position] = obj[clientId]
-						}
-						let currentDirection = this.gameData.charleston.directions.shift()
-
-						let increment;
-						console.log(currentDirection)
-						switch (currentDirection) {
-							case "right": increment = 1; break;
-							case "across": increment = 2; break;
-							case "left": increment = 3; break;
-							case undefined: increment = 0; console.error("Charleston increment 0");break;
-						}
-
-						playerHands.forEach((hand, index) => {
-							let placement = placements[index]
-							console.log(index, increment)
-							let passToIndex = (index+increment)%4
-
-							placement.forEach((tile) => {
-								console.log(playerHands)
-								console.log(passToIndex)
-								playerHands[passToIndex].add(tile)
-							})
-						})
-
-						let nextDirection = this.gameData.charleston.directions[0]
-						if (nextDirection) {
-							this.messageAll([], "roomActionGameplayAlert", "The next charleston pass is going " + nextDirection , "success")
-						}
-						else {
-							this.messageAll([], "roomActionGameplayAlert", "The charleston is over. Let the games begin! " , "success")
-							this.gameData.charleston = false //The charleston is over.
-						}
-					}
-					else {
-						this.gameData.previousTurnPickedUp = true //Used for in-hand mahjong detection.
-
-						//Handle this turn, and begin the next one.
-						let priorityList = []
-						for (let key in obj) {
-							let client = global.stateManager.getClient(key)
-							if (obj[key] !== "Next") {
-
-								let hand = this.gameData.playerHands[key]
-								hand.add(this.gameData.currentTurn.thrown)
-								//wouldMakeMahjong will confirm that the current tile will allow mahjong to happen.
-								let mahjongHand = hand.isMahjong()
-								let wouldMakeMahjong = !!(mahjongHand);
-								hand.remove(this.gameData.currentTurn.thrown)
-
-								if (mahjongHand instanceof Hand) {
-									//Determine if the possible mahjong contains the specified placement, and if not, notify user and drop mahjong priority.
-									let stringContents = mahjongHand.getStringContents()
-									//Exposed vs unexposed can cause issues comparing strings. Need a .matches in future.
-									let previousValue = obj[key].exposed
-									obj[key].exposed = false
-									let unexposed = obj[key].toJSON()
-									obj[key].exposed = true
-									let exposed = obj[key].toJSON()
-									obj[key].exposed = previousValue
-
-									if (!(stringContents.includes(unexposed) || stringContents.includes(exposed))) {
-										wouldMakeMahjong = false
-									}
-								}
-
-								if (obj[key].mahjong && !wouldMakeMahjong) {
-									client.message("roomActionPlaceTiles", "You can't go mahjong at this moment. Your placement will be considered without mahjong priority applied. ", "error")
-								}
-
-								let priority;
-								let placerWind = hand.wind
-								if (wouldMakeMahjong && obj[key].mahjong) {
-									priority = 109
-									let total = getBackwardsDistance(placerWind, throwerWind)
-									console.log(total)
-									priority -= total
-								}
-								else if (obj[key] instanceof Match) {
-									//Validate that this is not a pair.
-									if (obj[key].amount === 2) {
-										if (!wouldMakeMahjong) {
-											client.message("roomActionPlaceTiles", "You can't place a pair when it will not make you mahjong. ", "error")
-											continue;
-										}
-										else {
-											placement.mahjong = true //The specified action can only be accomplished through mahjong.
-										}
-									}
-									priority = 104;
-									//Add priority based on position to thrower. The closer to the thrower, the highest priority.
-									let total = getBackwardsDistance(placerWind, throwerWind)
-									console.log(total)
-									priority -= total
-								}
-								else if (obj[key] instanceof Sequence) {
-									//Verify that the user is the one immediently before.
-									if (getBackwardsDistance(placerWind, throwerWind) > 1) {
-										console.log("Greater than one person distance on sequence. Denied. ")
-										client.message("roomActionPlaceTiles", "You can only take a sequence from the player before you in the rotation order, except with mahjong.", "error")
-										continue;
-									}
-									priority = 99
-								}
-								else {
-									priority = 98
-								}
-								priorityList.push([priority, key])
-							}
-						}
-						//If anybody attempted to place, time to process them.
-						let utilized = false; //Did we use the thrown tile?
-						console.log(priorityList.length)
-						if (priorityList.length !== 0) {
-							//Sort highest to lowest
-							priorityList.sort((a, b) => {return b[0] - a[0]})
-							for (let i=0;i<priorityList.length;i++) {
-								console.log("Here 1")
-								let clientId = priorityList[i][1]
-								let client = global.stateManager.getClient(clientId)
-
-								if (utilized === true) {
-									client.message("roomActionPlaceTiles", "Placing tiles failed because another player had a higher priority placement (mahjong>match>sequence, and by order within category).", "error")
-									continue;
-								}
-
-								let placement = obj[clientId]
-								//If placement succeeds, switch userTurn
-								console.log(placement)
-								if (placement instanceof Sequence) {
-									//Confirm that the sequence uses the thrown tile.
-									let valid = false
-									placement.tiles.forEach((tile) => {
-										console.log(tile)
-										console.log(this.gameData.currentTurn.thrown)
-										if (tile.value === this.gameData.currentTurn.thrown.value && tile.type === this.gameData.currentTurn.thrown.type) {
-											valid = true
-										}
-									})
-									console.log(valid)
-									if (valid) {
-										let hand = this.gameData.playerHands[clientId]
-										//Add the tile to hand, attempt to verify, and, if not, remove
-										hand.add(this.gameData.currentTurn.thrown)
-										if (hand.removeTilesFromHand(placement)) {
-											utilized = true
-											hand.add(placement)
-											placement.exposed = true
-											this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a sequence of " + placement.tiles[0].type + "s" , {clientId, speech: "Chow"})
-											if (placement.mahjong) {
-												goMahjong(clientId)
-											}
-											this.gameData.currentTurn.userTurn = clientId
-										}
-										else {
-											hand.remove(this.gameData.currentTurn.thrown)
-											client.message("roomActionPlaceTiles", "You can't place a sequence of tiles you do not possess", "error")
-										}
-									}
-									else {
-										client.message("roomActionPlaceTiles", "Are you trying to hack? You must use the thrown tile when attempting to place off turn. ", "error")
-									}
-								}
-								else if (placement instanceof Match) {
-									//Confirm that the match uses the thrown tile
-									if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
-										let hand = this.gameData.playerHands[clientId]
-										//We can just verify for on less tile here.
-
-										if (hand.removeMatchingTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
-											utilized = true
-											hand.add(placement)
-											placement.exposed = true
-											let matchType = [,,"pair","pong","kong"][placement.amount]
-											this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a " + matchType + " of " + placement.value + " " + placement.type + "s", {clientId, speech: matchType})
-											if (placement.mahjong) {
-												goMahjong(clientId)
-											}
-											if (placement.amount === 4) {
-												//Draw them another tile.
-												this.drawTile(clientId, true) //Draw from back of wall.
-											}
-											this.gameData.currentTurn.userTurn = clientId
-										}
-										else {
-											console.log("Attempted to place invalid match")
-											client.message("roomActionPlaceTiles", "You can't place a match of tiles you do not possess", "error")
-										}
-									}
-								}
-							}
-						}
-
-						if (utilized === false) {
-							this.gameData.previousTurnPickedUp = false
-
-							//Shift to next player, draw them a tile.
-							let nextWind = windOrder[(windOrder.indexOf(this.gameData.playerHands[this.gameData.currentTurn.userTurn].wind) + 1)%4]
-
-							for (let clientId in this.gameData.playerHands) {
-								let hand = this.gameData.playerHands[clientId]
-								if (hand.wind === nextWind) {
-
-									//Pick up as 4th tile for an exposed pong if possible.
-									//TODO: Consider notifying people when the 4th tile is added. We currently don't do this, because it is just points, so shouldn't really impact
-									//gameplay, and the message can't currently be sent to the person who gained the pickup, as they receive tile pickup message too.
-									hand.contents.forEach((item) => {
-										if (item instanceof Match && item.type === this.gameData.currentTurn.thrown.type && item.value === this.gameData.currentTurn.thrown.value) {
-											utilized = true
-											item.amount = 4
-										}
-									})
-
-									//Switch the turn, and draw the next tile.
-									if (utilized === false) {
-										this.gameData.discardPile.push(this.gameData.currentTurn.thrown)
-										this.drawTile(clientId)
-									}
-									else {
-										this.drawTile(clientId, true)
-									}
-
-									this.gameData.currentTurn.userTurn = clientId
-								}
-							}
-						}
-						this.gameData.currentTurn.thrown = false
-					}
-
-					//Clear the object.
-					for (let key in obj) {delete obj[key]}
-					this.sendStateToClients()
-				}
-
-				return true
-			}).bind(this)
+			set: (require("./Room/turnChoicesProxyHandler.js")).bind(this)
 		}
 
 		let getState = (function getState(requestingClientId) {
@@ -559,7 +289,7 @@ class Room {
 				}
 				if (!tile) {
 					console.log("Wall Empty");
-					this.messageAll([], "roomActionWallEmpty", getSummary(), "success")
+					this.messageAll([], "roomActionWallEmpty", this.getSummary(), "success")
 					if (!this.gameData.eastWindPlayerId) {
 						for (let clientId in this.gameData.playerHands) {
 							if (this.gameData.playerHands[clientId].wind === "south") {
@@ -595,7 +325,7 @@ class Room {
 			}
 			this.inGame = false
 			this.state.gameReady = this.gameReady = Date.now() //Adjust save key.
-			this.state.moves.length = 0 //Clear without resetting proxy. 
+			this.state.moves.length = 0 //Clear without resetting proxy.
 			delete this.state.wall
 			delete this.state.windAssignments
 			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
@@ -603,6 +333,7 @@ class Room {
 			this.sendStateToClients()
 		}).bind(this)
 
+		let placerMahjongOverride = false
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
 			this.state.moves.push([obj, clientId])
@@ -627,8 +358,11 @@ class Room {
 						}
 						this.messageAll([], "roomActionGameplayAlert", "A charleston has begun. The first pass is going " + this.gameData.charleston.directions[0] , "success")
 					}
-					else {
+					else if (!obj.mahjong) {
 						return client.message(obj.type, "The very first throw must be either 1 tile, to initiate the game, or 3 tiles, to initiate charleston. ", "error")
+					}
+					else if (obj.mahjong) {
+						placement = undefined
 					}
 				}
 				else if (this.gameData.charleston) {
@@ -676,7 +410,7 @@ class Room {
 					return client.message(obj.type, "You can't pass tiles you don't possess. ", "error")
 				}
 			}
-			else if (this.gameData.currentTurn.thrown === false) {
+			else if (this.gameData.currentTurn.thrown === false || this.gameData.currentTurn.thrown === undefined) {
 				if (clientId !== this.gameData.currentTurn.userTurn) {
 					//This player is not allowed to perform any actions at this stage.
 					return client.message(obj.type, "Can't place after draw before throw", "error")
@@ -715,6 +449,7 @@ class Room {
 						//Discard tile.
 						this.gameData.currentTurn.thrown = placement
 						this.gameData.currentTurn.turnChoices[clientId] = "Next"
+						placerMahjongOverride = false
 						this.sendStateToClients()
 						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, {clientId, speech: tileName})
 						console.log("Throw")
@@ -749,7 +484,8 @@ class Room {
 					}
 				}
 				else if (obj.mahjong) {
-					goMahjong(clientId, !this.gameData.previousTurnPickedUp)
+					this.goMahjong(clientId, !this.gameData.previousTurnPickedUp, placerMahjongOverride)
+					placerMahjongOverride = true
 				}
 				else {
 					//TODO: This triggers attempting to place an in hand sequence. This is the wrong error message, although it is an error.
