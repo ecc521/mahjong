@@ -188,7 +188,7 @@ function calculateNextTurn(obj, exemptFromChecks) {
 							placement.exposed = true
 							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a sequence of " + placement.tiles[0].type + "s" , {clientId, speech: "Chow"})
 							if (placement.mahjong) {
-								this.goMahjong(clientId)
+								this.goMahjong(clientId, undefined, exemptFromChecks.includes(clientId))
 							}
 							this.gameData.currentTurn.userTurn = clientId
 						}
@@ -214,7 +214,7 @@ function calculateNextTurn(obj, exemptFromChecks) {
 							let matchType = [,,"pair","pong","kong"][placement.amount]
 							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has placed a " + matchType + " of " + placement.value + " " + placement.type + "s", {clientId, speech: matchType})
 							if (placement.mahjong) {
-								this.goMahjong(clientId)
+								this.goMahjong(clientId, undefined, exemptFromChecks.includes(clientId))
 							}
 							if (placement.amount === 4) {
 								//Draw them another tile.
