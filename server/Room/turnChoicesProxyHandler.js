@@ -20,6 +20,7 @@ function getBackwardsDistance(placerWind, throwerWind) {
 }
 
 function getPriority(obj, key, exemptFromChecks = false) {
+	if (this.gameData.charleston) {return true} //We don't validate these.
 	if (obj[key] === "Next") {return true} //Valid, but no-op.
 
 	let client = global.stateManager.getClient(key)
@@ -48,7 +49,7 @@ function getPriority(obj, key, exemptFromChecks = false) {
 		}
 	}
 
-	if (obj[key].mahjong && !wouldMakeMahjong) {
+	if (obj[key].mahjong && !wouldMakeMahjong && !exemptFromChecks) {
 		client.message("roomActionPlaceTiles", "Unable to detect a mahjong in your hand. If this is an error, simply dismiss this message and press the mahjong button again. ", "error")
 		return false;
 	}
@@ -276,9 +277,14 @@ let exemptFromChecks = []
 module.exports = function(obj, prop, value) {
 	obj[prop] = value
 	//Remove invalid assignments. getPriority will issue error messages to clients as needed.
-	if (getPriority.call(this, obj, prop, exemptFromChecks[prop]) === false) {
+	if (getPriority.call(this, obj, prop, exemptFromChecks.includes(prop)) === false) {
 		delete obj[prop]
-		exemptFromChecks.push(prop) //We will only block a client once per turn. Successive attempts will be treated as overrides.
+		if (global.stateManager.getClient(prop).isBot) {
+			console.log("Bots are not allowed to obtain override power. ")
+		}
+		else {
+			exemptFromChecks.push(prop) //We will only block a client once per turn. Successive attempts will be treated as overrides.
+		}
 	}
 
 	//The user can never pick up their own discard tile, hence is always "Next", except during charleston
@@ -288,6 +294,7 @@ module.exports = function(obj, prop, value) {
 
 	if (Object.keys(obj).length === 4) {
 		calculateNextTurn.call(this, obj)
+		exemptFromChecks = []
 	}
 
 	return true

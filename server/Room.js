@@ -485,7 +485,12 @@ class Room {
 				}
 				else if (obj.mahjong) {
 					this.goMahjong(clientId, !this.gameData.previousTurnPickedUp, placerMahjongOverride)
-					placerMahjongOverride = true
+					if (global.stateManager.getClient(clientId).isBot) {
+						console.log("Bots are not allowed to obtain override power")
+					}
+					else {
+						placerMahjongOverride = true
+					}
 				}
 				else {
 					//TODO: This triggers attempting to place an in hand sequence. This is the wrong error message, although it is an error.
