@@ -94,7 +94,7 @@ function getPriority(obj, key, exemptFromChecks = false) {
 	return [priority, key]
 }
 
-function calculateNextTurn(obj) {
+function calculateNextTurn(obj, exemptFromChecks) {
 	//Obj is the turnChoices object.
 
 	if (this.gameData.charleston) {
@@ -145,7 +145,7 @@ function calculateNextTurn(obj) {
 		//Handle this turn, and begin the next one.
 		let priorityList = []
 		for (let key in obj) {
-			let res = getPriority.call(this, obj, key)
+			let res = getPriority.call(this, obj, key, exemptFromChecks.includes(key))
 			if (res instanceof Array) {priorityList.push(res)}
 		}
 		//If anybody attempted to place, time to process them.
@@ -293,7 +293,7 @@ module.exports = function(obj, prop, value) {
 	}
 
 	if (Object.keys(obj).length === 4) {
-		calculateNextTurn.call(this, obj)
+		calculateNextTurn.call(this, obj, exemptFromChecks)
 		exemptFromChecks = []
 	}
 
