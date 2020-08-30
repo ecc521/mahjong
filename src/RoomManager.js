@@ -369,6 +369,15 @@ window.stateManager.addEventListener("onEndGame", function(obj) {
 	else {console.log("Game Ended due to state sync. Popup suppressed in dev mode. ")}
 })
 
+
+//Create link to tutorial.
+let tutorial = document.createElement("a")
+tutorial.target = "_blank"
+tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/"
+tutorial.id = "tutorialLink"
+tutorial.innerHTML = "Mahjong 4 Friends Tutorial"
+roomManager.appendChild(tutorial)
+
 let isDevMode = false;
 
 //Allow query params.
@@ -385,6 +394,5 @@ if (params.has("clientId") && !params.get("clientId").startsWith("bot")) {
 	isDevMode = true
 	new Popups.MessageBar("This page is in development mode due to the clientId parameter. ").show(8000)
 }
-
 
 module.exports = roomManager

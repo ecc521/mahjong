@@ -150,3 +150,8 @@
 	border-radius: 2.5vh;
 	background: linear-gradient(45deg, #ffff39, #5bff5b, #609fff);
 }
+
+#roomManager #tutorialLink {
+	font-size: 30px;
+	line-height: 60px;
+}

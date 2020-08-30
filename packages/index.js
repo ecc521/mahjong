@@ -9439,7 +9439,14 @@ window.stateManager.addEventListener("onEndGame", function (obj) {
   } else {
     console.log("Game Ended due to state sync. Popup suppressed in dev mode. ");
   }
-});
+}); //Create link to tutorial.
+
+var tutorial = document.createElement("a");
+tutorial.target = "_blank";
+tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/";
+tutorial.id = "tutorialLink";
+tutorial.innerHTML = "Mahjong 4 Friends Tutorial";
+roomManager.appendChild(tutorial);
 var isDevMode = false; //Allow query params.
 
 var params = new URLSearchParams(window.location.search);
