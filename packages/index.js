@@ -8140,7 +8140,7 @@ document.addEventListener("keyup", function (e) {
 
     if (userHand.inPlacemat[pos] && !userHand.inPlacemat[pos].evicting) {
       //Hotkeys will not throw errors. They will silently fail if invalid.
-      userHand.contents.push(userHand.inPlacemat.splice(pos, 1)[0]);
+      userHand.add(userHand.inPlacemat.splice(pos, 1)[0]);
       userHand.renderPlacemat();
       userHand.renderTiles();
     }
