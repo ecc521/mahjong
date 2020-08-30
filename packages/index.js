@@ -7702,6 +7702,8 @@ __webpack_require__(39);
 
 __webpack_require__(60);
 
+__webpack_require__(133);
+
 __webpack_require__(10);
 
 __webpack_require__(26);
@@ -7715,6 +7717,8 @@ __webpack_require__(47);
 __webpack_require__(61);
 
 __webpack_require__(86);
+
+__webpack_require__(116);
 
 __webpack_require__(87);
 
@@ -8119,6 +8123,37 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
         placeTilesButton.disabled = "disabled";
         goMahjongButton.disabled = "disabled";
       }
+    }
+  }
+}); //Add hotkeys
+
+document.addEventListener("keyup", function (e) {
+  var chars = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"]; //q,w,e,r,t,y,u,i,o,p will correspond to first 10 hand spots. Pressing will move to placemat.
+
+  if (e.code === "Space" && e.shiftKey) {
+    goMahjongButton.click();
+  } else if (e.code === "Space") {
+    placeTilesButton.click();
+  } else if (Number(e.key) > 0 && Number(e.key) < 5) {
+    //1,2,3, and 4 will correspond to the 4 placemat spots. Pressing them will remove the specified tile.
+    var pos = Number(e.key) - 1;
+
+    if (userHand.inPlacemat[pos] && !userHand.inPlacemat[pos].evicting) {
+      //Hotkeys will not throw errors. They will silently fail if invalid.
+      userHand.contents.push(userHand.inPlacemat.splice(pos, 1)[0]);
+      userHand.renderPlacemat();
+      userHand.renderTiles();
+    }
+  } else if (chars.includes(e.key.toLowerCase())) {
+    var tiles = userHand.contents.filter(function (item) {
+      return item instanceof Tile;
+    });
+    var index = chars.indexOf(e.key.toLowerCase());
+
+    if (userHand.inPlacemat.length < 4 && tiles[index]) {
+      userHand.inPlacemat.push(userHand.contents.splice(userHand.contents.indexOf(tiles[index]), 1)[0]);
+      userHand.renderPlacemat();
+      userHand.renderTiles();
     }
   }
 });

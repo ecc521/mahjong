@@ -373,6 +373,38 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	}
 })
 
+//Add hotkeys
+document.addEventListener("keyup", function(e) {
+	let chars = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"]//q,w,e,r,t,y,u,i,o,p will correspond to first 10 hand spots. Pressing will move to placemat.
+
+	if (e.code === "Space" && e.shiftKey) {
+		goMahjongButton.click()
+	}
+	else if (e.code === "Space") {
+		placeTilesButton.click()
+	}
+	else if (Number(e.key) > 0 && Number(e.key) < 5) {
+		//1,2,3, and 4 will correspond to the 4 placemat spots. Pressing them will remove the specified tile.
+		let pos = Number(e.key) - 1
+		if (userHand.inPlacemat[pos] && !userHand.inPlacemat[pos].evicting) {
+			//Hotkeys will not throw errors. They will silently fail if invalid.
+			userHand.contents.push(userHand.inPlacemat.splice(pos, 1)[0])
+			userHand.renderPlacemat()
+			userHand.renderTiles()
+		}
+	}
+	else if (chars.includes(e.key.toLowerCase())) {
+		let tiles = userHand.contents.filter((item) => {return item instanceof Tile})
+		let index = chars.indexOf(e.key.toLowerCase())
+		if (userHand.inPlacemat.length < 4 && tiles[index]) {
+			userHand.inPlacemat.push(
+				userHand.contents.splice(
+					userHand.contents.indexOf(tiles[index]), 1)[0])
+			userHand.renderPlacemat()
+			userHand.renderTiles()
+		}
+	}
+})
 
 
 module.exports = gameBoard
