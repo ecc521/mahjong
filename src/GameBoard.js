@@ -375,7 +375,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 
 //Add hotkeys
 document.addEventListener("keyup", function(e) {
-	let chars = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p"]//q,w,e,r,t,y,u,i,o,p will correspond to first 10 hand spots. Pressing will move to placemat.
+	let chars = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f"] //qwertyuiopasdf will correspond to first 14 hand spots. Pressing will move to placemat.
 
 	if (e.code === "Space" && e.shiftKey) {
 		goMahjongButton.click()
