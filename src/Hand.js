@@ -357,6 +357,20 @@ class Hand {
 						this.handToRender.appendChild(elem)
 					}
 				}
+
+				function resizeHandTiles(hand) {
+					if (hand.children.length > 14) {
+						//Downscale tiles to fit.
+						let baseSize = parseFloat(document.documentElement.style.getPropertyValue("--vh")) //Pixels.
+						baseSize /= hand.children.length / 14
+						hand.children.forEach((child) => {
+							child.style.setProperty("--vh", baseSize + "px")
+						})
+					}
+				}
+
+				resizeHandTiles(this.handToRender)
+				if (this.handForExposed) {resizeHandTiles(this.handForExposed)}
 			}).bind(this)
 
 			console.log(exposedTiles)

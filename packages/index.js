@@ -2676,6 +2676,24 @@ var Hand = /*#__PURE__*/function () {
         for (var _i = 0; _i < tiles.length; _i++) {
           _loop(_i);
         }
+
+        function resizeHandTiles(hand) {
+          if (hand.children.length > 14) {
+            //Downscale tiles to fit.
+            var baseSize = parseFloat(document.documentElement.style.getPropertyValue("--vh")); //Pixels.
+
+            baseSize /= hand.children.length / 14;
+            hand.children.forEach(function (child) {
+              child.style.setProperty("--vh", baseSize + "px");
+            });
+          }
+        }
+
+        resizeHandTiles(this.handToRender);
+
+        if (this.handForExposed) {
+          resizeHandTiles(this.handForExposed);
+        }
       }.bind(this);
 
       console.log(exposedTiles);

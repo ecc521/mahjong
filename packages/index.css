@@ -191,12 +191,12 @@
 #topHand {
 	position: absolute;
 	top: 0;
-	left: 9.52vh;
-	left: calc(var(--vh) * 9.52);
+	left: 10.52vh;
+	left: calc(var(--vh) * 10.52);
 	max-height: 12vh;
 	max-height: calc(var(--vh) * 12);
-	width: calc(100vw - 19.04vh);
-	width: calc(100vw - calc(var(--vh) * 19.04));
+	width: calc(100vw - 21.04vh);
+	width: calc(100vw - calc(var(--vh) * 21.04));
 	text-align: center; /*Center tiles horizontally. */
 	background-color: #5a3e32;
 }
@@ -205,10 +205,10 @@
 	position: absolute;
 	left: 0;
 	top: 0;
-	max-width: 9.52vh;
-	max-width: calc(var(--vh) * 9.52);
-	width: 9.52vh;
-	width: calc(var(--vh) * 9.52);
+	max-width: 10.52vh;
+	max-width: calc(var(--vh) * 10.52);
+	width: 10.52vh;
+	width: calc(var(--vh) * 10.52);
 	height: 100vh;
 	height: calc(var(--vh) * 100);
 	background-color: #4c3329;
@@ -218,10 +218,10 @@
 	position: absolute;
 	right: 0;
 	top: 0;
-	max-width:9.52vh;
-	max-width:calc(var(--vh) * 9.52);
-	width: 9.52vh;
-	width: calc(var(--vh) * 9.52);
+	max-width:10.52vh;
+	max-width:calc(var(--vh) * 10.52);
+	width: 10.52vh;
+	width: calc(var(--vh) * 10.52);
 	height: 100vh;
 	height: calc(var(--vh) * 100);
 	background-color: #4c3329;
@@ -234,14 +234,14 @@ This means that something using bottom is off the page - hence we must use top. 
 	/*bottom: 0;*/
 	top: 88vh;
 	top: calc(var(--vh) * 88);
-	left: 9.52vh;
-	left: calc(var(--vh) * 9.52);
+	left: 10.52vh;
+	left: calc(var(--vh) * 10.52);
 	height:12vh;
 	height:calc(var(--vh) * 12);
 	max-height: 12vh;
 	max-height: calc(var(--vh) * 12);
-	width: calc(100vw - 19.04vh);
-	width: calc(100vw - calc(var(--vh) * 19.04));
+	width: calc(100vw - 21.04vh);
+	width: calc(100vw - calc(var(--vh) * 21.04));
 	text-align: center; /*Center tiles horizontally. */
 	background-color: #7d4b37;
 }
@@ -279,8 +279,8 @@ This means that something using bottom is off the page - hence we must use top. 
 
 /*TODO: If tiles aren't at max size and height is much greater than width, the tiles run into each other, as the negative bottoms are height based, but tiles are width bound. */
 #gameBoard #topHand img {
-	max-width: calc(calc(100vw - 19.04vh) / 16); /*Raised from 14 in order to allow for more tiles to fit. */
-	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 16); /*Raised from 14 in order to allow for more tiles to fit. */
+	max-width: calc(calc(100vw - 19.04vh) / 14); /*Raised from 14 in order to allow for more tiles to fit. */
+	max-width: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14); /*Raised from 14 in order to allow for more tiles to fit. */
 	margin-left: calc(calc(100vw - 19.04vh) / 17 / -10); /*Negative margin of 10%. Allows even more tiles to fit. */
 	margin-left: calc(calc(100vw - calc(var(--vh) * 19.04)) / 17 / -10); /*Negative margin of 10%. Allows even more tiles to fit. */
 	max-height: 12vh;
@@ -293,26 +293,28 @@ This means that something using bottom is off the page - hence we must use top. 
 	transform: rotate(270deg);
 	max-width: 9.52vh;
 	max-width: calc(var(--vh) * 9.52);
-	max-height: 9vh;
-	max-height: calc(var(--vh) * 9);
+	max-height: 10.5vh;
+	max-height: calc(var(--vh) * 10.5);
 	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
 	padding-left: calc(var(--vh) * 2.38); /*Otherwise it is transformed partially off the screen. */
-	margin-bottom: -3.4vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-bottom: calc(var(--vh) * -3.4); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: -2vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: calc(var(--vh) * -2); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-top: -2vh; /*Split margin between top and bottom, as to prevent margin causing page to scroll downwards. */
+	margin-top: calc(var(--vh) * -2); /*Split margin between top and bottom, as to prevent margin causing page to scroll downwards. */
 }
 
 #gameBoard #rightHand img {
 	transform: rotate(90deg);
 	max-width: 9.52vh;
 	max-width: calc(var(--vh) * 9.52);
-	max-height: 9vh;
-	max-height: calc(var(--vh) * 9);
-	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
-	padding-left: calc(var(--vh) * 2.38); /*Otherwise it is transformed partially off the screen. */
-	margin-top: -2.38vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-top: calc(var(--vh) * -2.38); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-bottom: -1.02vh;
-	margin-bottom: calc(var(--vh) * -1.02);
+	max-height: 10.5vh;
+	max-height: calc(var(--vh) * 10.5);
+	margin-top: -2.75vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-top: calc(var(--vh) * -2.75); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: -1.25vh;
+	margin-bottom: calc(var(--vh) * -1.25);
+	padding-left: 2.77vh; /*Stop from travling off hand to left. */
+	padding-left: calc(var(--vh) * 2.77); /*Stop from travling off hand to left. */
 }
 
 #gameBoard #userHand img, #gameBoard #userHandExposed img, #gameBoard #tilePlacemat img {
@@ -487,8 +489,8 @@ This means that something using bottom is off the page - hence we must use top. 
 /*Since we have to use top instead of bottom due to viewport bugs, this can be floating above where it should be. */
 #gameBoard #fullscreenControls {
 	position: absolute;
-	right: 9.52vh;
-	right: calc(var(--vh) * 9.52);
+	right: 10.52vh;
+	right: calc(var(--vh) * 10.52);
 	top: 71vh;
 	top: calc(var(--vh) * 71);
 	max-height: 5vh;
