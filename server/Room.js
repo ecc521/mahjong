@@ -305,7 +305,7 @@ class Room {
 			}
 			let client = global.stateManager.getClient(clientId)
 			if (!doNotMessage) {
-				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), {durationMultiplier: 2})
+				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), {durationMultiplier: 1.5})
 				if (pretty > 0) {
 					this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " drew " + ((pretty === 1)?"a pretty!":pretty + " prettys!"), {clientId, speech: "I'm pretty!"})
 				}
@@ -433,7 +433,7 @@ class Room {
 							}
 							return false
 						}).bind(this))) {
-							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", {clientId, speech: "Make that a kong", durationMultiplier: 1.2})
+							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", {clientId, speech: "Make that a kong", durationMultiplier: 1.1}) //Add duation. Long speech.
 							this.sendStateToClients()
 							return;
 						}
@@ -445,7 +445,7 @@ class Room {
 						if (!hand.calling && hand.isCalling(this.gameData.discardPile, this.gameData.settings.unlimitedSequences)) {
 							hand.calling = true
 							discardMessage += ", and is calling"
-							durationMultiplier = 1.8
+							durationMultiplier = 1.5
 						}
 
 						//Discard tile.
