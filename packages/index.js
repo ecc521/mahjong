@@ -7911,14 +7911,16 @@ window.stateManager.onWallEmpty = function (obj) {
 };
 
 window.stateManager.onGameplayAlert = function (obj) {
+  var _obj$status;
+
   console.log(obj);
   console.log(obj.message);
-  var alert = new Popups.BlocklessAlert(obj.message, 3200);
+  var alert = new Popups.BlocklessAlert(obj.message, 4000 * ((obj === null || obj === void 0 ? void 0 : (_obj$status = obj.status) === null || _obj$status === void 0 ? void 0 : _obj$status.durationMultiplier) || 1));
   console.log(alert);
   alert.onStart.then(function () {
-    var _obj$status, _obj$status2;
+    var _obj$status2, _obj$status3;
 
-    if (window.voiceChoices[obj === null || obj === void 0 ? void 0 : (_obj$status = obj.status) === null || _obj$status === void 0 ? void 0 : _obj$status.clientId] && (obj === null || obj === void 0 ? void 0 : (_obj$status2 = obj.status) === null || _obj$status2 === void 0 ? void 0 : _obj$status2.speech)) {
+    if (window.voiceChoices[obj === null || obj === void 0 ? void 0 : (_obj$status2 = obj.status) === null || _obj$status2 === void 0 ? void 0 : _obj$status2.clientId] && (obj === null || obj === void 0 ? void 0 : (_obj$status3 = obj.status) === null || _obj$status3 === void 0 ? void 0 : _obj$status3.speech)) {
       //TODO: SPEAK!!!
       var utterance = new SpeechSynthesisUtterance(obj.status.speech);
       var voice = window.voiceChoices[obj.status.clientId].get();

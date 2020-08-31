@@ -153,7 +153,7 @@ window.stateManager.onWallEmpty = function(obj) {
 window.stateManager.onGameplayAlert = function(obj) {
 	console.log(obj)
 	console.log(obj.message)
-	let alert = new Popups.BlocklessAlert(obj.message, 3200)
+	let alert = new Popups.BlocklessAlert(obj.message, 4000 * (obj?.status?.durationMultiplier || 1))
 	console.log(alert)
 	alert.onStart.then(() => {
 		if (window.voiceChoices[obj?.status?.clientId] && obj?.status?.speech) {

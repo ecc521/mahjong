@@ -305,7 +305,7 @@ class Room {
 			}
 			let client = global.stateManager.getClient(clientId)
 			if (!doNotMessage) {
-				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), "success")
+				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), {durationMultiplier: 2})
 				if (pretty > 0) {
 					this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " drew " + ((pretty === 1)?"a pretty!":pretty + " prettys!"), {clientId, speech: "I'm pretty!"})
 				}
@@ -433,7 +433,7 @@ class Room {
 							}
 							return false
 						}).bind(this))) {
-							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", {clientId, speech: "Make that a kong"})
+							this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has upgraded an exposed pong into a kong. ", {clientId, speech: "Make that a kong", durationMultiplier: 1.2})
 							this.sendStateToClients()
 							return;
 						}
@@ -441,9 +441,11 @@ class Room {
 						let tileName = placement.value + " " + placement.type
 						let discardMessage = client.getNickname() + " has thrown a " + tileName
 						//We're also going to check if the discarder is calling.
+						let durationMultiplier = 1;
 						if (!hand.calling && hand.isCalling(this.gameData.discardPile, this.gameData.settings.unlimitedSequences)) {
 							hand.calling = true
 							discardMessage += ", and is calling"
+							durationMultiplier = 1.8
 						}
 
 						//Discard tile.
@@ -451,7 +453,7 @@ class Room {
 						this.gameData.currentTurn.turnChoices[clientId] = "Next"
 						placerMahjongOverride = false
 						this.sendStateToClients()
-						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, {clientId, speech: tileName})
+						this.messageAll([clientId], "roomActionGameplayAlert", discardMessage, {clientId, speech: tileName, durationMultiplier})
 						console.log("Throw")
 					}
 					else {
