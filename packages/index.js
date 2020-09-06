@@ -2683,7 +2683,7 @@ var Hand = /*#__PURE__*/function () {
             var baseVh = parseFloat(document.documentElement.style.getPropertyValue("--vh")); //Pixels.
 
             baseVh /= hand.children.length / 14;
-            var baseVw = parseFloat(document.documentElement.style.getPropertyValue("--vh")); //Pixels.
+            var baseVw = parseFloat(document.documentElement.style.getPropertyValue("--vw")); //Pixels.
 
             baseVw /= hand.children.length / 14;
             hand.children.forEach(function (child) {

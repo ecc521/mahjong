@@ -363,7 +363,7 @@ class Hand {
 						//Downscale tiles to fit.
 						let baseVh = parseFloat(document.documentElement.style.getPropertyValue("--vh")) //Pixels.
 						baseVh /= hand.children.length / 14
-						let baseVw = parseFloat(document.documentElement.style.getPropertyValue("--vh")) //Pixels.
+						let baseVw = parseFloat(document.documentElement.style.getPropertyValue("--vw")) //Pixels.
 						baseVw /= hand.children.length / 14
 						hand.children.forEach((child) => {
 							child.style.setProperty("--vh", baseVh + "px")
