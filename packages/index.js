@@ -5482,6 +5482,7 @@ var gameBoard = __webpack_require__(129); //While viewport relative units work f
 
 function setVisibleAreaHeight() {
   document.documentElement.style.setProperty('--vh', "".concat(window.innerHeight / 100, "px"));
+  document.documentElement.style.setProperty('--vw', "".concat(window.innerWidth / 100, "px"));
 }
 
 window.addEventListener('resize', setVisibleAreaHeight);

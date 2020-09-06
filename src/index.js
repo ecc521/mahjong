@@ -43,6 +43,7 @@ let gameBoard = require("./GameBoard.js")
 //We will use CSS variables to counteract this bug.
 function setVisibleAreaHeight() {
 	document.documentElement.style.setProperty('--vh', `${window.innerHeight/100}px`)
+    document.documentElement.style.setProperty('--vw', `${window.innerWidth/100}px`)
 }
 window.addEventListener('resize', setVisibleAreaHeight)
 setVisibleAreaHeight()

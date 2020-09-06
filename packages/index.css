@@ -201,10 +201,6 @@
 	line-height: 60px;
 }
 
-:root {
-	--vw: 1vw;
-}
-
 #topHand {
 	position: absolute;
 	top: 0;
