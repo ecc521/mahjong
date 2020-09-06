@@ -361,10 +361,13 @@ class Hand {
 				function resizeHandTiles(hand) {
 					if (hand.children.length > 14) {
 						//Downscale tiles to fit.
-						let baseSize = parseFloat(document.documentElement.style.getPropertyValue("--vh")) //Pixels.
-						baseSize /= hand.children.length / 14
+						let baseVh = parseFloat(document.documentElement.style.getPropertyValue("--vh")) //Pixels.
+						baseVh /= hand.children.length / 14
+						let baseVw = parseFloat(document.documentElement.style.getPropertyValue("--vh")) //Pixels.
+						baseVw /= hand.children.length / 14
 						hand.children.forEach((child) => {
-							child.style.setProperty("--vh", baseSize + "px")
+							child.style.setProperty("--vh", baseVh + "px")
+							child.style.setProperty("--vw", baseVw + "px")
 						})
 					}
 				}

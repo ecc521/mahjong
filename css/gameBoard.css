@@ -1,3 +1,7 @@
+:root {
+	--vw: 1vw;
+}
+
 #topHand {
 	position: absolute;
 	top: 0;
@@ -126,7 +130,7 @@ This means that something using bottom is off the page - hence we must use top. 
 
 #gameBoard #tilePlacemat img {
 	margin-right: 20px;
-	border-radius: calc(calc(100vw - calc(var(--vh) * 19.04)) / 14 / 12); /*border radius 1/12th the width of a tile. TODO: This should be analyzed later to make sure it works right*/
+	border-radius: calc((100vw - 19.04vh) / 14 / 12); /*border radius 1/12th the width of a tile. TODO: This should be analyzed later to make sure it works right*/
 }
 
 @keyframes discardSlotPulse {

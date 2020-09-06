@@ -32,6 +32,7 @@ function reformatCSSForViewportBug(inputText) {
 		if (line.trim().startsWith("--")) {continue} //Variable declaration.
 
 		let newLine = line.replace(/(-)?([\d.]+)vh/g, "calc(var(--vh) * $1$2)")
+		newLine = newLine.replace(/(-)?([\d.]+)vw/g, "calc(var(--vw) * $1$2)")
 
 		if (line !== newLine) { //Insert the new line below the current line
 			lines.splice(i + 1, 0, newLine)
