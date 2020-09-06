@@ -358,6 +358,7 @@ class Hand {
 					}
 				}
 
+				//Note: If the window is resized, tiles will not adjust until the hand is redrawn.
 				function resizeHandTiles(hand) {
 					if (hand.children.length > 14) {
 						//Downscale tiles to fit.
@@ -365,6 +366,7 @@ class Hand {
 						baseVh /= hand.children.length / 14
 						let baseVw = parseFloat(document.documentElement.style.getPropertyValue("--vw")) //Pixels.
 						baseVw /= hand.children.length / 14
+
 						hand.children.forEach((child) => {
 							child.style.setProperty("--vh", baseVh + "px")
 							child.style.setProperty("--vw", baseVw + "px")

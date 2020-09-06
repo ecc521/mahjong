@@ -2675,7 +2675,8 @@ var Hand = /*#__PURE__*/function () {
 
         for (var _i = 0; _i < tiles.length; _i++) {
           _loop(_i);
-        }
+        } //Note: If the window is resized, tiles will not adjust until the hand is redrawn.
+
 
         function resizeHandTiles(hand) {
           if (hand.children.length > 14) {
@@ -8058,10 +8059,12 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
   var message = obj.message;
 
   if (!message.inGame) {
+    document.body.style.overflow = "";
     return;
   }
 
   ;
+  document.body.style.overflow = "hidden";
 
   if (message.wallTiles !== undefined) {
     console.log(message.wallTiles);
@@ -8205,6 +8208,17 @@ document.addEventListener("keyup", function (e) {
       userHand.renderPlacemat();
       userHand.renderTiles();
     }
+  }
+});
+window.addEventListener("resize", function () {
+  topHand.renderTiles();
+  leftHand.renderTiles();
+  rightHand.renderTiles();
+  userHand.renderTiles();
+});
+window.addEventListener("scroll", function (event) {
+  if (window.stateManager.inGame) {
+    window.scrollTo(0, 0);
   }
 });
 module.exports = gameBoard;

@@ -263,7 +263,11 @@ let nametags = nametagIds.map((id) => {
 window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	let message = obj.message
 
-	if (!message.inGame) {return};
+	if (!message.inGame) {
+		document.body.style.overflow = ""
+		return
+	};
+	document.body.style.overflow = "hidden"
 
 	if (message.wallTiles !== undefined) {
 		console.log(message.wallTiles)
@@ -403,6 +407,19 @@ document.addEventListener("keyup", function(e) {
 			userHand.renderPlacemat()
 			userHand.renderTiles()
 		}
+	}
+})
+
+window.addEventListener("resize", function() {
+	topHand.renderTiles()
+	leftHand.renderTiles()
+	rightHand.renderTiles()
+	userHand.renderTiles()
+})
+
+window.addEventListener("scroll", function(event) {
+	if (window.stateManager.inGame) {
+		window.scrollTo(0,0)
 	}
 })
 

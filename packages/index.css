@@ -303,29 +303,31 @@ This means that something using bottom is off the page - hence we must use top. 
 
 /*Note: Currently leftHand and rightHand tiles are facing 180 degrees away from where they would in a real game, however this probably makes it easier to read the tiles. */
 #gameBoard #leftHand img {
-	transform: rotate(270deg);
+	transform: rotate(270deg) translate(-3vh, 0px);
+	transform: rotate(270deg) translate(calc(var(--vh) * -3), 0px);
 	max-width: 9.52vh;
 	max-width: calc(var(--vh) * 9.52);
 	max-height: 10.5vh;
 	max-height: calc(var(--vh) * 10.5);
 	padding-left: 2.38vh; /*Otherwise it is transformed partially off the screen. */
 	padding-left: calc(var(--vh) * 2.38); /*Otherwise it is transformed partially off the screen. */
-	margin-bottom: -2vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-bottom: calc(var(--vh) * -2); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-top: -2vh; /*Split margin between top and bottom, as to prevent margin causing page to scroll downwards. */
-	margin-top: calc(var(--vh) * -2); /*Split margin between top and bottom, as to prevent margin causing page to scroll downwards. */
+	margin-bottom: 0vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: calc(var(--vh) * 0); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-top: -4vh; /*Split margin between top and bottom, as to prevent margin causing page to scroll downwards. */
+	margin-top: calc(var(--vh) * -4); /*Split margin between top and bottom, as to prevent margin causing page to scroll downwards. */
 }
 
 #gameBoard #rightHand img {
-	transform: rotate(90deg);
+	transform: rotate(90deg) translate(.75vh, 0px);
+	transform: rotate(90deg) translate(calc(var(--vh) * .75), 0px);
 	max-width: 9.52vh;
 	max-width: calc(var(--vh) * 9.52);
 	max-height: 10.5vh;
 	max-height: calc(var(--vh) * 10.5);
-	margin-top: -2.75vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-top: calc(var(--vh) * -2.75); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
-	margin-bottom: -1.25vh;
-	margin-bottom: calc(var(--vh) * -1.25);
+	margin-top: -4vh; /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-top: calc(var(--vh) * -4); /*It seems like the elements height does not reflect the fact that it has been transformed. Negative margin to remove some of this. */
+	margin-bottom: 0vh;
+	margin-bottom: calc(var(--vh) * 0);
 	padding-left: 2.77vh; /*Stop from travling off hand to left. */
 	padding-left: calc(var(--vh) * 2.77); /*Stop from travling off hand to left. */
 }
