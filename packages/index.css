@@ -339,6 +339,11 @@ This means that something using bottom is off the page - hence we must use top. 
 	max-height: calc(var(--vh) * 12);
 }
 
+#gameBoard #userHand img {
+	margin-left: calc(calc(100vw - 19.04vh) / 17 / -10); /*Negative margin of 10%. Allows even more tiles to fit. */
+	margin-left: calc(calc(calc(var(--vw) * 100) - calc(var(--vh) * 19.04)) / 17 / -10); /*Negative margin of 10%. Allows even more tiles to fit. */
+}
+
 /*Note: These animations are eating up a very significant amount of CPU/GPU power. We may want to stop using them. */
 @keyframes handTurnPulse {
   0% {
