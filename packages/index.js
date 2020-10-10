@@ -8183,6 +8183,10 @@ window.stateManager.addEventListener("onStateUpdate", function (obj) {
 document.addEventListener("keyup", function (e) {
   var chars = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f"]; //qwertyuiopasdf will correspond to first 14 hand spots. Pressing will move to placemat.
 
+  if (!stateManager.inGame) {
+    return;
+  }
+
   if (e.code === "Space" && e.shiftKey) {
     goMahjongButton.click();
   } else if (e.code === "Space") {
