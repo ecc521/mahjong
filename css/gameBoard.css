@@ -157,7 +157,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	height: 12vw;
 	max-width: 12vh;
 	max-height: 12vh;
-	margin-right: 2vw;
+	margin-right: 3vw;
 	margin-top: 2vh;
 }
 
@@ -166,7 +166,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	margin: 0;
 	min-width: 12vw;
 	text-align: center;
-	right: 9.52vh;
+	right: calc(9.52vh + 1vw);
 	top: 26vh;
 }
 
@@ -177,7 +177,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	min-width: 12vh;
 	font-size: 1.2vw;
 	transform: rotate(270deg);
-	right: calc(9.52vh + 8vw);
+	right: calc(9.52vh + 9vw);
 	top: 19vh;
 }
 
@@ -186,7 +186,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	margin: 0;
 	min-width: 12vw;
 	text-align: center;
-	right: 9.52vh;
+	right: calc(9.52vh + 1vw);
 	top: 12vh;
 }
 
@@ -197,7 +197,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	min-width: 12vh;
 	font-size: 1.2vw;
 	transform: rotate(90deg);
-	right: 4.52vh;
+	right: calc(4.52vh + 1vw);
 	top: 19vh;
 }
 
