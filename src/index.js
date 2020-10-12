@@ -2,6 +2,16 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
 
+let sizes = [16,24,32,64,96,160,196]
+sizes.forEach((size) => {
+    let favicon = document.createElement("link")
+    favicon.rel = "shortcut icon"
+    favicon.type = "image/png"
+    favicon.sizes = size + "x" + size
+    favicon.href = `assets/icons/${size}x${size}-green-dragon.png`
+    document.head.appendChild(favicon)
+})
+
 const StateManager = require("./StateManager.js")
 
 //Mobile browsers use the touch API - desktop is drag and drop. We'll use a polyfill so we don't have to implement both.
