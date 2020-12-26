@@ -1,3 +1,14 @@
+try {
+    let isIE = (/MSIE (\d+\.\d+);/.test(navigator.userAgent) || navigator.userAgent.indexOf("Trident/") > -1)
+    if (isIE) {
+        let warning = document.createElement("h2")
+        warning.innerHTML = "Internet Explorer is NOT Supported. Choose a different browser (Chrome, Firefox, Edge, Safari, Opera, and most other browsers should work)"
+        document.body.insertBefore(warning, document.body.firstChild)
+    }
+}
+catch(e) {console.error(e)}
+
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js');
 }
