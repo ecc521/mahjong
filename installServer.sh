@@ -36,16 +36,26 @@ sudo a2enmod rewrite
 sudo a2enmod headers
 sudo a2enmod proxy
 sudo a2enmod proxy_http
-a2enmod proxy_wstunnel
+sudo a2enmod http2
+sudo a2enmod proxy_wstunnel
 
+
+sudo tee -a /etc/apache2/conf-available/NODEMAHJONG4FRIENDS.conf > /dev/null << EOF
 #Enable reverse proxy to /node.
-echo "LoadModule proxy_module modules/mod_proxy.so" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
-echo "LoadModule proxy_http_module modules/mod_proxy_http.so" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
-echo "LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
-echo "ProxyPass /node ws://127.0.0.1:3000/node" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf
-echo "ProxyRequests off" >> $HOME/mahjong/NODEMAHJONG4FRIENDS.conf #Not needed, good practice.
+LoadModule proxy_module modules/mod_proxy.so
+LoadModule proxy_http_module modules/mod_proxy_http.so
+LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
+ProxyPass /node ws://127.0.0.1:3000/node
+ProxyRequests off #Not Needed - Good Practice
 
-sudo mv $HOME/mahjong/NODEMAHJONG4FRIENDS.conf /etc/apache2/conf-available/NODEMAHJONG4FRIENDS.conf
+#Allow HTTP 2.
+LoadModule http2_module modules/mod_http2.so
+Protocols h2 http/1.1
+
+#Compress JSON
+AddOutputFilterByType DEFLATE application/json
+EOF
+
 sudo a2enconf NODEMAHJONG4FRIENDS #To disable, run sudo a2disconf NODEMAHJONG4FRIENDS
 
 #Restart apache so configuration changes take effect.
