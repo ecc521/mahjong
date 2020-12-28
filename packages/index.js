@@ -9351,7 +9351,10 @@ inRoomContainer.appendChild(joinRoomLinkElem);
 inRoomContainer.appendChild(document.createElement("br"));
 var roomSaveIdElem = document.createElement("p");
 roomSaveIdElem.id = "roomSaveIdElem";
-inRoomContainer.appendChild(roomSaveIdElem); //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
+inRoomContainer.appendChild(roomSaveIdElem);
+var supportInfo = document.createElement("p");
+supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>";
+roomManager.appendChild(supportInfo); //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
 //TODO: Also need a way to deal with reloads.
 
 speechSynthesis.getVoices(); //Not a no-op, Google Chrome bug causes very first call from loaded page to return empty, some sort of delay with it.

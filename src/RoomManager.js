@@ -162,6 +162,9 @@ let roomSaveIdElem = document.createElement("p")
 roomSaveIdElem.id = "roomSaveIdElem"
 inRoomContainer.appendChild(roomSaveIdElem)
 
+let supportInfo = document.createElement("p")
+supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>"
+roomManager.appendChild(supportInfo)
 
 //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
 //TODO: Also need a way to deal with reloads.
