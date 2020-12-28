@@ -50,7 +50,7 @@ function getPriority(obj, key, exemptFromChecks = false) {
 	}
 
 	if (obj[key].mahjong && !wouldMakeMahjong && !exemptFromChecks) {
-		client.message("roomActionPlaceTiles", "Unable to detect a mahjong in your hand. If this is an error, simply dismiss this message and press the mahjong button again. ", "error")
+		client.message("roomActionPlaceTiles", "Unable to detect a mahjong in your hand. (Press 'Mahjong' again to override). ", "error")
 		return false;
 	}
 
@@ -65,10 +65,12 @@ function getPriority(obj, key, exemptFromChecks = false) {
 	else if (obj[key] instanceof Match) {
 		//Validate that this is not a pair.
 		if (obj[key].amount === 2) {
-			if (!wouldMakeMahjong) {
-				//We don't support overrides of this message at the moment.
-				client.message("roomActionPlaceTiles", "You can't place a pair when it will not make you mahjong. ", "error")
+			if (!wouldMakeMahjong && !exemptFromChecks) {
+				client.message("roomActionPlaceTiles", "You can't place a pair when it will not make you mahjong. (Press 'Proceed' or 'Mahjong' again to override)", "error")
 				return false;
+			}
+			else if (exemptFromChecks) {
+				//Allow, and don't force mahjong.
 			}
 			else {
 				placement.mahjong = true //The specified action can only be accomplished through mahjong.
@@ -83,7 +85,7 @@ function getPriority(obj, key, exemptFromChecks = false) {
 	else if (obj[key] instanceof Sequence) {
 		//Verify that the user is the one immediently before.
 		if (getBackwardsDistance(placerWind, throwerWind) > 1 && !exemptFromChecks) {
-			client.message("roomActionPlaceTiles", "You can only take a sequence from the player before you in the rotation order, except with mahjong. If you play under different rules, simply press proceed again. ", "error")
+			client.message("roomActionPlaceTiles", "You can only take a sequence from the player before you, except with mahjong. (Press 'Proceed' again to override) ", "error")
 			return false;
 		}
 		priority = 99
