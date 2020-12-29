@@ -163,6 +163,7 @@ roomSaveIdElem.id = "roomSaveIdElem"
 inRoomContainer.appendChild(roomSaveIdElem)
 
 let supportInfo = document.createElement("p")
+supportInfo.id = "supportInfo"
 supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>"
 roomManager.appendChild(supportInfo)
 
