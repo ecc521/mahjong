@@ -9218,11 +9218,7 @@ var SettingsMenu = __webpack_require__(144); //Allow the user to join and create
 
 var roomManager = document.createElement("div");
 roomManager.id = "roomManager";
-document.body.appendChild(roomManager);
-var copyrightNotice = document.createElement("p");
-copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved";
-copyrightNotice.id = "copyrightNotice";
-roomManager.appendChild(copyrightNotice); //In order to get the "4 friends" part styled differently, we will need 3 elements for our heading.
+document.body.appendChild(roomManager); //In order to get the "4 friends" part styled differently, we will need 3 elements for our heading.
 
 var heading = document.createElement("div");
 heading.id = "heading";
@@ -9348,14 +9344,24 @@ var joinRoomLink = document.createElement("a");
 joinRoomLink.target = "_blank";
 joinRoomLinkElem.appendChild(joinRoomLink);
 inRoomContainer.appendChild(joinRoomLinkElem);
-inRoomContainer.appendChild(document.createElement("br"));
 var roomSaveIdElem = document.createElement("p");
 roomSaveIdElem.id = "roomSaveIdElem";
-inRoomContainer.appendChild(roomSaveIdElem);
+inRoomContainer.appendChild(roomSaveIdElem); //Create link to tutorial.
+
+var tutorial = document.createElement("a");
+tutorial.target = "_blank";
+tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/";
+tutorial.id = "tutorialLink";
+tutorial.innerHTML = "Mahjong 4 Friends Tutorial";
+roomManager.appendChild(tutorial);
 var supportInfo = document.createElement("p");
 supportInfo.id = "supportInfo";
 supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>";
-roomManager.appendChild(supportInfo); //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
+roomManager.appendChild(supportInfo);
+var copyrightNotice = document.createElement("p");
+copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved";
+copyrightNotice.id = "copyrightNotice";
+roomManager.appendChild(copyrightNotice); //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
 //TODO: Also need a way to deal with reloads.
 
 speechSynthesis.getVoices(); //Not a no-op, Google Chrome bug causes very first call from loaded page to return empty, some sort of delay with it.
@@ -9549,14 +9555,7 @@ window.stateManager.addEventListener("onEndGame", function (obj) {
   } else {
     console.log("Game Ended due to state sync. Popup suppressed in dev mode. ");
   }
-}); //Create link to tutorial.
-
-var tutorial = document.createElement("a");
-tutorial.target = "_blank";
-tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/";
-tutorial.id = "tutorialLink";
-tutorial.innerHTML = "Mahjong 4 Friends Tutorial";
-roomManager.appendChild(tutorial);
+});
 var isDevMode = false; //Allow query params.
 
 var params = new URLSearchParams(window.location.search);

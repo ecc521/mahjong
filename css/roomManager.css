@@ -1,7 +1,7 @@
 #roomManager {
 	position: absolute;
 	width: 100vw;
-	height: 100vh;
+	min-height: 100vh;
 	z-index: 10;
 	background-color: #368a36;
 	text-align: center;
@@ -60,9 +60,7 @@
 }
 
 #roomManager #copyrightNotice {
-	position: absolute;
 	text-align: center;
-	top: 96vh;
 	width: 100vw;
 	color: #ffbd17;
 }
@@ -159,4 +157,8 @@
 #roomManager #tutorialLink {
 	font-size: 30px;
 	line-height: 60px;
+}
+
+#roomManager #joinRoomLinkElem {
+	font-size: 1.5em;
 }

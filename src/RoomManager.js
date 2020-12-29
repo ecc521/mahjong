@@ -6,11 +6,6 @@ let roomManager = document.createElement("div")
 roomManager.id = "roomManager"
 document.body.appendChild(roomManager)
 
-let copyrightNotice = document.createElement("p")
-copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved"
-copyrightNotice.id = "copyrightNotice"
-roomManager.appendChild(copyrightNotice)
-
 
 //In order to get the "4 friends" part styled differently, we will need 3 elements for our heading.
 let heading = document.createElement("div")
@@ -157,15 +152,27 @@ joinRoomLink.target = "_blank"
 joinRoomLinkElem.appendChild(joinRoomLink)
 inRoomContainer.appendChild(joinRoomLinkElem)
 
-inRoomContainer.appendChild(document.createElement("br"))
 let roomSaveIdElem = document.createElement("p")
 roomSaveIdElem.id = "roomSaveIdElem"
 inRoomContainer.appendChild(roomSaveIdElem)
+
+//Create link to tutorial.
+let tutorial = document.createElement("a")
+tutorial.target = "_blank"
+tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/"
+tutorial.id = "tutorialLink"
+tutorial.innerHTML = "Mahjong 4 Friends Tutorial"
+roomManager.appendChild(tutorial)
 
 let supportInfo = document.createElement("p")
 supportInfo.id = "supportInfo"
 supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>"
 roomManager.appendChild(supportInfo)
+
+let copyrightNotice = document.createElement("p")
+copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved"
+copyrightNotice.id = "copyrightNotice"
+roomManager.appendChild(copyrightNotice)
 
 //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
 //TODO: Also need a way to deal with reloads.
@@ -372,15 +379,6 @@ window.stateManager.addEventListener("onEndGame", function(obj) {
 	}
 	else {console.log("Game Ended due to state sync. Popup suppressed in dev mode. ")}
 })
-
-
-//Create link to tutorial.
-let tutorial = document.createElement("a")
-tutorial.target = "_blank"
-tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/"
-tutorial.id = "tutorialLink"
-tutorial.innerHTML = "Mahjong 4 Friends Tutorial"
-roomManager.appendChild(tutorial)
 
 let isDevMode = false;
 
