@@ -73,6 +73,23 @@ createRoom.addEventListener("click", function() {
 })
 joinOrCreateRoom.appendChild(createRoom)
 
+let screenRotationAlert = document.createElement("p")
+screenRotationAlert.id = "screenRotationAlert"
+screenRotationAlert.innerHTML = "Rotating your screen to Landscape mode is recommended. "
+notInRoomContainer.appendChild(screenRotationAlert)
+
+function setScreenRotationAlert(event) {
+	let orientation = window.screen?.orientation?.type
+	//Window.innerWidth is returning the wrong value in simulator. May not be an issue on actual devices, but screen.width works fine.
+	if (orientation && orientation.includes("portrait") && screen.width < 900) {
+		screenRotationAlert.style.display = ""
+	}
+	else {
+		screenRotationAlert.style.display = "none"
+	}
+}
+window.addEventListener("orientationchange", setScreenRotationAlert);
+setScreenRotationAlert()
 
 let inRoomContainer = document.createElement("div")
 inRoomContainer.id = "inRoomContainer"

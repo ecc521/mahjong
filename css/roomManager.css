@@ -162,3 +162,8 @@
 #roomManager #joinRoomLinkElem {
 	font-size: 1.5em;
 }
+
+#roomManager #screenRotationAlert {
+	font-size: 2.5em;
+	background-color: white;
+}
