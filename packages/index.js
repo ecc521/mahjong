@@ -7972,6 +7972,31 @@ window.stateManager.onWallEmpty = function (obj) {
 window.stateManager.onGameplayAlert = function (obj) {
   var _obj$status;
 
+  //Play sound.
+  var sound = document.createElement("audio");
+  var baseUrl = "assets/sounds/";
+  var urls = [];
+
+  if (obj.message.includes("thrown")) {
+    sound.volume = 0.5;
+    urls = ["tile-drop-table.mp3"];
+  } else if (obj.message.includes("mahjong")) {
+    sound.volume = 1.2;
+    urls = ["tiles-dropping-table.mp3"];
+  }
+
+  if (urls.length > 0) {
+    sound.src = baseUrl + urls[Math.floor(Math.random() * urls.length)];
+    sound.setAttribute("preload", "auto");
+    sound.setAttribute("controls", "none");
+    sound.style.display = "none";
+    document.body.appendChild(sound);
+    sound.play();
+    setTimeout(function () {
+      sound.remove();
+    }, 2000);
+  }
+
   console.log(obj);
   console.log(obj.message);
   var alert = new Popups.BlocklessAlert(obj.message, 4000 * ((obj === null || obj === void 0 ? void 0 : (_obj$status = obj.status) === null || _obj$status === void 0 ? void 0 : _obj$status.durationMultiplier) || 1));
@@ -7997,10 +8022,7 @@ window.stateManager.onGameplayAlert = function (obj) {
 
       if (voice !== "none") {
         speechSynthesis.speak(utterance);
-        console.log("Tried to speak");
       }
-
-      console.log(utterance);
     }
   });
 };

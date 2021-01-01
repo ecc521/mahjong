@@ -151,6 +151,33 @@ window.stateManager.onWallEmpty = function(obj) {
 }
 
 window.stateManager.onGameplayAlert = function(obj) {
+	//Play sound.
+	let sound = document.createElement("audio");
+
+	let baseUrl = "assets/sounds/"
+	let urls = [];
+	if (obj.message.includes("thrown")) {
+		sound.volume = 0.5
+		urls = ["tile-drop-table.mp3"]
+	}
+	else if (obj.message.includes("mahjong")) {
+		sound.volume = 1.2
+		urls = ["tiles-dropping-table.mp3"]
+	}
+
+	if (urls.length > 0) {
+		sound.src = baseUrl + urls[Math.floor(Math.random() * urls.length)];
+		sound.setAttribute("preload", "auto");
+		sound.setAttribute("controls", "none");
+		sound.style.display = "none";
+		document.body.appendChild(sound);
+		sound.play()
+		setTimeout(function() {
+			sound.remove()
+		}, 2000)
+	}
+
+
 	console.log(obj)
 	console.log(obj.message)
 	let alert = new Popups.BlocklessAlert(obj.message, 4000 * (obj?.status?.durationMultiplier || 1))
@@ -171,9 +198,7 @@ window.stateManager.onGameplayAlert = function(obj) {
 			}
 			if (voice !== "none") {
 				speechSynthesis.speak(utterance)
-				console.log("Tried to speak")
 			}
-			console.log(utterance)
 		}
 	})
 }
