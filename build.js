@@ -1,3 +1,5 @@
+require("./webpackbuild.js")
+
 //There is a CSS viewport height bug for relative units in some mobile browsers. To counteract this, we will use CSS custom declarations where available.
 
 //This isn't going to be a spec compliant parser, and will probably be a pain to maintain. We should use something real in the future.

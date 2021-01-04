@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "webpack & node build.js",
+    "build": "node build.js",
     "bubblewrap": "bubblewrap"
   },
   "repository": {
