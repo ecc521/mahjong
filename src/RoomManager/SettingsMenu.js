@@ -106,7 +106,7 @@ function BotSettings() {
 		}
 	}
 	this.set = function(obj = {}) {
-		checkbox.checked = obj?.canCharleston ?? 2
+		checkbox.checked = obj?.canCharleston ?? false
 	}
 	this.isHost = true
 }
