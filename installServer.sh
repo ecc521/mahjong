@@ -22,15 +22,6 @@ npm install
 #Install apache
 sudo apt-get install -y apache2
 
-#Symlink to /var/www/html
-sudo mv /var/www/html /var/www/oldhtml #Move /var/www/html instead of deleting it... We don't want to delete anything important.
-sudo ln -s $HOME/mahjong /var/www/html
-
-echo "You may need to make sure that .htaccess files are enabled."
-echo "Edit the AllowOverride statement in the /var/www/ directory selector in the file /etc/apache2/apache2.conf to say All."
-
-read -n 1 -s -r -p "Press any key to continue"
-
 #Enable needed modules
 sudo a2enmod rewrite
 sudo a2enmod headers
@@ -39,24 +30,31 @@ sudo a2enmod proxy_http
 sudo a2enmod http2
 sudo a2enmod proxy_wstunnel
 
+sudo rm /etc/apache2/sites-available/mahjong.conf
 
-sudo tee -a /etc/apache2/conf-available/NODEMAHJONG4FRIENDS.conf > /dev/null << EOF
-#Enable reverse proxy to /node.
+sudo tee -a /etc/apache2/sites-available/mahjong.conf > /dev/null << EOF
+<VirtualHost *:80>
+		ServerAdmin admin@mahjong4friends.com
+		ServerName mahjong4friends.com
+		ServerAlias www.mahjong4friends.com
+		DocumentRoot $HOME/mahjong
+		ErrorLog ${APACHE_LOG_DIR}/mahjongerror.log
+		CustomLog ${APACHE_LOG_DIR}/mahjongaccess.log combined
+</VirtualHost>
+
 LoadModule proxy_module modules/mod_proxy.so
 LoadModule proxy_http_module modules/mod_proxy_http.so
 LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
 ProxyPass /node ws://127.0.0.1:3000/node
-ProxyRequests off #Not Needed - Good Practice
 
-#Allow HTTP 2.
 LoadModule http2_module modules/mod_http2.so
 Protocols h2 http/1.1
 
-#Compress JSON
 AddOutputFilterByType DEFLATE application/json
 EOF
 
-sudo a2enconf NODEMAHJONG4FRIENDS #To disable, run sudo a2disconf NODEMAHJONG4FRIENDS
+sudo a2ensite mahjong
+
 
 #Restart apache so configuration changes take effect.
 sudo systemctl restart apache2
@@ -65,10 +63,12 @@ sudo systemctl restart apache2
 sudo apt-get install -y certbot python-certbot-apache
 sudo certbot --apache
 
-echo "Run crontab -e (may need sudo). Add the following lines:"
-echo "@reboot node $HOME/mahjong/server.js >> $HOME/mahjong/server/data/server.log"
-echo "0 0 * * MON sudo reboot" #Reboot every monday. TODO: Save server state for resumption. 
-echo "@reboot sudo certbot renew  >> $HOME/mahjong/server/data/updateCertificate.log"
 
-echo "\nExplanation: Run server on reboot. Reboot at 4am every day. Check certificate every reboot and renew if needed."
-echo "You can reboot now or start server.js"
+echo "Adding instructions to crontab. The server is currently scheduled to reboot periodically, which you may want to disable. "
+
+#Run server on reboot. Reboot at 4am every day. Run certbot renew on each reboot.
+(crontab -l ; echo "@reboot mkdir -p $HOME/mahjong/server/data/ && node $HOME/mahjong/server.js >> $HOME/mahjong/server/data/server.log") | sort - | uniq - | crontab -
+(crontab -l ; echo "@reboot sudo certbot renew") | sort - | uniq - | crontab -
+(crontab -l ; echo "0 0 * * MON sudo reboot") | sort - | uniq - | crontab - #TODO: Save server state for resumption.
+
+echo "Rebooting now is recommended, and should start the site up properly. "
