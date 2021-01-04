@@ -45,7 +45,7 @@ sudo tee -a /etc/apache2/sites-available/mahjong.conf > /dev/null << EOF
 LoadModule proxy_module modules/mod_proxy.so
 LoadModule proxy_http_module modules/mod_proxy_http.so
 LoadModule proxy_wstunnel_module modules/mod_proxy_wstunnel.so
-ProxyPass /node ws://127.0.0.1:3000/node
+ProxyPass /node ws://127.0.0.1:7591/node
 
 LoadModule http2_module modules/mod_http2.so
 Protocols h2 http/1.1

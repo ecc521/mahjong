@@ -4,7 +4,7 @@ const http = require("http")
 const WebSocket = require('ws');
 
 const hostname = "0.0.0.0"
-const httpport = 3000
+const httpport = 7591
 
 const serverDataDirectory = path.join(__dirname, "server", "data")
 if (!fs.existsSync(serverDataDirectory)) {fs.mkdirSync(serverDataDirectory, {recursive: true})}
@@ -14,7 +14,7 @@ const websocketServer = new WebSocket.Server({
 	server: httpserver,
 	//TODO: How to test if permesssage-deflate is actually working? Not seeing it in consoles.
 	//Also, our current messages are insanely large, as we send all state, not just changes (meaning ~6KB, not ~200 bytes per message). Compression should get this down to
-	//a few hundred bytes though, especially if window is carried over between messages. 
+	//a few hundred bytes though, especially if window is carried over between messages.
 	perMessageDeflate: {
 	  threshold: 150, // Size (in bytes) below which messages should not be compressed.
 	}

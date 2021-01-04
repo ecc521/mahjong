@@ -45,7 +45,7 @@ else {
 }
 if (window.location.hostname === "127.0.0.1" || window.location.hostname.startsWith("192.168.1")) {
     //Local development
-    url.port = 3000
+    url.port = 7591
 }
 let websocketURL = url.toString()
 window.stateManager = new StateManager(websocketURL)
