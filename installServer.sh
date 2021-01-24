@@ -1,4 +1,4 @@
-read -n 1 -s -r -p "This file is intended to set up a server to host the Mahjong 4 Friends website. It may overwrite stuff without asking. Press any key to continue"
+read -p "This file is intended to set up a server to host the Mahjong 4 Friends website. It may overwrite stuff without asking, although will attempt to avoid destroying existing config. Press enter to continue"
 
 #Get updates
 sudo apt-get update
