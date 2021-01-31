@@ -12,8 +12,8 @@ for (let i=1;i<=1;i++) {
 		document.body.appendChild(cnv)
 		ctx.fillStyle = "#b66d17" //From top of tiles.
 		//ctx.fillStyle = "#e78723" //2 rows into border from white
-		ctx.font = "25px Arial"
-		ctx.fillText(i, 12, 41)
+		ctx.font = "22px Arial"
+		ctx.fillText(i, 15, 40)
 	})
 	img.src = url
 	//document.body.appendChild(img)
@@ -57,7 +57,7 @@ for (let i=4;i<=4;i++) {
 	//document.body.appendChild(img)
 }
 
-for (let i=5;i<=6;i++) {
+for (let i=5;i<=5;i++) {
 	url = "/assets/tiles/characters/Unedited/" + i + ".png"
 	let img = document.createElement("img")
 	img.addEventListener("load", function() {
@@ -69,7 +69,25 @@ for (let i=5;i<=6;i++) {
 		ctx.fillStyle = "#b66d17" //From top of tiles.
 		//ctx.fillStyle = "#e78723" //2 rows into border from white
 		ctx.font = "25px Arial"
-		ctx.fillText(i, 15, 44)
+		ctx.fillText(i, 13, 47)
+	})
+	img.src = url
+	//document.body.appendChild(img)
+}
+
+for (let i=6;i<=6;i++) {
+	url = "/assets/tiles/characters/Unedited/" + i + ".png"
+	let img = document.createElement("img")
+	img.addEventListener("load", function() {
+		let cnv = document.createElement("canvas")
+		cnv.width = 96;cnv.height=128
+		let ctx = cnv.getContext("2d")
+		ctx.drawImage(img, 0, 0)
+		document.body.appendChild(cnv)
+		ctx.fillStyle = "#b66d17" //From top of tiles.
+		//ctx.fillStyle = "#e78723" //2 rows into border from white
+		ctx.font = "25px Arial"
+		ctx.fillText(i, 15, 43)
 	})
 	img.src = url
 	//document.body.appendChild(img)
