@@ -3,9 +3,17 @@ class Tile {
 		this.type = config.type //Ex. wind, bamboo, character, pretty, dragon
 		this.value = config.value //Ex. 1,3 red, west
 
+		this.tileName = this.value + " " + this.type //TODO: Should we capitalize?
 		if (config.faceDown) {
 			this.faceDown = true
 			this.imageUrl = "assets/tiles/face-down.png"
+			//Some face down tiles might be part of a kong. 
+			if (this.value && this.type) {
+				this.tileName = "Face Down " + this.tileName
+			}
+			else {
+				this.tileName = "Face Down Tile"
+			}
 		}
 		else {
 			this.imageUrl = "assets/tiles/" + this.type + "s" + "/" + this.value + ".png"

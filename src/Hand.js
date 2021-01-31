@@ -89,7 +89,7 @@ class Hand {
 				}
 				else if (item instanceof Match && item.amount === 4) {
 					//If it is stored as a match, but not exposed, is in hand kong.
-					//Is not stored as a match if the user never placed them downw
+					//Is not stored as a match if the user never placed them down
 					exposedTiles.push(item)
 				}
 				else if (includeFaceDown) {
@@ -252,6 +252,7 @@ class Hand {
 				}
 				if (tile) {
 					elem.src = tile.imageUrl
+					elem.title = tile.tileName
 					//Both work. Using i is faster and simpler.
 					elem.placematIndex = i //this.inPlacemat.findIndex((item) => {return item === tile})
 					elem.addEventListener("dragstart", dragstart)
@@ -307,7 +308,8 @@ class Hand {
 					if (item instanceof Match) {
 						if (item.amount === 4) {
 							//kong. Flip 1 tile.
-							items[0] = new Tile({faceDown: true})
+							items[0].faceDown = true
+							items[0] = Tile.fromJSON(items[0].toJSON()) //Regenerate tile. This fixes the image url and name. 
 						}
 					}
 					if (item.exposed) {
@@ -316,7 +318,8 @@ class Hand {
 					else {
 						if (item instanceof Match && item.amount === 4) {
 							//In hand kong. Expose with 2 flipped tiles. (One already flipped)
-							items[3] = new Tile({faceDown: true})
+							items[3].faceDown = true
+							items[3] = Tile.fromJSON(items[3].toJSON()) //Regenerate tile. This fixes the image url and name.
 							exposedTiles = exposedTiles.concat(items)
 						}
 						else {
@@ -333,6 +336,7 @@ class Hand {
 					let tile = tiles[i]
 					let elem = document.createElement("img")
 					elem.src = tile.imageUrl
+					elem.title = tile.tileName
 
 					if (type === "exposed" && this.handForExposed) {
 						this.handForExposed.appendChild(elem)

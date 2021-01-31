@@ -84,9 +84,11 @@ class Wall {
 		while (div.firstChild) {div.firstChild.remove()} //Delete any existing tiles.
 
 		for (let i=0;i<tilesRemaining.length;i++) {
-			let tile = document.createElement("img")
-			tile.src = tilesRemaining[i].imageUrl
-			div.appendChild(tile)
+			let tile = tilesRemaining[i]
+			let tileImage = document.createElement("img")
+			tileImage.src = tile.imageUrl
+			tileImage.title = tile.tileName
+			div.appendChild(tileImage)
 		}
 
 		if (tilesRemaining.length === 0) {return} //Don't write "0" to the screen.
