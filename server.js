@@ -17,6 +17,9 @@ const websocketServer = new WebSocket.Server({
 	//a few hundred bytes though, especially if window is carried over between messages.
 	perMessageDeflate: {
 	  threshold: 150, // Size (in bytes) below which messages should not be compressed.
+	  memLevel: 9,
+		level: 9,
+		serverMaxWindowBits: 15,
 	}
 });
 
