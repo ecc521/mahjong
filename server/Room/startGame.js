@@ -20,43 +20,56 @@ function startGame(obj) {
 		this.state.moves.length = 0 //Delete elements, without overwriting proxy.
 
 		this.gameData.discardPile = []
-		this.gameData.settings = obj.settings
-		this.state.settings = obj.settings
+
+		//Assign new settings
+		if (obj?.settings?.unlimitedSequences !== undefined) {
+			this.state.settings.unlimitedSequences = obj?.settings?.unlimitedSequences
+		}
+
+		if (obj?.settings?.botSettings?.canCharleston !== undefined) {
+			this.state.settings.botSettings.canCharleston = obj?.settings?.botSettings?.canCharleston
+		}
+
 
 		this.gameData.playerHands = {}
 
 		//Build the player hands.
 		//For now, we will randomly assign winds.
+
+		//windAssignments is clientId: wind
 		let winds = ["north", "east", "south", "west"]
-		let eastWindPlayerId;
-
-		if (this.clientIds.includes(this.gameData.eastWindPlayerId)) {
-			winds.splice(winds.indexOf("east"), 1) //Delete east wind option
-		}
-
 		let windAssignments = {}
 
-		for (let i=0;i<this.clientIds.length;i++) {
-			let clientId = this.clientIds[i]
+		for (let clientId in this.state.settings.windAssignments) {
+			let wind = this.state.settings.windAssignments[clientId]
 
-			let wind;
-			if (this.gameData.eastWindPlayerId === clientId) {
-				wind = "east"
-				delete this.gameData.eastWindPlayerId
-			}
-			else {
-				wind = winds.splice(Math.floor(Math.random() * winds.length), 1)[0]
-			}
+			if (obj?.settings?.randomizeWinds && wind !== "east") {continue}
 
-			//Overrule wind assignment from state.
-			if (this.state.windAssignments) {
-				wind = this.state.windAssignments[clientId]
+			if (this.clientIds.includes(clientId)) {
+				let windIndex = winds.indexOf(wind)
+				//If two clientIds have the same wind, we need to exclude one.
+				if (windIndex !== -1) {
+					winds.splice(windIndex, 1)
+					windAssignments[clientId] = wind
+				}
 			}
+		}
+
+		this.clientIds.forEach((clientId) => {
+			if (!windAssignments[clientId]) {
+				windAssignments[clientId] = winds.splice(Math.floor(Math.random() * winds.length), 1)[0]
+			}
+		})
+
+		console.log(windAssignments)
+
+		let eastWindPlayerId;
+		for (let clientId in windAssignments) {
+			console.log(clientId)
+			let wind = windAssignments[clientId]
 
 			let hand = new Hand({wind})
 			this.gameData.playerHands[clientId] = hand
-
-			windAssignments[clientId] = wind
 
 			let tileCount = 13
 			if (wind === "east") {
@@ -68,7 +81,8 @@ function startGame(obj) {
 			}
 		}
 
-		this.state.windAssignments = windAssignments
+		this.state.settings.windAssignments = windAssignments
+		console.log(this.state.settings.windAssignments)
 
 		this.gameData.currentTurn = {
 			thrown: false,

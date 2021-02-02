@@ -9,7 +9,7 @@ function SettingsMenu(settingsDiv, isHost = false) {
 
 	let options = {
 		unlimitedSequences: new UnlimitedSequencesSelector(),
-		charleston: new CharlestonSelector(),
+		randomizeWinds: new RandomizeWindsSelector(),
 		botSettings: new BotSettings()
 	}
 
@@ -41,18 +41,30 @@ function SettingsMenu(settingsDiv, isHost = false) {
 	}
 }
 
-function CharlestonSelector() {
-	let elem = document.createElement("div")
-	elem.id = "charlestonSelectorDiv"
 
+
+function RandomizeWindsSelector() {
+	let elem = document.createElement("div")
+	elem.id = "randomizeWindsSelectorDiv"
+
+	let checkbox = document.createElement("input")
+	checkbox.id = "randomizeWindsSelectorCheckbox"
+	checkbox.type = "checkbox"
+
+	let label = document.createElement("label")
+	label.for = "randomizeWindsSelectorCheckbox"
+	label.innerHTML = "Randomize Winds (Except East)"
+	label.addEventListener("click", function() {checkbox.click()})
 
 	this.elem = elem
+	elem.appendChild(checkbox)
+	elem.appendChild(label)
 
 	this.get = function() {
-		return ["right", "across", "left"]
+		return checkbox.checked
 	}
-	this.set = function() {
-
+	this.set = function(boolean = false) {
+		checkbox.checked = boolean
 	}
 	this.isHost = true
 }

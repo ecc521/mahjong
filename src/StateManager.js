@@ -272,7 +272,6 @@ class StateManager {
 		}).bind(this)
 
 		let onGetCurrentRoom = (function onGetCurrentRoom(obj) {
-			console.log(obj)
 			this.inRoom = obj.message || false
 			//Now, if we are in a room, we should sync state with the room.
 			if (this.inRoom) {

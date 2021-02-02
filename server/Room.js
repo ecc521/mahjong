@@ -12,6 +12,17 @@ class Room {
 
 		this.state = state
 		this.state.roomId = roomId
+		this.state.settings = this.state.settings || {}
+
+		this.state.settings.unlimitedSequences = false
+
+		this.state.settings.charleston = ["right","across","left"]
+
+		this.state.settings.botSettings = this.state.settings.botSettings || {}
+		this.state.settings.botSettings.canCharleston = false
+
+		this.state.settings.windAssignments = this.state.settings.windAssignments || {}
+
 		console.log(state)
 		//TODO: Currently, clientId of other users is shown to users in the same room, allowing for impersonation. This needs to be fixed by using different identifiers.
 
@@ -30,7 +41,13 @@ class Room {
 		let updateState = (function update() {
 			this.state.clientIds = this.clientIds
 			if (writeStateSuspend) {console.log("Write suspended");return}
-			global.stateManager.writeRoomState(this.roomId)
+			try{
+				global.stateManager.writeRoomState(this.roomId)
+			}
+			catch(e) {
+				console.log("Couldn't write room state.")
+				console.error(e)
+			}
 		}).bind(this)
 
 		let updateStateProxy = {
@@ -116,12 +133,22 @@ class Room {
 			return summary
 		}).bind(this)
 
+		let shouldRotateWinds = true
+		this.rotateWinds = function() {
+			//We don't want to rotate until the game is actually ended - otherwise, we mess up state if the game is reverted.
+			let winds = ["north", "east", "south", "west"]
+			for (let clientId in this.state.settings.windAssignments) {
+				let wind = this.state.settings.windAssignments[clientId]
+				this.state.settings.windAssignments[clientId] = winds[(winds.indexOf(wind) + 1) % 4] //Next in order
+			}
+		}
+
 		this.goMahjong = (function goMahjong(clientId, drewOwnTile = false, override = false) {
 			//First, verify the user can go mahjong.
 			let client = global.stateManager.getClient(clientId)
 
 			let hand = this.gameData.playerHands[clientId]
-			let isMahjong = hand.isMahjong(this.gameData.settings.unlimitedSequences)
+			let isMahjong = hand.isMahjong(this.state.settings.unlimitedSequences)
 			if (isMahjong instanceof Hand) {
 				hand.contents = isMahjong.contents //Autocomplete the mahjong.
 			}
@@ -133,7 +160,10 @@ class Room {
 			//The game is over.
 			this.gameData.isMahjong = true
 			this.sendStateToClients()
-			this.gameData.eastWindPlayerId = clientId //Whoever goes mahjong gets east next game.
+			//If East does not win, rotate.
+			if (this.state.settings.windAssignments[clientId] !== "east") {
+				shouldRotateWinds = false
+			}
 
 			this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " has gone mahjong" , {clientId, speech: "Mahjong"})
 			this.messageAll([], "roomActionMahjong", this.getSummary(clientId, drewOwnTile), "success")
@@ -165,6 +195,8 @@ class Room {
 					state.wallTiles = state.wallTiles.length
 				}
 			}
+
+			state.settings = this.state.settings
 
 			state.discardPile = this.gameData.discardPile
 			state.saveId = this.saveId
@@ -290,13 +322,6 @@ class Room {
 				if (!tile) {
 					console.log("Wall Empty");
 					this.messageAll([], "roomActionWallEmpty", this.getSummary(), "success")
-					if (!this.gameData.eastWindPlayerId) {
-						for (let clientId in this.gameData.playerHands) {
-							if (this.gameData.playerHands[clientId].wind === "south") {
-								this.gameData.eastWindPlayerId = clientId
-							}
-						}
-					}
 					this.gameData.wall.isEmpty = true
 					this.sendStateToClients() //Game over. Wall empty.
 					return
@@ -323,12 +348,13 @@ class Room {
 				//Tell players who ended the game, so blame can be applied.
 				gameEndMessage = "The game has been ended by " + clientId + ", who goes by the name of " + client.getNickname() + "."
 			}
+			if (shouldRotateWinds) {this.rotateWinds()}
+			shouldRotateWinds = true
 			this.inGame = false
 			this.state.gameReady = this.gameReady = Date.now() //Adjust save key.
 			this.state.moves.length = 0 //Clear without resetting proxy.
 			delete this.state.wall
-			delete this.state.windAssignments
-			this.gameData = {eastWindPlayerId: this.gameData.eastWindPlayerId}
+			this.gameData = {}
 			this.messageAll([], obj.type, gameEndMessage, "success")
 			this.sendStateToClients()
 		}).bind(this)
@@ -351,10 +377,10 @@ class Room {
 				console.log(obj.message)
 
 				//The very first throw will determine if we charleston or not. Throwing one tile will start the game, throwing 3 will initiate charleston.
-				if (this.gameData.settings.charleston.length > 0 && this.gameData.charleston === undefined && placement.length !== 1 && hand.wind === "east") {
+				if (this.state.settings.charleston.length > 0 && this.gameData.charleston === undefined && placement.length !== 1 && hand.wind === "east") {
 					if (placement.length === 3) {
 						this.gameData.charleston = {
-							directions: this.gameData.settings.charleston.slice(0)
+							directions: this.state.settings.charleston.slice(0)
 						}
 						this.messageAll([], "roomActionGameplayAlert", "A charleston has begun. The first pass is going " + this.gameData.charleston.directions[0] , "success")
 					}
@@ -442,7 +468,7 @@ class Room {
 						let discardMessage = client.getNickname() + " has thrown a " + tileName
 						//We're also going to check if the discarder is calling.
 						let durationMultiplier = 1;
-						if (!hand.calling && hand.isCalling(this.gameData.discardPile, this.gameData.settings.unlimitedSequences)) {
+						if (!hand.calling && hand.isCalling(this.gameData.discardPile, this.state.settings.unlimitedSequences)) {
 							hand.calling = true
 							discardMessage += ", and is calling"
 							durationMultiplier = 1.5
@@ -511,7 +537,7 @@ class Room {
 				if (!(placement instanceof Match || placement instanceof Sequence)) {
 					return client.message(obj.type, "You can't discard when it is not your turn", "error")
 				}
-				if (placement instanceof Sequence && !this.gameData.settings.unlimitedSequences) {
+				if (placement instanceof Sequence && !this.state.settings.unlimitedSequences) {
 					if (hand.contents.some((item) => {return item instanceof Sequence})) {
 						return client.message(obj.type, "unlimitedSequences is off, so you can't place another sequence. ", "error")
 					}
