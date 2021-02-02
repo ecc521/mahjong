@@ -136,7 +136,7 @@ class Room {
 		let shouldRotateWinds = true
 		this.rotateWinds = function() {
 			//We don't want to rotate until the game is actually ended - otherwise, we mess up state if the game is reverted.
-			let winds = ["north", "east", "south", "west"]
+			let winds = ["north", "east", "south", "west"].reverse()
 			for (let clientId in this.state.settings.windAssignments) {
 				let wind = this.state.settings.windAssignments[clientId]
 				this.state.settings.windAssignments[clientId] = winds[(winds.indexOf(wind) + 1) % 4] //Next in order
