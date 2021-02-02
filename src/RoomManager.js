@@ -186,6 +186,11 @@ supportInfo.id = "supportInfo"
 supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>"
 roomManager.appendChild(supportInfo)
 
+let ratingPrompt = document.createElement("p")
+ratingPrompt.id = "supportInfo"
+ratingPrompt.innerHTML = `Enjoying Mahjong 4 Friends? Please <a href="https://play.google.com/store/apps/details?id=com.mahjong4friends.twa&hl=en_US&gl=US" target="_blank">leave a review on Google Play</a>!`
+roomManager.appendChild(ratingPrompt)
+
 let copyrightNotice = document.createElement("p")
 copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved"
 copyrightNotice.id = "copyrightNotice"
