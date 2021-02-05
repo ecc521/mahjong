@@ -73,6 +73,9 @@ createRoom.addEventListener("click", function() {
 })
 joinOrCreateRoom.appendChild(createRoom)
 
+if (window.location.protocol === "capacitor:") {
+	window.screen.orientation.lock('landscape');
+}
 let screenRotationAlert = document.createElement("p")
 screenRotationAlert.id = "screenRotationAlert"
 screenRotationAlert.innerHTML = "Rotating your screen to Landscape mode is recommended. "
@@ -304,7 +307,11 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 function enterRoom() {
 	inRoomContainer.style.display = "block"
 	notInRoomContainer.style.display = "none"
-	joinRoomLink.href = "?roomId=" + stateManager.inRoom
+	let queryParam = "?roomId=" + stateManager.inRoom
+	joinRoomLink.href = queryParam
+	if (window.location.protocol === "capacitor:") {
+	    joinRoomLink.href = "https://mahjong4friends.com" + queryParam
+	}
 	joinRoomLink.innerHTML = joinRoomLink.href
 }
 

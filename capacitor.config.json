@@ -1,0 +1,13 @@
+{
+  "appId": "com.mahjong4friends.twa",
+  "appName": "Mahjong 4 Friends",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "capacitorDir",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
