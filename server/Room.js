@@ -160,8 +160,8 @@ class Room {
 			//The game is over.
 			this.gameData.isMahjong = true
 			this.sendStateToClients()
-			//If East does not win, rotate.
-			if (this.state.settings.windAssignments[clientId] !== "east") {
+			//If East wins, do not rotate. 
+			if (this.state.settings.windAssignments[clientId] === "east") {
 				shouldRotateWinds = false
 			}
 
