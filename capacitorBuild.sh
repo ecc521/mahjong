@@ -2,7 +2,6 @@ npx cap add ios && npx cordova-res ios --copy #Generate the ios directory and ic
 
 rm -rf capacitorDir #Purge the current capacitorDir directory so that junk can't accumulate.
 mkdir capacitorDir
-cp -r packages capacitorDir/packages
 cp -r assets capacitorDir/assets
 cp -r index.html capacitorDir/index.html
 

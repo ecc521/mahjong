@@ -73,9 +73,16 @@ createRoom.addEventListener("click", function() {
 })
 joinOrCreateRoom.appendChild(createRoom)
 
-if (window.location.protocol === "capacitor:") {
-	window.screen.orientation.lock('landscape');
+
+
+//Inform user to use landscape. 
+if (window.isNative === "ios") {
+    try {
+        window.screen.orientation.lock('landscape');
+    }
+    catch (e) {console.error(e)}
 }
+
 let screenRotationAlert = document.createElement("p")
 screenRotationAlert.id = "screenRotationAlert"
 screenRotationAlert.innerHTML = "Rotating your screen to Landscape mode is recommended. "
@@ -84,7 +91,9 @@ notInRoomContainer.appendChild(screenRotationAlert)
 function setScreenRotationAlert(event) {
 	let orientation = window.screen?.orientation?.type
 	//Window.innerWidth is returning the wrong value in simulator. May not be an issue on actual devices, but screen.width works fine.
-	if (orientation && orientation.includes("portrait") && screen.width < 900) {
+	if (
+		(orientation?orientation.includes("portrait"):(Math.abs(window.orientation) !== 90)) //Support iOS window.orientation
+		&& screen.width < 900) {
 		screenRotationAlert.style.display = ""
 	}
 	else {
@@ -309,7 +318,7 @@ function enterRoom() {
 	notInRoomContainer.style.display = "none"
 	let queryParam = "?roomId=" + stateManager.inRoom
 	joinRoomLink.href = queryParam
-	if (window.location.protocol === "capacitor:") {
+	if (window.isNative === "ios") {
 	    joinRoomLink.href = "https://mahjong4friends.com" + queryParam
 	}
 	joinRoomLink.innerHTML = joinRoomLink.href

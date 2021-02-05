@@ -11,7 +11,7 @@ catch(e) {console.error(e)}
 
 if ('serviceWorker' in navigator) {
     try {
-        navigator.serviceWorker.register('sw.js');
+        navigator.serviceWorker.register('packagedsw.js');
     }
     catch (e) {
         console.error(e)
@@ -53,7 +53,7 @@ if (window.location.hostname === "127.0.0.1" || window.location.hostname.startsW
     url.port = 7591
 }
 let websocketURL = url.toString()
-if (window.location.protocol === "capacitor:") {
+if (window.isNative === "ios") {
     websocketURL = "wss://mahjong4friends.com/node"
 }
 window.stateManager = new StateManager(websocketURL)
@@ -75,6 +75,8 @@ function setVisibleAreaHeight() {
     document.documentElement.style.setProperty('--vw', `${window.innerWidth/100}px`)
 }
 window.addEventListener('resize', setVisibleAreaHeight)
+window.addEventListener('orientationchange', setVisibleAreaHeight)
+
 setVisibleAreaHeight()
 
 
