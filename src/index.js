@@ -53,7 +53,7 @@ if (window.location.hostname === "127.0.0.1" || window.location.hostname.startsW
     url.port = 7591
 }
 let websocketURL = url.toString()
-if (window.isNative === "ios") {
+if (window.isNative) {
     websocketURL = "wss://mahjong4friends.com/node"
 }
 window.stateManager = new StateManager(websocketURL)

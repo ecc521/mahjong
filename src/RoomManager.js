@@ -75,8 +75,8 @@ joinOrCreateRoom.appendChild(createRoom)
 
 
 
-//Inform user to use landscape. 
-if (window.isNative === "ios") {
+//Inform user to use landscape.
+if (window.isNative) {
     try {
         window.screen.orientation.lock('landscape');
     }
@@ -318,7 +318,7 @@ function enterRoom() {
 	notInRoomContainer.style.display = "none"
 	let queryParam = "?roomId=" + stateManager.inRoom
 	joinRoomLink.href = queryParam
-	if (window.isNative === "ios") {
+	if (window.isNative) {
 	    joinRoomLink.href = "https://mahjong4friends.com" + queryParam
 	}
 	joinRoomLink.innerHTML = joinRoomLink.href

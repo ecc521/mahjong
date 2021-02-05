@@ -1,6 +1,6 @@
 {
   "appId": "com.mahjong4friends.twa",
-  "appName": "Mahjong 4 Friends",
+  "appName": "Mahjong 4 Friends",
   "bundledWebRuntime": false,
   "npmClient": "npm",
   "webDir": "capacitorDir",
