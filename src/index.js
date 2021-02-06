@@ -10,7 +10,12 @@ catch(e) {console.error(e)}
 
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+    try {
+        navigator.serviceWorker.register('packagedsw.js');
+    }
+    catch (e) {
+        console.error(e)
+    }
 }
 
 let sizes = [16,24,32,64,96,160,196]
@@ -48,6 +53,9 @@ if (window.location.hostname === "127.0.0.1" || window.location.hostname.startsW
     url.port = 7591
 }
 let websocketURL = url.toString()
+if (window.isNative) {
+    websocketURL = "wss://mahjong4friends.com/node"
+}
 window.stateManager = new StateManager(websocketURL)
 
 //Make classes public to allow for easier development.
@@ -67,6 +75,8 @@ function setVisibleAreaHeight() {
     document.documentElement.style.setProperty('--vw', `${window.innerWidth/100}px`)
 }
 window.addEventListener('resize', setVisibleAreaHeight)
+window.addEventListener('orientationchange', setVisibleAreaHeight)
+
 setVisibleAreaHeight()
 
 

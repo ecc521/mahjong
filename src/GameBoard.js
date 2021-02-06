@@ -440,12 +440,14 @@ document.addEventListener("keyup", function(e) {
 	}
 })
 
-window.addEventListener("resize", function() {
+function handleScreenResize() {
 	topHand.renderTiles()
 	leftHand.renderTiles()
 	rightHand.renderTiles()
 	userHand.renderTiles()
-})
+}
+window.addEventListener("resize", handleScreenResize)
+window.addEventListener("orientationchange", handleScreenResize)
 
 window.addEventListener("scroll", function(event) {
 	if (window.stateManager.inGame) {
