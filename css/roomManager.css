@@ -22,12 +22,11 @@
 }
 
 #roomManager #roomIdInput, #roomManager #nicknameInput{
-	height: 5vh;
 	width: 32vw;
 	min-width: 550px;
 	max-width: 100vw;
-	font-size: 3vh;
-	padding-left: 1vh;
+	font-size: 2.5em;
+	padding: 5px;
 }
 
 #roomManager #supportInfo {
@@ -43,11 +42,10 @@
 }
 
 #roomManager #joinRoom, #roomManager #createRoom{
-	width: 16vw;
 	min-width: 150px;
-	height: 7vh;
 	border-radius: 3.5vh;
-	font-size: 2vh;
+	font-size: 2em;
+	padding: 10px;
 }
 
 #roomManager #joinRoom {
@@ -71,12 +69,12 @@
 }
 
 #roomManager #currentRoom {
-	font-size: 4vh;
+	font-size: 2em;
 	margin: 0;
 }
 
 #roomManager #playerCount {
-	font-size: 3vh;
+	font-size: 1.5em;
 }
 
 #roomManager .playerViewRow {
@@ -88,21 +86,21 @@
 }
 
 #roomManager .playerViewNameSpan {
-	font-size: 4vh;
+	font-size: 2em;
 	width: 40%;
 	display: inline-block;
 }
 
 #roomManager .playerViewVoiceChoice {
-	font-size: 4vh;
+	font-size: 1em;
 	width: 30%;
 	display: inline-block;
 	text-align: center;
 }
 
 #roomManager .playerViewVoiceChoice select{
-	font-size: 2vh;
-	max-width: 100%;
+	font-size: 1em;
+	max-width: 50%;
 }
 
 #roomManager .playerViewIdSpan {
@@ -112,7 +110,7 @@
 #roomManager .playerViewCard {
 	width: 30%;
 	display: inline-block;
-	font-size: 3vh;
+	font-size: 1.5em;
 	text-align: center;
 }
 
@@ -129,33 +127,30 @@
 }
 
 #roomManager #startGameButton, #roomManager #addBotButton  {
-	width: 30vw;
-	height: 5vh;
-	font-size: 3vh;
-	border-radius: 2.5vh;
+	font-size: 1.5em;
+	border-radius: 250000px;
 	margin-left: 1vw;
+	padding: 10px;
 	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
 }
 
 #roomManager #closeRoomButton {
-	width: 30vw;
-	height: 5vh;
-	font-size: 3vh;
-	border-radius: 2.5vh;
+	font-size: 1.5em;
+	border-radius: 250000px;
 	margin-left: 1vw;
+	padding: 10px;
 	background: linear-gradient(45deg, orange, yellow, lightgreen);
 }
 
 #roomManager #leaveRoomButton {
-	width: 30vw;
-	height: 5vh;
-	font-size: 3vh;
+	font-size: 1.5em;
 	border-radius: 2.5vh;
+	padding: 10px;
 	background: linear-gradient(45deg, #ffff39, #5bff5b, #609fff);
 }
 
 #roomManager #tutorialLink {
-	font-size: 30px;
+	font-size: 2em;
 	line-height: 60px;
 }
 
