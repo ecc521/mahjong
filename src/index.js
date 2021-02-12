@@ -19,7 +19,7 @@ if ('serviceWorker' in navigator) {
 }
 
 window.isAndroid = false
-if (window.location.hash === "#android") {
+if (document.referrer && document.referrer.includes("android-app://com.mahjong4friends.twa")) {
   window.isAndroid = true
 }
 
@@ -45,7 +45,7 @@ mobile_drag_drop_polyfill({
     dragImageTranslateOverride: scrollBehaviourDragImageTranslateOverride
 });
 
-let url = new URL(window.location.origin + window.location.pathname) //We need to make sure we don't include hash links. 
+let url = new URL(window.location.origin + window.location.pathname)
 url.pathname = "/node"
 if (window.location.protocol === "https:") {
     url.protocol = "wss:"
