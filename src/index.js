@@ -18,6 +18,11 @@ if ('serviceWorker' in navigator) {
     }
 }
 
+window.isAndroid = false
+if (window.location.hash === "#android") {
+  window.isAndroid = true
+}
+
 let sizes = [16,24,32,64,96,160,196]
 sizes.forEach((size) => {
     let favicon = document.createElement("link")
@@ -40,7 +45,7 @@ mobile_drag_drop_polyfill({
     dragImageTranslateOverride: scrollBehaviourDragImageTranslateOverride
 });
 
-let url = new URL(window.location)
+let url = new URL(window.location.origin + window.location.pathname) //We need to make sure we don't include hash links. 
 url.pathname = "/node"
 if (window.location.protocol === "https:") {
     url.protocol = "wss:"

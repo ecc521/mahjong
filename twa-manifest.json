@@ -8,7 +8,7 @@
   "navigationColor": "#000000",
   "backgroundColor": "#000000",
   "enableNotifications": false,
-  "startUrl": "/",
+  "startUrl": "/#android",
   "iconUrl": "https://mahjong4friends.com/assets/icons/512x512-green-dragon.png",
   "splashScreenFadeOutDuration": 300,
   "signingKey": {

@@ -198,15 +198,48 @@ supportInfo.id = "supportInfo"
 supportInfo.innerHTML = "Questions, Comments, or Concerns? Contact <a href='mailto:support@mahjong4friends.com'>support@mahjong4friends.com</a>"
 roomManager.appendChild(supportInfo)
 
-let ratingPrompt = document.createElement("p")
-ratingPrompt.id = "supportInfo"
-if (window.Capacitor) {
-	ratingPrompt.innerHTML = `Enjoying Mahjong 4 Friends? Please rate us in the App Store!`
+if (window.Capacitor || window.isAndroid) {
+	let ratingPrompt = document.createElement("p")
+	ratingPrompt.id = "supportInfo"
+	if (window.Capacitor) {
+		ratingPrompt.innerHTML = `Enjoying Mahjong 4 Friends? Please <a href="https://apps.apple.com/us/app/mahjong-4-friends/id1552704332" target="_blank">rate us in the App Store</a>!`
+	}
+	else if (window.isAndroid){
+		ratingPrompt.innerHTML = `Enjoying Mahjong 4 Friends? Please <a href="https://play.google.com/store/apps/details?id=com.mahjong4friends.twa" target="_blank">leave a review on Google Play</a>!`
+	}
+	roomManager.appendChild(ratingPrompt)
 }
 else {
-	ratingPrompt.innerHTML = `Enjoying Mahjong 4 Friends? Please <a href="https://play.google.com/store/apps/details?id=com.mahjong4friends.twa&hl=en_US&gl=US" target="_blank">leave a review on Google Play</a>!`
+	let externalAppStoresDiv = document.createElement("div")
+	externalAppStoresDiv.id = "externalAppStoresDiv"
+	roomManager.appendChild(externalAppStoresDiv)
+
+	function createButton(href, src, text) {
+		let link = document.createElement("a")
+		link.href = href
+		link.target = "_blank"
+
+		let img = document.createElement("img")
+		img.src = src
+		img.alt = text
+
+		link.appendChild(img)
+		externalAppStoresDiv.appendChild(link)
+	}
+	
+	createButton(
+		"https://apps.apple.com/us/app/mahjong-4-friends/id1552704332",
+		"assets/badges/appstore.svg",
+		"Get Mahjong 4 Friends on the App Store"
+	)
+
+	createButton(
+		"https://play.google.com/store/apps/details?id=com.mahjong4friends.twa",
+		"assets/badges/googleplay.svg",
+		"Get Mahjong 4 Friends on Google Play"
+	)
 }
-roomManager.appendChild(ratingPrompt)
+
 
 let copyrightNotice = document.createElement("p")
 copyrightNotice.innerHTML = "Copyright © 2020, All Rights Reserved"

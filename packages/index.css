@@ -185,6 +185,14 @@
 	background-color: white;
 }
 
+#roomManager #externalAppStoresDiv * {
+	height: 70px;
+	max-width: 90%;
+	margin: 16px;
+	margin-right: 8px;
+	margin-left: 8px;
+}
+
 #topHand {
 	position: absolute;
 	top: 0;
