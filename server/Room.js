@@ -16,7 +16,9 @@ class Room {
 
 		this.state.settings.unlimitedSequences = false
 
-		this.state.settings.charleston = ["right","across","left"]
+		this.state.settings.charleston = ["across","right","left"] //TODO: This is probably the best default. We want a setting.
+		//TODO: Add a setting for allowing blind passing tiles.
+		//TODO: Add settings for 0/arbitrary number/unlimited sequences. Need to update isCalling for that as well. 
 
 		this.state.settings.botSettings = this.state.settings.botSettings || {}
 		this.state.settings.botSettings.canCharleston = false
@@ -160,7 +162,7 @@ class Room {
 			//The game is over.
 			this.gameData.isMahjong = true
 			this.sendStateToClients()
-			//If East wins, do not rotate. 
+			//If East wins, do not rotate.
 			if (this.state.settings.windAssignments[clientId] === "east") {
 				shouldRotateWinds = false
 			}
