@@ -154,6 +154,11 @@
 	line-height: 60px;
 }
 
+#roomManager #documentationLink {
+	font-size: 1.3em;
+	line-height: 30px;
+}
+
 #roomManager #joinRoomLinkElem {
 	font-size: 1.5em;
 }

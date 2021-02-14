@@ -23,7 +23,7 @@
     body {
       background-color: #368a36;
       text-align: center;
-      font-size: 2em;
+      font-size: 1.5em;
     }
     </style>
 
@@ -48,13 +48,24 @@
     <h2>Need Assistance? Is something broken?</h2>
 
     <script>
-    //Create link to tutorial.
-    let tutorial = document.createElement("a")
-    tutorial.target = "_blank"
-    tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/"
-    tutorial.id = "tutorialLink"
-    tutorial.innerHTML = "Try the Mahjong 4 Friends Tutorial"
-    document.body.appendChild(tutorial)
+	//Create link to tutorial.
+	let tutorial = document.createElement("a")
+	tutorial.target = "_blank"
+	tutorial.href = "https://drive.google.com/file/d/1aGyekkldVouVY2Hy7SXTTvhS7I5X6o8O/view"
+	tutorial.id = "tutorialLink"
+	tutorial.innerHTML = "Mahjong 4 Friends Tutorial"
+	document.body.appendChild(tutorial)
+
+	document.body.appendChild(document.createElement("br"))
+	document.body.appendChild(document.createElement("br"))
+
+	//Create link to tutorial.
+	let documentation = document.createElement("a")
+	documentation.target = "_blank"
+	documentation.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/edit#heading=h.t7shfpx0qwex"
+	documentation.id = "documentationLink"
+	documentation.innerHTML = "Full Documentation"
+	document.body.appendChild(documentation)
 
     let supportInfo = document.createElement("p")
     supportInfo.id = "supportInfo"
@@ -62,7 +73,7 @@
     document.body.appendChild(supportInfo)
     </script>
 
-    <br><br>
+    <br>
     <h2>Privacy Information</h2>
     <h3>This policy applies to the Mahjong 4 Friends website, iOS App, and Android App. </h3>
     <p>Mahjong 4 Friends does not provide any information to third parties, and information collected is only that neccessary to recreate a game for debugging purpose.

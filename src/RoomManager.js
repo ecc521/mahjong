@@ -188,10 +188,20 @@ inRoomContainer.appendChild(roomSaveIdElem)
 //Create link to tutorial.
 let tutorial = document.createElement("a")
 tutorial.target = "_blank"
-tutorial.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/"
+tutorial.href = "https://drive.google.com/file/d/1aGyekkldVouVY2Hy7SXTTvhS7I5X6o8O/view"
 tutorial.id = "tutorialLink"
 tutorial.innerHTML = "Mahjong 4 Friends Tutorial"
 roomManager.appendChild(tutorial)
+
+roomManager.appendChild(document.createElement("br"))
+
+//Create link to tutorial.
+let documentation = document.createElement("a")
+documentation.target = "_blank"
+documentation.href = "https://docs.google.com/document/d/1sSGxlRHMkWYHjYhxJTLvHoFsVPAgSs7DFRpsZLmgIvc/edit#heading=h.t7shfpx0qwex"
+documentation.id = "documentationLink"
+documentation.innerHTML = "See Full Documentation"
+roomManager.appendChild(documentation)
 
 let supportInfo = document.createElement("p")
 supportInfo.id = "supportInfo"
