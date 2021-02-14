@@ -226,7 +226,7 @@ else {
 		link.appendChild(img)
 		externalAppStoresDiv.appendChild(link)
 	}
-	
+
 	createButton(
 		"https://apps.apple.com/us/app/mahjong-4-friends/id1552704332",
 		"assets/badges/appstore.svg",
@@ -354,7 +354,7 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 function enterRoom() {
 	inRoomContainer.style.display = "block"
 	notInRoomContainer.style.display = "none"
-	let queryParam = "?roomId=" + stateManager.inRoom
+	let queryParam = "#roomId=" + stateManager.inRoom
 	joinRoomLink.href = queryParam
 	if (window.isNative) {
 	    joinRoomLink.href = "https://mahjong4friends.com" + queryParam
@@ -459,7 +459,7 @@ window.stateManager.addEventListener("onEndGame", function(obj) {
 let isDevMode = false;
 
 //Allow query params.
-let params = new URLSearchParams(window.location.search)
+let params = new URLSearchParams("?" + window.location.hash.slice(1))
 if (params.has("roomId")) {
 	roomIdInput.value = params.get("roomId")
 }

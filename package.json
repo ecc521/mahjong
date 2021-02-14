@@ -41,6 +41,7 @@
     "babel-loader": "^8.1.0",
     "core-js": "^3.6.5",
     "es6-promise-plugin": "^4.2.2",
+    "ionic-plugin-deeplinks": "^1.0.22",
     "webpack": "^4.44.1",
     "ws": "^7.3.1"
   }

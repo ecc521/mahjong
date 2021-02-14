@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target" : { "namespace": "android_app", "package_name": "com.mahjong4friends.twa",
+               "sha256_cert_fingerprints": ["A7:88:53:2D:87:E1:1D:B1:C7:74:46:AB:2D:A8:6E:11:98:80:7E:B8:0C:58:D0:91:90:49:92:E6:C3:92:FA:19"] }
+},
+{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target" : { "namespace": "android_app", "package_name": "com.mahjong4friends.twa",
+               "sha256_cert_fingerprints": ["36:F1:61:1F:7D:7F:14:AF:02:D0:C5:39:AF:8D:13:28:AA:8F:2D:59:AA:3B:F9:93:BC:0B:83:AD:84:78:F2:53"] }
+}]
