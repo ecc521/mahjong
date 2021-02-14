@@ -4,7 +4,7 @@ rm -rf capacitorDir #Purge the current capacitorDir directory so that junk can't
 mkdir capacitorDir
 cp -r assets capacitorDir/assets
 cp -r packages capacitorDir/packages
-cp -r index.html capacitorDir/index.html
+cp -r *.html capacitorDir/
 
 npx cap copy
 npx cap open ios #Open in XCode

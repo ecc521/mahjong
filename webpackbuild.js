@@ -6,6 +6,7 @@ let config = {
 	mode: "production", //Build for production
 	entry: {
 		"packages/index.js": "./src/index.js",
+		"packages/universalLinks.js": "./src/universalLinks.js",
 		"./packagedsw.js": "./sw.js",
 	},
 	target: "web",
