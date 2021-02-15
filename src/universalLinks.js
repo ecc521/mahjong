@@ -22,6 +22,7 @@ try {
 			}
 			else {
 				console.log("Different pathname. Setting")
+                window.location.hash = url.hash //Hash might be different too. 
 				window.location.pathname = url.pathname
 			}
 		}
