@@ -420,23 +420,12 @@ document.addEventListener("keyup", function(e) {
 	else if (Number(e.key) > 0 && Number(e.key) < 5) {
 		//1,2,3, and 4 will correspond to the 4 placemat spots. Pressing them will remove the specified tile.
 		let pos = Number(e.key) - 1
-		if (userHand.inPlacemat[pos] && !userHand.inPlacemat[pos].evicting) {
-			//Hotkeys will not throw errors. They will silently fail if invalid.
-			userHand.add(userHand.inPlacemat.splice(pos, 1)[0])
-			userHand.renderPlacemat()
-			userHand.renderTiles()
-		}
+		userHand.moveTile(userHand.inPlacemat[pos])
 	}
 	else if (chars.includes(e.key.toLowerCase())) {
-		let tiles = userHand.contents.filter((item) => {return item instanceof Tile})
 		let index = chars.indexOf(e.key.toLowerCase())
-		if (userHand.inPlacemat.length < 4 && tiles[index]) {
-			userHand.inPlacemat.push(
-				userHand.contents.splice(
-					userHand.contents.indexOf(tiles[index]), 1)[0])
-			userHand.renderPlacemat()
-			userHand.renderTiles()
-		}
+		let tiles = userHand.contents.filter((item) => {return item instanceof Tile})
+		userHand.moveTile(tiles[index])
 	}
 })
 

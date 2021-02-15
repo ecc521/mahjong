@@ -7,7 +7,7 @@ const Wall = require("./Wall.js")
 class Hand {
 	constructor(config = {}) {
 		//handForExposed - Optional. If exposed tiles should be placed in a seperate hand, they will be placed here.
-		//interactive: Can the user drag and drop to reorder?
+		//interactive: Can the user drag and drop to reorder? Click to swap between hand and placemat?
 		//tilePlacemat: Element that will allow user to select tiles to expose.
 		this.handToRender = config.handToRender
 		this.handForExposed = config.handForExposed
@@ -56,8 +56,8 @@ class Hand {
 		}).bind(this)
 
 		this.remove = (function(obj) {
-			let index = this.contents.findIndex((value) => {return value === obj})
-			let placematIndex = this.inPlacemat.findIndex((value) => {return value === obj})
+			let index = this.contents.indexOf(obj)
+			let placematIndex = this.inPlacemat.indexOf(obj)
 			if (index !== -1) {
 				this.contents.splice(index, 1)
 			}
@@ -65,6 +65,71 @@ class Hand {
 				this.inPlacemat.splice(placematIndex, 1)
 			}
 			else {throw obj + " does not exist in hand. "}
+		}).bind(this)
+
+
+		this.moveTile = (function moveTile(tile, switchPlace = true, targetPosition) {
+			//Tile is the object in either the hand or placemat.
+
+			let placematIndex = this.inPlacemat.indexOf(tile)
+			let contentsIndex = this.contents.indexOf(tile)
+
+			console.log(targetPosition)
+
+			if (placematIndex + contentsIndex === -2) {
+				console.error("Tile does not exist. ")
+				return
+			}
+
+			let target = [this.inPlacemat, this.contents];
+			if (switchPlace) {
+				if (placematIndex === -1) {
+					//Moving from hand to placemat.
+					if (this.inPlacemat.length >= 4) {
+						alert("Placemat is already full. ")
+						return
+					}
+					else {
+						this.inPlacemat.push(this.contents.splice(contentsIndex, 1)[0])
+					}
+				}
+				else {
+					//Moving from placemat to hand.
+					if (placematIndex === 0 && this.inPlacemat[0].evicting) {
+						alert("This tile was discarded. To claim it, select the tiles you would like to match with it, then hit proceed. ")
+						return;
+					}
+					let currentTile = this.inPlacemat.splice(placematIndex, 1)[0]
+					if (!isNaN(targetPosition)) {
+						//Moving to specfic place in hand.
+						this.contents.splice(targetPosition, 0, currentTile)
+					}
+					else {
+						//Add with auto sort.
+						this.add(currentTile)
+					}
+				}
+			}
+			else if (!isNaN(targetPosition)){
+				if (contentsIndex === -1) {
+					console.error("Reordering in placemat is not supported. Must be in hand.")
+				}
+				else {
+					console.log(contentsIndex)
+					console.log(targetPosition)
+
+					let newTargetPosition = targetPosition
+					if (targetPosition > contentsIndex) {targetPosition--}
+
+					console.log(targetPosition)
+
+					this.contents.splice(targetPosition, 0, this.contents.splice(contentsIndex, 1)[0])
+				}
+			}
+			else {console.error("Unable to determine how this tile should be moved. ")}
+
+			this.renderTiles() //Re-render.
+			this.renderPlacemat() //Not sure if this is needed?
 		}).bind(this)
 
 		this.removeMatchingTile = (function(obj) {
@@ -115,46 +180,28 @@ class Hand {
 			let elem = document.getElementsByClassName(randomClass)[0]
 			elem.classList.remove(randomClass)
 
-			let dropPosition = ev.x
-			let targetBounds = ev.target.getBoundingClientRect()
+			let targetIndex = 2 //Not sure why..??? But??? This works!
+			for (let i=0;i<this.handToRender.children.length;i++) {
+				let child = this.handToRender.children[i]
+				let bounds = child.getBoundingClientRect()
 
-			let targetIndex = ev.target.tileIndex
-
-			if (targetBounds.right - ev.x < targetBounds.width/2) {
-				//Dropped on right side of tile. Insert after.
 				targetIndex++
+
+				if (ev.x < bounds.left + bounds.width / 2) {
+					//This child is to the left of the drop point.
+					targetIndex-- //Should not be at the very end.
+					break;
+				}
 			}
 
-			if (targetIndex === undefined) {targetIndex = 0}
-			//Block a bug where a tile dropped where it would land where it is moves second to back.
-			if (targetIndex === elem.tileIndex) {return;}
-
-			let targetTile = this.contents[targetIndex]
-
-			let currentTile;
 			if (elem.placematIndex !== undefined) {
 				//We are dragging out of the placemat, into the hand.
-				if (elem.placematIndex === 0 && this.inPlacemat[0].evicting) {
-					console.log("Blocked dragging of evictingThrownTile")
-					alert("You can't bring the thrown tile into your hand. You can only place it down along with other tiles that match it or form a sequence. ")
-					return;
-				}
-				currentTile = this.inPlacemat.splice(elem.placematIndex, 1)[0]
+				this.moveTile(this.inPlacemat[elem.placematIndex], true, targetIndex)
 			}
 			else {
 				//Reordering hand.
-				currentTile = this.contents.splice(elem.tileIndex, 1)[0]
+				this.moveTile(this.contents[elem.tileIndex], false, targetIndex)
 			}
-
-			if (targetIndex <= this.contents.length) {
-				let newTargetIndex = this.contents.findIndex((tile) => {return targetTile === tile})
-				this.contents.splice(newTargetIndex, 0, currentTile)
-			}
-			else {
-				this.contents.push(currentTile)
-			}
-
-			this.renderTiles() //Re-render.
 		}).bind(this)
 
 		let dropOnPlacemat = (function dropOnPlacemat(ev) {
@@ -163,20 +210,7 @@ class Hand {
 			let elem = document.getElementsByClassName(randomClass)[0]
 			elem.classList.remove(randomClass)
 
-			let currentTile = this.contents[elem.tileIndex]
-
-			if (!currentTile) {return}
-
-			if (this.inPlacemat.length >= 4) {
-				alert("Placemat is already full. ")
-				return
-			}
-			else {
-				this.inPlacemat.push(this.contents.splice(elem.tileIndex, 1)[0])
-			}
-			this.renderTiles()
-
-
+			this.moveTile(this.contents[elem.tileIndex])
 		}).bind(this)
 
 		if (this.interactive) {
@@ -253,9 +287,13 @@ class Hand {
 				if (tile) {
 					elem.src = tile.imageUrl
 					elem.title = tile.tileName
+					elem.draggable = true //Is this even neccessary? It wasn't set earlier, yet it was working fine. Do browsers just assume or something?
 					//Both work. Using i is faster and simpler.
 					elem.placematIndex = i //this.inPlacemat.findIndex((item) => {return item === tile})
 					elem.addEventListener("dragstart", dragstart)
+					elem.addEventListener("click", (function() {
+						this.moveTile(tile) //Closure.
+					}).bind(this))
 				}
 				else {
 					elem.src = "assets/tiles/tile-outline.png"
@@ -309,7 +347,7 @@ class Hand {
 						if (item.amount === 4) {
 							//kong. Flip 1 tile.
 							items[0].faceDown = true
-							items[0] = Tile.fromJSON(items[0].toJSON()) //Regenerate tile. This fixes the image url and name. 
+							items[0] = Tile.fromJSON(items[0].toJSON()) //Regenerate tile. This fixes the image url and name.
 						}
 					}
 					if (item.exposed) {
@@ -355,6 +393,9 @@ class Hand {
 						}
 						if (this.interactive) {
 							elem.draggable = true
+							elem.addEventListener("click", (function() {
+								this.moveTile(tile) //Closure.
+							}).bind(this))
 							elem.addEventListener("dragstart", dragstart)
 							elem.tileIndex = this.contents.findIndex((item) => {return item === tile})
 						}
