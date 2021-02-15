@@ -287,7 +287,7 @@ class StateManager {
 
 		//Development use only. Warnings should be shown.
 		//This will only change the clientId for the session. It will not change localStorage.
-		let params = new URLSearchParams(window.location.search)
+		let params = new URLSearchParams("?" + window.location.hash.slice(1))
 		if (params.has("clientId")) {
 			window.clientId = params.get("clientId")
 		}
