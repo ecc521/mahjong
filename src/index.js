@@ -17,6 +17,8 @@ if ('serviceWorker' in navigator) {
     }
 }
 
+document.title = "Mahjong 4 Friends - Free Multiplayer Mahjong"
+
 window.isAndroid = false
 if (document.referrer && document.referrer.includes("android-app://com.mahjong4friends.twa")) {
   window.isAndroid = true
