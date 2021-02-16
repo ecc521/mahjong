@@ -37,6 +37,10 @@ html {
 }
 
 body {
+	background-color: white;
+}
+
+body {
 	/*The notch isn't very large, so when we have a notch, we'll scale the entire screen. */
 	/*We need to translate slightly further, as the scale reduces the size from both sides evenly. */
 	/*Translate is processed AFTER scale, so we must multiply the translation to counteract*/

@@ -607,7 +607,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	width: calc(var(--vw) * 100);
 	height: 100vh;
 	height: calc(var(--vh) * 100);
-	background-color: #f9fff9;
+	background-color: #c3f6c3;
 }
 
 #errorPopupCover {
@@ -759,6 +759,10 @@ html, body {
 
 html {
 	background-color: black;
+}
+
+body {
+	background-color: white;
 }
 
 body {

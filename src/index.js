@@ -90,8 +90,9 @@ function setVisibleAreaHeight() {
 
     let pxRight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sar"))
     pxRight -= 10 //Ignore the small safe area decrease caused by rounded corners.
-    }
+    document.documentElement.style.setProperty('--shiftPercentageRight', `${Math.max(0, pxRight/window.innerWidth)}`)
 }
+
 window.addEventListener('resize', setVisibleAreaHeight)
 window.addEventListener('orientationchange', setVisibleAreaHeight)
 
