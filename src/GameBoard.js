@@ -158,7 +158,7 @@ window.stateManager.onGameplayAlert = function(obj) {
 	let urls = [];
 	if (obj.message.includes("thrown")) {
 		sound.volume = 0.5
-		urls = ["tile-drop-table.mp3"]
+		//urls = ["tile-drop-table.mp3"]
 	}
 	else if (obj.message.includes("mahjong")) {
 		sound.volume = 1.2
