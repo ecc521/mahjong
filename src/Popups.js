@@ -64,8 +64,8 @@ class BlocklessAlert {
 			counter++
 			previousMessagePromise.then(() => {
 				console.log(counter + " messages remaining to be posted. ")
-				//Exponentation be below 1, or NaN, so be careful to assure newDuration is no longer. Also, clamp to max speedup of 3x (currently 15 left)
-				let newDuration = duration / Math.min((Math.max(1, counter ** 0.4) || 1), 3)
+				//Aggressively speed up alerts to eat through queue - up to 3.5x the speed.
+				let newDuration = duration / Math.min((Math.max(1, counter ** 0.7) || 1), 3.5)
 				console.log(`Adjusting duration from ${duration} to ${newDuration}`)
 				duration = newDuration
 				cover.style.animation = "fadeInAndOut " + duration + "ms ease-in"
