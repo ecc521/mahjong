@@ -82,11 +82,14 @@ function setVisibleAreaHeight() {
 	document.documentElement.style.setProperty('--vh', `${window.innerHeight/100}px`)
     document.documentElement.style.setProperty('--vw', `${window.innerWidth/100}px`)
 
-    //iOS capacitor needs some margin to handle the notch.
-    if (window.Capacitor) {
-        let px = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sal"))
-        px -= 10 //Ignore the small safe area decrease caused by rounded corners. 
-        document.documentElement.style.setProperty('--shiftPercentage', `${Math.max(0, px/window.innerWidth)}`)
+    //Add some margin to handle the notch.
+
+    let pxLeft = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sal"))
+    pxLeft -= 10 //Ignore the small safe area decrease caused by rounded corners.
+    document.documentElement.style.setProperty('--shiftPercentageLeft', `${Math.max(0, pxLeft/window.innerWidth)}`)
+
+    let pxRight = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sar"))
+    pxRight -= 10 //Ignore the small safe area decrease caused by rounded corners.
     }
 }
 window.addEventListener('resize', setVisibleAreaHeight)
