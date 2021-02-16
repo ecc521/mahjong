@@ -81,12 +81,18 @@ let gameBoard = require("./GameBoard.js")
 function setVisibleAreaHeight() {
 	document.documentElement.style.setProperty('--vh', `${window.innerHeight/100}px`)
     document.documentElement.style.setProperty('--vw', `${window.innerWidth/100}px`)
+
+    //iOS capacitor needs some margin to handle the notch.
+    if (window.Capacitor) {
+        let px = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--sal"))
+        px -= 10 //Ignore the small safe area decrease caused by rounded corners. 
+        document.documentElement.style.setProperty('--shiftPercentage', `${Math.max(0, px/window.innerWidth)}`)
+    }
 }
 window.addEventListener('resize', setVisibleAreaHeight)
 window.addEventListener('orientationchange', setVisibleAreaHeight)
 
 setVisibleAreaHeight()
-
 
 //Otherwise Safari will scroll the page when the user drags tiles.
 //It's possible that we need feature detection for passive listeners, as it may be misinterpreted by older browsers, however I currently observe no side effects.

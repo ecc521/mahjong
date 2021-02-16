@@ -725,7 +725,6 @@ This means that something using bottom is off the page - hence we must use top. 
 
 
 :root {
-	--vh: 1vh;
 	/*
 	While viewport relative units work fine on desktop, some mobile browsers will not show the entire viewport, due to the url bar.
 	See https://nicolas-hoizey.com/articles/2015/02/18/viewport-height-is-taller-than-the-visible-part-of-the-document-in-some-mobile-browsers/
@@ -735,6 +734,18 @@ This means that something using bottom is off the page - hence we must use top. 
 
 	Find and replace (-)?([\d.]+)vh with calc(var(--vh) * $1$2)
 	*/
+	--vh: 1vh;
+	--vw: 1vh;
+
+	/*Complex math doesn't work in CSS, as one of two sides in division and multiplication
+	must be a number - dividing 100vw by 500px to get a ratio is not allowed
+	must be a number - dividing calc(var(--vw) * 100) by 500px to get a ratio is not allowed
+
+	Therefore, we need to make these enviroment variables accessible to JavaScript*/
+	--sat: env(safe-area-inset-top);
+	--sar: env(safe-area-inset-right);
+	--sab: env(safe-area-inset-bottom);
+	--sal: env(safe-area-inset-left);
 }
 
 html, body {
@@ -744,4 +755,17 @@ html, body {
 	height: calc(var(--vh) * 100);
 	margin: 0;
 	padding: 0;
+}
+
+html {
+	background-color: black;
+}
+
+body {
+	/*The notch isn't very large, so when we have a notch, we'll scale the entire screen. */
+	/*We need to translate slightly further, as the scale reduces the size from both sides evenly. */
+	/*Translate is processed AFTER scale, so we must multiply the translation to counteract*/
+	transform: scaleX(calc(1 - var(--shiftPercentage)))
+		translateX(calc(50vw * var(--shiftPercentage) / (1 - var(--shiftPercentage))));
+		translateX(calc(calc(var(--vw) * 50) * var(--shiftPercentage) / (1 - var(--shiftPercentage))));
 }
