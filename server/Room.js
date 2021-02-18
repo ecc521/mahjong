@@ -18,7 +18,7 @@ class Room {
 
 		this.state.settings.charleston = ["across","right","left"] //TODO: This is probably the best default. We want a setting.
 		//TODO: Add a setting for allowing blind passing tiles.
-		//TODO: Add settings for 0/arbitrary number/unlimited sequences. Need to update isCalling for that as well. 
+		//TODO: Add settings for 0/arbitrary number/unlimited sequences. Need to update isCalling for that as well.
 
 		this.state.settings.botSettings = this.state.settings.botSettings || {}
 		this.state.settings.botSettings.canCharleston = false
@@ -174,6 +174,8 @@ class Room {
 
 		this.revertState = (function(moveCount) {
 			//Reverts state, removing moveCount moves
+			//TODO: We probably want to save state here. Can we simply change the save ID or something?
+			if (moveCount < 1) {return} //Block revert by zero or negative numbers.
 			global.stateManager.deleteRoom(this.roomId)
 			this.state.moves = this.state.moves.slice(0, -moveCount)
 			let room = new Room(this.roomId, this.state)
