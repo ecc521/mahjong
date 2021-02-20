@@ -64,8 +64,9 @@ class BlocklessAlert {
 			counter++
 			previousMessagePromise.then(() => {
 				console.log(counter + " messages remaining to be posted. ")
-				//Aggressively speed up alerts to eat through queue - up to 3.5x the speed.
-				let newDuration = duration / Math.min((Math.max(1, counter ** 0.7) || 1), 3.5)
+				//Aggressively speed up alerts to eat through queue
+				let newDuration = duration / (Math.max(1, counter ** 0.8) || 1)
+				newDuration = Math.max(800, newDuration) //TODO: The audio will need to be sped up if we speed these up too much. Not much speedup needed on audio though.
 				console.log(`Adjusting duration from ${duration} to ${newDuration}`)
 				duration = newDuration
 				cover.style.animation = "fadeInAndOut " + duration + "ms ease-in"
