@@ -1,5 +1,6 @@
 const Match = require("../../src/Match.js")
 const Sequence = require("../../src/Sequence.js")
+const Tile = require("../../src/Tile.js")
 const Hand = require("../../src/Hand.js")
 
 
@@ -31,6 +32,7 @@ function getPriority(obj, key, exemptFromChecks = false) {
 	//wouldMakeMahjong will confirm that the current tile will allow mahjong to happen.
 	let mahjongHand = hand.isMahjong()
 	let wouldMakeMahjong = !!(mahjongHand);
+
 	hand.remove(this.gameData.currentTurn.thrown)
 
 	if (mahjongHand instanceof Hand && !exemptFromChecks) {
@@ -49,7 +51,11 @@ function getPriority(obj, key, exemptFromChecks = false) {
 		}
 	}
 
-	if (obj[key].mahjong && !wouldMakeMahjong && !exemptFromChecks) {
+	if (obj[key] instanceof Tile && obj[key].mahjong && mahjongHand) {
+		//Naked Mahjong. The one tile is the tile someone else discarded.
+		console.log("Naked Mahjong Bypassing Checks")
+	}
+	else if (obj[key].mahjong && !wouldMakeMahjong && !exemptFromChecks) {
 		client.message("roomActionPlaceTiles", "Unable to detect a mahjong in your hand. (Press 'Mahjong' again to override). ", "error")
 		return false;
 	}
@@ -152,12 +158,10 @@ function calculateNextTurn(obj, exemptFromChecks) {
 		}
 		//If anybody attempted to place, time to process them.
 		let utilized = false; //Did we use the thrown tile?
-		console.log(priorityList.length)
 		if (priorityList.length !== 0) {
 			//Sort highest to lowest
 			priorityList.sort((a, b) => {return b[0] - a[0]})
 			for (let i=0;i<priorityList.length;i++) {
-				console.log("Here 1")
 				let clientId = priorityList[i][1]
 				let client = global.stateManager.getClient(clientId)
 
@@ -167,6 +171,8 @@ function calculateNextTurn(obj, exemptFromChecks) {
 				}
 
 				let placement = obj[clientId]
+				let hand = this.gameData.playerHands[clientId]
+
 				//If placement succeeds, switch userTurn
 				console.log(placement)
 				if (placement instanceof Sequence) {
@@ -181,7 +187,6 @@ function calculateNextTurn(obj, exemptFromChecks) {
 					})
 					console.log(valid)
 					if (valid) {
-						let hand = this.gameData.playerHands[clientId]
 						//Add the tile to hand, attempt to verify, and, if not, remove
 						hand.add(this.gameData.currentTurn.thrown)
 						if (hand.removeTilesFromHand(placement)) {
@@ -206,7 +211,6 @@ function calculateNextTurn(obj, exemptFromChecks) {
 				else if (placement instanceof Match) {
 					//Confirm that the match uses the thrown tile
 					if (placement.value === this.gameData.currentTurn.thrown.value && placement.type === this.gameData.currentTurn.thrown.type) {
-						let hand = this.gameData.playerHands[clientId]
 						//We can just verify for on less tile here.
 
 						if (hand.removeMatchingTilesFromHand(placement.getComponentTile(), placement.amount - 1)) {
@@ -229,6 +233,21 @@ function calculateNextTurn(obj, exemptFromChecks) {
 							client.message("roomActionPlaceTiles", "You can't place a match of tiles you do not possess", "error")
 						}
 					}
+				}
+				else if (placement.mahjong) {
+					//Attempt a naked mahjong - user didn't provide what to do.
+					//TODO: BUG! Naked Mahjong may result in some placements being considered in-hand when they are not!
+					//This should be fixed, or scores might be slightly off.
+					console.log("Attempting Naked Mahjong")
+					hand.add(this.gameData.currentTurn.thrown)
+					this.goMahjong(clientId, undefined, exemptFromChecks.includes(clientId))
+					try {
+						hand.remove(this.gameData.currentTurn.thrown)
+					}
+					catch (e) {console.log("Unable to remove. Appears Naked Mahjong Successful")}
+				}
+				else {
+					console.error("No known operation to perform when processing turn. ")
 				}
 			}
 		}

@@ -11,7 +11,10 @@ class Bot extends Client {
 		let _message = this.message //So we don't lose access to the websocket based sending.
 
 		let lastSent;
+		let lastWasError;
 		this.message = (function message(type, message, status) {
+			if (lastWasError) {lastWasError = false;return} //First bot error disables bot temporarily. 
+
 			if (this.suppressed) {return} //Isn't really neccessary, as the bot should never receive roomActionState while suppressed, however a good measure.
 
 			if (this.websocket) {
@@ -50,6 +53,7 @@ class Bot extends Client {
 			}
 			if (status === "error" && !message.includes("manually control the bot")) {
 				//Only send the message once every 60 seconds at most.
+				lastWasError = true
 				if (!lastSent || Date.now() - lastSent > 60*1000) {
 					lastSent = Date.now()
 					this.getRoom().messageAll([this.clientId], "roomActionPlaceTiles", `${this.clientId} has received an error message. If it is not functioning, you can manually control the bot <a target="_blank" href="?clientId=${this.clientId}">here</a>. This message will be sent for the first error every minute. `, "error")

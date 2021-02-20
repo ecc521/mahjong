@@ -538,17 +538,20 @@ class Room {
 			}
 			else {
 				//This is not a discard, and it related to a throw, so must either be a pong, kong, sequence, or a pair if the user is going mahjong.
-				if (!(placement instanceof Match || placement instanceof Sequence)) {
+				if (obj.mahjong) {
+					//Naked Mahjong
+					placement.mahjong = obj.mahjong
+				}
+				else if (!(placement instanceof Match || placement instanceof Sequence)) {
 					return client.message(obj.type, "You can't discard when it is not your turn", "error")
 				}
-				if (placement instanceof Sequence && !this.state.settings.unlimitedSequences) {
+				else if (placement instanceof Sequence && !this.state.settings.unlimitedSequences) {
 					if (hand.contents.some((item) => {return item instanceof Sequence})) {
 						return client.message(obj.type, "unlimitedSequences is off, so you can't place another sequence. ", "error")
 					}
 				}
 				//Schedule the order. It's validity will be checked later.
 				console.log("Scheduling")
-				placement.mahjong = obj.mahjong
 				this.gameData.currentTurn.turnChoices[clientId] = placement
 				this.sendStateToClients()
 			}

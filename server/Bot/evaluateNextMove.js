@@ -236,7 +236,7 @@ function evaluateNextMove() {
 				return breakdown[str]?.value || 0
 			})
 			let max = Math.max(...values)
-			if (max > 80) { //Very high bar for not charlestoning, as east charlestons with an extra tile, which extends advantage.
+			if (max > 55) { //Very high bar for not charlestoning, as east charlestons with an extra tile, which extends advantage.
 				placeTiles(breakdown.strategy.throw)
 			}
 			else {
@@ -253,8 +253,15 @@ function evaluateNextMove() {
 		currentHand.add(gameData.currentTurn.thrown)
 		let isMahjong = currentHand.isMahjong()
 		let tile = gameData.currentTurn.thrown
-		//TODO: Look at keeping for sequence.
+
+		if (isMahjong) {
+			console.log("Naked Mahjong")
+			currentHand.remove(gameData.currentTurn.thrown)
+			return placeTiles([gameData.currentTurn.thrown], isMahjong); //Naked Mahjong.
+		}
+
 		if (currentHand.removeMatchingTilesFromHand(tile, 4, true)) {
+			//TODO: Look at keeping for sequence.
 			currentHand.remove(gameData.currentTurn.thrown)
 			return placeTiles(new Array(4).fill(gameData.currentTurn.thrown), isMahjong)
 		}
