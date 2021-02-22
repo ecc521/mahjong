@@ -349,8 +349,8 @@ class Room {
 			let gameEndMessage = "The Game Has Ended";
 			if (clientId) {
 				let client = global.stateManager.getClient(clientId)
-				//Tell players who ended the game, so blame can be applied.
-				gameEndMessage = "The game has been ended by " + clientId + ", who goes by the name of " + client.getNickname() + "."
+				//Tell players who ended the game.
+				gameEndMessage = "The game has been ended by " + client.getNickname() + "."
 			}
 			if (shouldRotateWinds) {this.rotateWinds()}
 			shouldRotateWinds = true
@@ -359,7 +359,7 @@ class Room {
 			this.state.moves.length = 0 //Clear without resetting proxy.
 			delete this.state.wall
 			this.gameData = {}
-			this.messageAll([], obj.type, gameEndMessage, "success")
+			this.messageAll([clientId], obj.type, gameEndMessage, "success")
 			this.sendStateToClients()
 		}).bind(this)
 

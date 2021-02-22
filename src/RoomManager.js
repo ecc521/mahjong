@@ -459,8 +459,8 @@ window.stateManager.addEventListener("onStartGame", function() {
 
 window.stateManager.addEventListener("onEndGame", function(obj) {
 	roomManager.style.display = ""
-	if (!isDevMode || obj.message !== "State Sync") {
-		//If we are in dev mode, and the message is "State Sync", suppress this warning.
+	if (obj.message !== "State Sync") {
+		//State Sync game ends happen to the person that ends the game, as well as in development mode. 
 		new Popups.Notification("Game Ended", obj.message).show()
 	}
 	else {console.log("Game Ended due to state sync. Popup suppressed in dev mode. ")}

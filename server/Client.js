@@ -3,7 +3,7 @@ let Bot; //Don't want them both scripts importing each other.
 class Client {
 	constructor(clientId, websocket) {
 		this.clientId = clientId
-		this.nickname = clientId
+		this.nickname = clientId.slice(0,7)
 		this.websocket = websocket
 
 		this.setWebsocket = (function(websocket) {

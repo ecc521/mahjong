@@ -144,12 +144,6 @@ window.stateManager.onPlaceTiles = function(obj) {
 	}
 }
 
-window.stateManager.onWallEmpty = function(obj) {
-	if (obj.status === "success") {
-		new Popups.Notification("Game Over - Wall Empty", obj.message).show()
-	}
-}
-
 window.stateManager.onGameplayAlert = function(obj) {
 	//Play sound.
 	let sound = document.createElement("audio");
@@ -209,11 +203,34 @@ endGameButton.id = "endGameButton"
 endGameButton.innerHTML = "End Game"
 gameBoard.appendChild(endGameButton)
 
+let shouldConfirm = true
+
+window.stateManager.addEventListener("onStartGame", function() {
+	shouldConfirm = true
+})
+
 endGameButton.addEventListener("click", function() {
-	if (confirm("End the game?") && confirm("Are you absolutely sure you want to end the game? You will be blamed. ")) {
+	//Require confirmation unless the game is over. Note that this might be slightly bugged with revert.
+	if (
+		!shouldConfirm
+		|| confirm("Are you absolutely sure you want to end the game?")
+	) {
 		window.stateManager.endGame()
 	}
 })
+
+function gameOver(message, obj) {
+	shouldConfirm = false;
+	new Popups.Notification(message, obj.message).show()
+}
+
+window.stateManager.onGameMahjong = function(obj) {
+	gameOver("Mahjong!", obj)
+}
+
+window.stateManager.onWallEmpty = function(obj) {
+	gameOver("Game Over - Wall Empty", obj)
+}
 
 let goMahjongButton = document.createElement("button")
 goMahjongButton.id = "goMahjongButton"
@@ -225,10 +242,6 @@ goMahjongButton.addEventListener("click", function() {
 	console.log(placement)
 	window.stateManager.placeTiles(placement, {mahjong: true})
 })
-
-stateManager.onGameMahjong = function(obj) {
-	new Popups.Notification("Mahjong!", obj.message).show()
-}
 
 let wallRendering = document.createElement("div")
 wallRendering.id = "wall"
