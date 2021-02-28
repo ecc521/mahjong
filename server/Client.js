@@ -27,7 +27,7 @@ class Client {
 			if (this.suppressed) {return}
 			if (!this.websocket) {
 				//This should only happen if we loaded from state, as we would for testing.
-				return //console.error("Error in Client.message - Client.websocket is undefined")
+				return
 			}
 			try {
 				//Handle errors where the websocket connection has closed.

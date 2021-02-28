@@ -180,7 +180,7 @@ class Hand {
 			let elem = document.getElementsByClassName(randomClass)[0]
 			elem.classList.remove(randomClass)
 
-			let targetIndex = 2 //Not sure why..??? But??? This works!
+			let targetIndex = 0
 			for (let i=0;i<this.handToRender.children.length;i++) {
 				let child = this.handToRender.children[i]
 				let bounds = child.getBoundingClientRect()
