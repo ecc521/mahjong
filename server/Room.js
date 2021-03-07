@@ -364,6 +364,7 @@ class Room {
 		}).bind(this)
 
 		let placerMahjongOverride = false
+		let placerSequenceOverride = false
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
 			this.state.moves.push([obj, clientId])
@@ -545,9 +546,10 @@ class Room {
 				else if (!(placement instanceof Match || placement instanceof Sequence)) {
 					return client.message(obj.type, "You can't discard when it is not your turn", "error")
 				}
-				else if (placement instanceof Sequence && !this.state.settings.unlimitedSequences) {
+				else if (placement instanceof Sequence && !this.state.settings.unlimitedSequences && !placerSequenceOverride) {
 					if (hand.contents.some((item) => {return item instanceof Sequence})) {
-						return client.message(obj.type, "unlimitedSequences is off, so you can't place another sequence. ", "error")
+						placerSequenceOverride = true //TODO: We should probably turn this override off at some point. 
+						return client.message(obj.type, "Host game settings allow only one sequence - try your same move again to ignore the one sequence setting and place your sequence. Overriding sequence settings may prevent 'calling' or 'ready' hands from being automatically detected. ", "error")
 					}
 				}
 				//Schedule the order. It's validity will be checked later.
