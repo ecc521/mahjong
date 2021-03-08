@@ -10,18 +10,15 @@
 }
 
 #roomManager #mahjongHeading, #roomManager #fourFriendsHeading {
-	font-size: 7vh;
-	font-size: calc(var(--vh) * 7);
+	font-size: 3em;
 	color: #ffbd17;
 	display: inline-block;
 }
 
 #roomManager #fourFriendsHeading {
-	font-size: 5vh;
-	font-size: calc(var(--vh) * 5);
+	font-size: 2.2em;
 	vertical-align: top;
-	margin-left: 1.5vw;
-	margin-left: calc(var(--vw) * 1.5);
+	margin-left: 0.5em;
 	font-style: italic;
 	color: #ffe100;
 }
@@ -126,8 +123,7 @@
 }
 
 #roomManager .playerViewIdSpan {
-	font-size: 2vh;
-	font-size: calc(var(--vh) * 2);
+	font-size: 1.2em;
 }
 
 #roomManager .playerViewCard {
@@ -152,29 +148,25 @@
 	cursor: pointer;
 }
 
-#roomManager #startGameButton, #roomManager #addBotButton  {
+#roomManager #startGameButton, #roomManager #addBotButton, #roomManager #leaveRoomButton, #roomManager #closeRoomButton {
 	font-size: 1.5em;
 	border-radius: 250000px;
+	padding: 10px;
+}
+
+#roomManager #startGameButton, #roomManager #addBotButton  {
 	margin-left: 1vw;
 	margin-left: calc(var(--vw) * 1);
-	padding: 10px;
 	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
 }
 
 #roomManager #closeRoomButton {
-	font-size: 1.5em;
-	border-radius: 250000px;
 	margin-left: 1vw;
 	margin-left: calc(var(--vw) * 1);
-	padding: 10px;
 	background: linear-gradient(45deg, orange, yellow, lightgreen);
 }
 
 #roomManager #leaveRoomButton {
-	font-size: 1.5em;
-	border-radius: 2.5vh;
-	border-radius: calc(var(--vh) * 2.5);
-	padding: 10px;
 	background: linear-gradient(45deg, #ffff39, #5bff5b, #609fff);
 }
 
