@@ -1,6 +1,8 @@
 const Popups = require("./Popups.js")
 const SettingsMenu = require("./RoomManager/SettingsMenu.js")
 
+const QRCode = require("qrcode-generator")
+
 //Allow the user to join and create rooms.
 let roomManager = document.createElement("div")
 roomManager.id = "roomManager"
@@ -79,7 +81,7 @@ singlePlayerGame.id = "singlePlayerGame"
 singlePlayerGame.innerHTML = "Single Player"
 singlePlayerGame.addEventListener("click", function() {
 	let roomId = "sp-" + Math.floor(Math.random() * 1e10) //We need to stop depending on randomness - collisions are possible.
-	//Websockets guarantees delivery order, so we should be safe here, unless any calls error. 
+	//Websockets guarantees delivery order, so we should be safe here, unless any calls error.
 	window.stateManager.createRoom(roomId, "You")
 	window.stateManager.addBot("Bot 1")
 	window.stateManager.addBot("Bot 2")
@@ -181,18 +183,37 @@ addBotButton.addEventListener("click", function() {
 	window.stateManager.addBot(name)
 })
 
-let gameSettingsElem = document.createElement("div")
-gameSettingsElem.id = "gameSettingsElem"
-inRoomContainer.appendChild(gameSettingsElem)
+
+let inviteYourFriendsElem = document.createElement("div")
+inviteYourFriendsElem.id = "inviteYourFriendsElem"
+inRoomContainer.appendChild(inviteYourFriendsElem)
+
+let inviteYourFriendsHeader = document.createElement("h2")
+inviteYourFriendsHeader.innerHTML = "Play with Friends!"
+inviteYourFriendsElem.appendChild(inviteYourFriendsHeader)
 
 let joinRoomLinkElem = document.createElement("p")
 joinRoomLinkElem.id = "joinRoomLinkElem"
-joinRoomLinkElem.innerHTML = "Link to this room: "
+joinRoomLinkElem.innerHTML = "Share the link: "
 
 let joinRoomLink = document.createElement("a")
 joinRoomLink.target = "_blank"
 joinRoomLinkElem.appendChild(joinRoomLink)
-inRoomContainer.appendChild(joinRoomLinkElem)
+inviteYourFriendsElem.appendChild(joinRoomLinkElem)
+
+let joinRoomQRText = document.createElement("p")
+joinRoomQRText.innerHTML = "Or share the QR code: "
+joinRoomQRText.id = "joinRoomLinkElem"
+inviteYourFriendsElem.appendChild(joinRoomQRText)
+
+let QRImageElement = document.createElement("img")
+QRImageElement.id = "QRImageElement"
+joinRoomQRText.appendChild(QRImageElement)
+
+
+let gameSettingsElem = document.createElement("div")
+gameSettingsElem.id = "gameSettingsElem"
+inRoomContainer.appendChild(gameSettingsElem)
 
 let roomSaveIdElem = document.createElement("p")
 roomSaveIdElem.id = "roomSaveIdElem"
@@ -383,6 +404,18 @@ function enterRoom() {
 	    joinRoomLink.href = "https://mahjong4friends.com" + queryParam
 	}
 	joinRoomLink.innerHTML = joinRoomLink.href
+	try {
+		let qrGenerator = QRCode(0, "H"); //0 is for auto-detection. We want maximum error correction.
+		//TODO: Create a canvas, and draw mahjong logo into the middle of the QR code.
+		//TODO: Use a higher resolution QR code (docs at https://www.npmjs.com/package/qrcode-generator), and downscale it.
+		//That way people can click on it and get even higher resolution.
+		qrGenerator.addData(joinRoomLink.href)
+		qrGenerator.make()
+		QRImageElement.src = qrGenerator.createDataURL(3, 9) //Size of each QR data-square, and margin.
+	}
+	catch (e) {
+		console.error(e)
+	}
 }
 
 function exitRoom() {
@@ -415,7 +448,11 @@ window.stateManager.onLeaveRoom = function(obj) {
 	//We left the room. Change clientId.
 	const StateManager = require("./StateManager.js")
 	StateManager.setClientId(StateManager.createNewClientId())
-	new Popups.Notification("Out of Room", obj.message).show()
+	//Don't show somebody that they left the room. Just exit.
+	//Don't show the host that they closed the room. Just exit.
+	if (obj.message !== "You closed the room. " && obj.message !== "You left the room. ") {
+		new Popups.Notification("Out of Room", obj.message).show()
+	}
 }
 
 window.stateManager.addEventListener("onStateUpdate", function(obj) {

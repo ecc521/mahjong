@@ -260,7 +260,7 @@ class Room {
 			if (this.clientIds.length >= 4) {
 				//Alert the host somebody was blocked from joining.
 				global.stateManager.getClient(this.hostClientId).message("roomActionGameplayAlert", global.stateManager.getClient(clientId).getNickname() + ` (${clientId}) tried to join the room. `, "success")
-				return "Room Full"
+				return "Room Full. You can ask the host to kick a player or bot. "
 			}
 			if (this.clientIds.includes(clientId)) {return "Already In Room"}
 			if (!this.hostClientId) {this.hostClientId = clientId}
@@ -269,7 +269,7 @@ class Room {
 			return true
 		}).bind(this)
 
-		this.removeClient = (function(clientId, explaination = "You have left the room. ") {
+		this.removeClient = (function(clientId, explaination = "You left the room. ") {
 			let clientIdIndex = this.clientIds.findIndex((currentClientId) => {return currentClientId === clientId})
 			if (clientIdIndex === -1) {
 				return "Client Not Found"
@@ -548,7 +548,7 @@ class Room {
 				}
 				else if (placement instanceof Sequence && !this.state.settings.unlimitedSequences && !placerSequenceOverride) {
 					if (hand.contents.some((item) => {return item instanceof Sequence})) {
-						placerSequenceOverride = true //TODO: We should probably turn this override off at some point. 
+						placerSequenceOverride = true //TODO: We should probably turn this override off at some point.
 						return client.message(obj.type, "Host game settings allow only one sequence - try your same move again to ignore the one sequence setting and place your sequence. Overriding sequence settings may prevent 'calling' or 'ready' hands from being automatically detected. ", "error")
 					}
 				}
@@ -605,10 +605,16 @@ class Room {
 				if (!isHost) {
 					return client.message(obj.type, "Only Host Can Close Room", "error")
 				}
+
+				let hostClientId = this.hostClientId //Host may change as people are removed.
+
 				this.clientIds.slice(0).forEach((clientId) => {
-					//Clone array to avoid shifting.
-					this.removeClient(clientId, "The room has been closed. ")
+					if (clientId !== hostClientId) {
+						//Clone array to avoid shifting.
+						this.removeClient(clientId, "The room has been closed. ")
+					}
 				})
+				this.removeClient(hostClientId, "You closed the room. ")
 				global.stateManager.deleteRoom(this.roomId)
 			}
 			else if (obj.type === "roomActionPlaceTiles") {

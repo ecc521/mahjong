@@ -188,6 +188,21 @@
 	line-height: 30px;
 }
 
+#roomManager #inviteYourFriendsElem {
+	background-color: #63c863;
+	border-radius: 5px;
+	width: 90vw;
+	width: calc(var(--vw) * 90);
+	margin-left: 5vw;
+	margin-left: calc(var(--vw) * 5);
+	min-height: 100px;
+	margin-top: 10px;
+}
+
+#roomManager #QRImageElement {
+	vertical-align: middle;
+}
+
 #roomManager #joinRoomLinkElem {
 	font-size: 1.5em;
 }
