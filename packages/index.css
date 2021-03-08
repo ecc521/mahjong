@@ -80,7 +80,7 @@
 }
 
 #roomManager #inRoomContainer {
-	background-color: #00000011; /*Darken the background slightly. */
+	background-color: #00000007; /*Darken the background slightly. */
 	min-height: 40vh;
 	min-height: calc(var(--vh) * 40);
 }
@@ -100,7 +100,7 @@
 	padding-left: calc(var(--vw) * 2);
 	padding-right: 2vw;
 	padding-right: calc(var(--vw) * 2);
-	background-color: #00000022; /*Darken even more.*/
+	background-color: #00000011; /*Darken even more.*/
 	border: 2px solid #00000044;
 }
 
@@ -181,7 +181,7 @@
 }
 
 #roomManager #inviteYourFriendsElem {
-	background-color: #63c863;
+	background-color: #3dae3b;
 	border-radius: 5px;
 	width: 90vw;
 	width: calc(var(--vw) * 90);
