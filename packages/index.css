@@ -50,7 +50,7 @@
 	margin-top: calc(var(--vh) * 2);
 }
 
-#roomManager #joinRoom, #roomManager #createRoom{
+#roomManager #joinRoom, #roomManager #createRoom, #roomManager #singlePlayerGame{
 	min-width: 150px;
 	border-radius: 3.5vh;
 	border-radius: calc(var(--vh) * 3.5);
@@ -67,6 +67,13 @@
 	margin-left: calc(var(--vw) * 1);
 	background: linear-gradient(45deg, #FF6600, #FF77CC, #7777FF);
 }
+
+#roomManager #singlePlayerGame {
+	background: linear-gradient(45deg, #d18e5f, #dfd31d, #779fff);
+	min-width: 300px;
+	margin-top: 10px;
+}
+
 
 #roomManager #copyrightNotice {
 	text-align: center;

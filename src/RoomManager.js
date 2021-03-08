@@ -66,13 +66,26 @@ createRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	if (nicknameInput.value.length > 18
-		&& !confirm("Extremely long names may cause visual display problems on some devices. Proceed?")
+	if (nicknameInput.value.length > 12
+		&& !confirm("Long names may cause visual display problems. Proceed?")
 	) {return}
 	window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(createRoom)
 
+joinOrCreateRoom.appendChild(document.createElement("br"))
+let singlePlayerGame = document.createElement("button")
+singlePlayerGame.id = "singlePlayerGame"
+singlePlayerGame.innerHTML = "Single Player"
+singlePlayerGame.addEventListener("click", function() {
+	let roomId = "sp-" + Math.floor(Math.random() * 1e10) //We need to stop depending on randomness - collisions are possible.
+	//Websockets guarantees delivery order, so we should be safe here, unless any calls error. 
+	window.stateManager.createRoom(roomId, "You")
+	window.stateManager.addBot("Bot 1")
+	window.stateManager.addBot("Bot 2")
+	window.stateManager.addBot("Bot 3")
+})
+joinOrCreateRoom.appendChild(singlePlayerGame)
 
 
 //Inform user to use landscape.
@@ -460,7 +473,7 @@ window.stateManager.addEventListener("onStartGame", function() {
 window.stateManager.addEventListener("onEndGame", function(obj) {
 	roomManager.style.display = ""
 	if (obj.message !== "State Sync") {
-		//State Sync game ends happen to the person that ends the game, as well as in development mode. 
+		//State Sync game ends happen to the person that ends the game, as well as in development mode.
 		new Popups.Notification("Game Ended", obj.message).show()
 	}
 	else {console.log("Game Ended due to state sync. Popup suppressed in dev mode. ")}
