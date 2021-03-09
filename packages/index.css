@@ -116,7 +116,7 @@
 }
 
 #roomManager .editableName.playerViewNameSpan::after {
-	content: url("../assets/edit.svg") url(https://mahjong4friends.com/assets/edit.svg); /*Use fallback for apps without updated assets*/
+	content: url(https://mahjong4friends.com/assets/edit.svg); /*Use fallback for apps without updated assets*/
 	display: inline-block;
     width: 0.6em;
 	margin-left: 8px;
