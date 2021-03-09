@@ -155,6 +155,15 @@ class StateManager {
 			}))
 		}
 
+		this.setNickname = function(nickname, targetId = window.clientId) {
+			this.sendMessage(JSON.stringify({
+				type: "roomActionChangeNickname",
+				clientId: window.clientId,
+				nickname,
+				targetId
+			}))
+		}
+
 		this.getCurrentRoom = (function() {
 			//Get our room.
 			this.sendMessage(JSON.stringify({

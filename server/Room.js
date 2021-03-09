@@ -638,6 +638,24 @@ class Room {
 			else if (obj.type === "roomActionState") {
 				return client.message(obj.type, getState(clientId), "success")
 			}
+			else if (obj.type === "roomActionChangeNickname") {
+				let message; //Message will remain undefined if the user does not have permission to rename.
+				let target = global.stateManager.getClient(obj.targetId)
+
+				if (obj.targetId === clientId) {
+					message = target.getNickname() + " renamed to " + obj.nickname
+				}
+				else if (isHost) {
+					message = "The host renamed " + target.getNickname() + " to " + obj.nickname
+				}
+
+				if (message) {
+					target.setNickname(obj.nickname)
+					this.messageAll([clientId], "roomActionGameplayAlert", message, "success" )
+					this.sendStateToClients()
+				}
+				return
+			}
 		}).bind(this)
 
 		this.toJSON = (function() {

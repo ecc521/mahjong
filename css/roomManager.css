@@ -98,6 +98,18 @@
 	display: inline-block;
 }
 
+#roomManager .editableName.playerViewNameSpan:hover {
+	margin-left: -4px;
+	border: 2px solid #0097f3;
+}
+
+#roomManager .editableName.playerViewNameSpan::after {
+	content: url("../assets/edit.svg") url(https://mahjong4friends.com/assets/edit.svg); /*Use fallback for apps without updated assets*/
+	display: inline-block;
+    width: 0.6em;
+	margin-left: 8px;
+}
+
 #roomManager .playerViewVoiceChoice {
 	font-size: 1em;
 	width: 30%;
@@ -105,9 +117,9 @@
 	text-align: center;
 }
 
-#roomManager .playerViewVoiceChoice select{
+#roomManager .playerViewVoiceChoice select {
 	font-size: 1em;
-	max-width: 50%;
+	max-width: 100%;
 }
 
 #roomManager .playerViewIdSpan {
