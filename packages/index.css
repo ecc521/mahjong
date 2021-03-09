@@ -94,6 +94,10 @@
 	font-size: 1.5em;
 }
 
+#roomManager #playerView {
+	margin-bottom: 5px;
+}
+
 #roomManager .playerViewRow {
 	text-align: left;
 	padding-left: 2vw;
@@ -116,7 +120,8 @@
 }
 
 #roomManager .editableName.playerViewNameSpan::after {
-	content: url(https://mahjong4friends.com/assets/edit.svg); /*Use fallback for apps without updated assets*/
+	content: url(https://mahjong4friends.com/assets/edit.svg); /*Use absolute URL, as older app versions may not have the local
+	asset (and URL fallbacks weren't working with content attribute - might need to use background) - the relative path is ../assets/edit.svg */
 	display: inline-block;
     width: 0.6em;
 	margin-left: 8px;
@@ -135,7 +140,7 @@
 }
 
 #roomManager .playerViewIdSpan {
-	font-size: 1.2em;
+	font-size: 1em;
 }
 
 #roomManager .playerViewCard {
@@ -151,12 +156,9 @@
 
 #roomManager .playerViewKickButton {
 	background: linear-gradient(45deg, #f23f3f,#eeb972);
-	border-radius: 10vh;
-	border-radius: calc(var(--vh) * 10);
-	padding-top: 1vh;
-	padding-top: calc(var(--vh) * 1);
-	padding-bottom: 1vh;
-	padding-bottom: calc(var(--vh) * 1);
+	border-radius: 250000px;
+	padding: 5px 20px 5px 20px;
+	font-size: 1em;
 	cursor: pointer;
 }
 

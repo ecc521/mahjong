@@ -217,10 +217,6 @@ let gameSettingsElem = document.createElement("div")
 gameSettingsElem.id = "gameSettingsElem"
 inRoomContainer.appendChild(gameSettingsElem)
 
-let roomSaveIdElem = document.createElement("p")
-roomSaveIdElem.id = "roomSaveIdElem"
-inRoomContainer.appendChild(roomSaveIdElem)
-
 //Create link to tutorial.
 let tutorial = document.createElement("a")
 tutorial.target = "_blank"
@@ -357,11 +353,6 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 		voiceChoice.classList.add("playerViewVoiceChoice")
 		row.appendChild(voiceChoice)
 
-		let idSpan = document.createElement("span")
-		idSpan.classList.add("playerViewIdSpan")
-		idSpan.innerHTML = "User ID: " + obj.id
-		row.appendChild(idSpan)
-
 		function setNicknameEditable(span, targetId) {
 			span.classList.add("editableName")
 
@@ -403,13 +394,15 @@ function renderPlayerView(clientList = [], kickUserCallback) {
 				//The host can edit any nicknames.
 				setNicknameEditable(nameSpan, obj.id)
 
-				card.innerHTML = "Kick " + obj.nickname
-				card.classList.add("playerViewKickButton")
-				card.addEventListener("click", function() {
-					if (confirm("Are you sure you want to kick " + obj.nickname)) {
+				let kickButton = document.createElement("button")
+				kickButton.innerHTML = "Remove " + obj.nickname
+				kickButton.classList.add("playerViewKickButton")
+				kickButton.addEventListener("click", function() {
+					if (confirm("Are you sure you want to remove " + obj.nickname)) {
 						kickUserCallback(obj.id)
 					}
 				})
+				card.appendChild(kickButton)
 			}
 			else {
 				card.innerHTML = "Player"
@@ -484,7 +477,6 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	console.log(obj)
 
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
-	roomSaveIdElem.innerHTML = "In-Game Debugging ID: " + obj.message.saveId
 
 	let choices = gameSettings?.getChoices()
 
