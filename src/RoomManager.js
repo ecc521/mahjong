@@ -84,7 +84,13 @@ singlePlayerGame.innerHTML = "Single Player"
 singlePlayerGame.addEventListener("click", function() {
 	let roomId = "sp-" + Math.floor(Math.random() * 1e10) //We need to stop depending on randomness - collisions are possible.
 	//Websockets guarantees delivery order, so we should be safe here, unless any calls error.
-	window.stateManager.createRoom(roomId, "You")
+
+	let nickname = nicknameInput.value || "Player 1"
+	if (nickname.length > nameWarningCharAmount
+		&& !confirm("Long names may cause visual display problems. Proceed?")
+	) {return}
+
+	window.stateManager.createRoom(roomId, nickname)
 	window.stateManager.addBot("Bot 1")
 	window.stateManager.addBot("Bot 2")
 	window.stateManager.addBot("Bot 3")
@@ -421,13 +427,63 @@ function enterRoom() {
 	}
 	joinRoomLink.innerHTML = joinRoomLink.href
 	try {
+		let dpi = 4
+
 		let qrGenerator = QRCode(0, "H"); //0 is for auto-detection. We want maximum error correction.
-		//TODO: Create a canvas, and draw mahjong logo into the middle of the QR code.
-		//TODO: Use a higher resolution QR code (docs at https://www.npmjs.com/package/qrcode-generator), and downscale it.
-		//That way people can click on it and get even higher resolution.
+
+		//Generate the code.
 		qrGenerator.addData(joinRoomLink.href)
 		qrGenerator.make()
-		QRImageElement.src = qrGenerator.createDataURL(3, 9) //Size of each QR data-square, and margin.
+
+		//Draw the code into a canvas
+		let cnv = document.createElement("canvas")
+		let pixelsPerBlock = 3 * dpi
+		cnv.width = cnv.height = qrGenerator.getModuleCount() * pixelsPerBlock
+
+		let ctx = cnv.getContext("2d")
+		qrGenerator.renderTo2dContext(ctx, pixelsPerBlock)
+
+		//Copy the code into a new canvas, width padding added.
+		let paddingPixels = 6 * dpi
+
+		let drawCanvas = document.createElement("canvas")
+		drawCanvas.width = drawCanvas.height = cnv.width + paddingPixels * 2
+
+		let drawCtx = drawCanvas.getContext("2d")
+		drawCtx.fillStyle = "white"
+		drawCtx.fillRect(0, 0, drawCanvas.width, drawCanvas.height)
+
+		drawCtx.drawImage(cnv, paddingPixels, paddingPixels)
+
+
+		//Insert the Mahjong logo.
+		let img = document.createElement("img")
+		img.src = "assets/tiles/dragons/green.png"
+		img.addEventListener("load", function() {
+			let centerPadding = 3 * dpi //Pixels to pad the center image.
+
+			let maxCenterSize = drawCanvas.width * 0.3 //No hard requirement on what we can do, but 20% is fine.
+
+			let width = img.width
+			let height = img.height
+
+			let ratio = Math.max(1, Math.max(width, height)/maxCenterSize)
+
+			width /= ratio
+			height /= ratio
+
+			let left = drawCanvas.width / 2 - width / 2
+			let top = drawCanvas.height / 2 - height / 2
+
+			drawCtx.fillRect(left - centerPadding, top - centerPadding, width + centerPadding * 2, height + centerPadding * 2);
+
+			drawCtx.drawImage(img, left, top, width, height)
+			QRImageElement.src = drawCanvas.toDataURL("image/png")
+			QRImageElement.width = QRImageElement.height = drawCanvas.width / dpi
+		})
+
+		QRImageElement.src = drawCanvas.toDataURL("image/png")
+		QRImageElement.width = QRImageElement.height = drawCanvas.width / dpi
 	}
 	catch (e) {
 		console.error(e)

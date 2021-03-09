@@ -259,7 +259,7 @@ class Room {
 		this.addClient = (function(clientId) {
 			if (this.clientIds.length >= 4) {
 				//Alert the host somebody was blocked from joining.
-				global.stateManager.getClient(this.hostClientId).message("roomActionGameplayAlert", global.stateManager.getClient(clientId).getNickname() + ` (${clientId}) tried to join the room. `, "success")
+				global.stateManager.getClient(this.hostClientId).message("roomActionGameplayAlert", global.stateManager.getClient(clientId).getNickname() + ` tried to join the room. `, "success")
 				return "Room Full. You can ask the host to kick a player or bot. "
 			}
 			if (this.clientIds.includes(clientId)) {return "Already In Room"}
