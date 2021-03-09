@@ -190,28 +190,26 @@ let inviteYourFriendsElem = document.createElement("div")
 inviteYourFriendsElem.id = "inviteYourFriendsElem"
 inRoomContainer.appendChild(inviteYourFriendsElem)
 
+let inviteYourFriendsDiv = document.createElement("div")
+inviteYourFriendsDiv.id = "inviteYourFriendsDiv"
+inviteYourFriendsElem.appendChild(inviteYourFriendsDiv)
+
 let inviteYourFriendsHeader = document.createElement("h2")
-inviteYourFriendsHeader.innerHTML = "Play with Friends!"
-inviteYourFriendsElem.appendChild(inviteYourFriendsHeader)
+inviteYourFriendsHeader.innerHTML = "Invite Players to Join This Game!"
+inviteYourFriendsDiv.appendChild(inviteYourFriendsHeader)
 
 let joinRoomLinkElem = document.createElement("p")
 joinRoomLinkElem.id = "joinRoomLinkElem"
-joinRoomLinkElem.innerHTML = "Share the link: "
+joinRoomLinkElem.innerHTML = "Share the link: <br>"
 
 let joinRoomLink = document.createElement("a")
 joinRoomLink.target = "_blank"
 joinRoomLinkElem.appendChild(joinRoomLink)
-inviteYourFriendsElem.appendChild(joinRoomLinkElem)
-
-let joinRoomQRText = document.createElement("p")
-joinRoomQRText.innerHTML = "Or share the QR code: "
-joinRoomQRText.id = "joinRoomLinkElem"
-inviteYourFriendsElem.appendChild(joinRoomQRText)
+inviteYourFriendsDiv.appendChild(joinRoomLinkElem)
 
 let QRImageElement = document.createElement("img")
 QRImageElement.id = "QRImageElement"
-joinRoomQRText.appendChild(QRImageElement)
-
+inviteYourFriendsElem.appendChild(QRImageElement)
 
 let gameSettingsElem = document.createElement("div")
 gameSettingsElem.id = "gameSettingsElem"

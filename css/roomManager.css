@@ -182,19 +182,27 @@
 
 #roomManager #inviteYourFriendsElem {
 	background-color: #3dae3b;
-	border-radius: 5px;
-	width: 90vw;
-	margin-left: 5vw;
-	min-height: 100px;
+	border-radius: 10px;
 	margin-top: 10px;
+	padding: 10px;
+	padding-top: 0;
+	overflow: hidden;
+}
+
+#roomManager #inviteYourFriendsDiv {
+	display: inline-block;
+	margin-top: 0.5em;
+	vertical-align: top;
 }
 
 #roomManager #QRImageElement {
-	vertical-align: middle;
+	margin-left: 20px;
+	margin-top: 1em;
 }
 
 #roomManager #joinRoomLinkElem {
 	font-size: 1.5em;
+	margin: 0;
 }
 
 #roomManager #screenRotationAlert {
