@@ -13,7 +13,7 @@ class Bot extends Client {
 		let lastSent;
 		let lastWasError;
 		this.message = (function message(type, message, status) {
-			if (lastWasError) {lastWasError = false;return} //First bot error disables bot temporarily. 
+			if (lastWasError) {lastWasError = false;return} //First bot error disables bot temporarily.
 
 			if (this.suppressed) {return} //Isn't really neccessary, as the bot should never receive roomActionState while suppressed, however a good measure.
 
@@ -51,7 +51,8 @@ class Bot extends Client {
 					}
 				}
 			}
-			if (status === "error" && !message.includes("manually control the bot")) {
+			//Don't error on the manually control bot message (I believe it triggers all other bots to error otherwise), or when we can't place because another player had a higher priority placement.
+			if (status === "error" && !message.includes("manually control the bot") && !message.includes("higher priority placement")) {
 				//Only send the message once every 60 seconds at most.
 				lastWasError = true
 				if (!lastSent || Date.now() - lastSent > 60*1000) {

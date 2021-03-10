@@ -51,9 +51,11 @@ function getPriority(obj, key, exemptFromChecks = false) {
 		}
 	}
 
+	let nakedMahjong = false
 	if (obj[key] instanceof Tile && obj[key].mahjong && mahjongHand) {
 		//Naked Mahjong. The one tile is the tile someone else discarded.
 		console.log("Naked Mahjong Bypassing Checks")
+		nakedMahjong = true
 	}
 	else if (obj[key].mahjong && !wouldMakeMahjong && !exemptFromChecks) {
 		client.message("roomActionPlaceTiles", "Unable to detect a mahjong in your hand. (Press 'Mahjong' again to override). ", "error")
@@ -62,7 +64,7 @@ function getPriority(obj, key, exemptFromChecks = false) {
 
 	let priority;
 	let placerWind = hand.wind
-	if (wouldMakeMahjong && obj[key].mahjong) {
+	if ((wouldMakeMahjong || nakedMahjong) && obj[key].mahjong) {
 		priority = 109
 		let total = getBackwardsDistance(placerWind, throwerWind)
 		console.log(total)
