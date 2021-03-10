@@ -108,8 +108,7 @@
 }
 
 #roomManager .editableName.playerViewNameSpan::after {
-	content: url(https://mahjong4friends.com/assets/edit.svg); /*Use absolute URL, as older app versions may not have the local
-	asset (and URL fallbacks weren't working with content attribute - might need to use background) - the relative path is ../assets/edit.svg */
+	content: url(../assets/edit.svg);
 	display: inline-block;
     width: 0.6em;
 	margin-left: 8px;

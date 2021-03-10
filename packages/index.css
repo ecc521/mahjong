@@ -120,8 +120,7 @@
 }
 
 #roomManager .editableName.playerViewNameSpan::after {
-	content: url(https://mahjong4friends.com/assets/edit.svg); /*Use absolute URL, as older app versions may not have the local
-	asset (and URL fallbacks weren't working with content attribute - might need to use background) - the relative path is ../assets/edit.svg */
+	content: url(../assets/edit.svg);
 	display: inline-block;
     width: 0.6em;
 	margin-left: 8px;
@@ -652,18 +651,16 @@ This means that something using bottom is off the page - hence we must use top. 
 	height: calc(var(--vh) * 100);
 	background-color: #000000aa;
 	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 #errorPopup {
-	position: absolute;
-	top: 30vh;
-	top: calc(var(--vh) * 30);
-	left: 35vw;
-	left: calc(var(--vw) * 35);
-	width: 30vw;
-	width: calc(var(--vw) * 30);
 	min-height: 25vh;
 	min-height: calc(var(--vh) * 25);
+	max-width: 50vw;
+	max-width: calc(var(--vw) * 50);
 	background-color: #368a36;
 	border: 5px solid #ffbd17;
 	border-radius: 1vh;
@@ -672,8 +669,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 #errorPopup #errorText {
-	font-size: 4.5vh;
-	font-size: calc(var(--vh) * 4.5);
+	font-size: 3.2em;
 	color: #ffe100;
 	margin-block-start: 2.25vh;
 	margin-block-start: calc(var(--vh) * 2.25);
@@ -682,26 +678,22 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 #errorPopup #messageText {
-	font-size: 2.5vh;
-	font-size: calc(var(--vh) * 2.5);
+	font-size: 2em;
 	color: white;
+	margin-bottom: 0;
 }
 
 #errorPopup #dismissButton {
-	width: 10vw;
-	width: calc(var(--vw) * 10);
-	height: 5vh;
-	height: calc(var(--vh) * 5);
-	border-radius: 2.5vh;
-	border-radius: calc(var(--vh) * 2.5);
-	font-size: 2vh;
-	font-size: calc(var(--vh) * 2);
+	border-radius: 250000px;
+	font-size: 2em;
 	margin-top: 2vh;
 	margin-top: calc(var(--vh) * 2);
 	margin-bottom: 1.5vh;
 	margin-bottom: calc(var(--vh) * 1.5);
 	background: linear-gradient(45deg, orange, yellow, lightgreen);
 	border: 2px solid black;
+	padding: 5px 20px 5px 20px;
+	margin-top: 0.8em;
 }
 
 

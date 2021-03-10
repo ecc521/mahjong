@@ -4,14 +4,14 @@
 	height: 100vh;
 	background-color: #000000aa;
 	z-index: 100;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 
 #errorPopup {
-	position: absolute;
-	top: 30vh;
-	left: 35vw;
-	width: 30vw;
 	min-height: 25vh;
+	max-width: 50vw;
 	background-color: #368a36;
 	border: 5px solid #ffbd17;
 	border-radius: 1vh;
@@ -19,26 +19,27 @@
 }
 
 #errorPopup #errorText {
-	font-size: 4.5vh;
+	font-size: 3.2em;
 	color: #ffe100;
 	margin-block-start: 2.25vh;
 	margin-block-end: 2.25vh;
 }
 
 #errorPopup #messageText {
-	font-size: 2.5vh;
+	font-size: 2em;
 	color: white;
+	margin-bottom: 0;
 }
 
 #errorPopup #dismissButton {
-	width: 10vw;
-	height: 5vh;
-	border-radius: 2.5vh;
-	font-size: 2vh;
+	border-radius: 250000px;
+	font-size: 2em;
 	margin-top: 2vh;
 	margin-bottom: 1.5vh;
 	background: linear-gradient(45deg, orange, yellow, lightgreen);
 	border: 2px solid black;
+	padding: 5px 20px 5px 20px;
+	margin-top: 0.8em;
 }
 
 

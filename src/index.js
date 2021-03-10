@@ -24,6 +24,37 @@ if (document.referrer && document.referrer.includes("android-app://com.mahjong4f
   window.isAndroid = true
 }
 
+if (window.Capacitor) {
+    try {
+        ;((async function() {
+            //This request needs to be a native request, because itunes isn't setting CORS headers properly for capacitor://localhost
+            //1.1 is the last version that doesn't include the native request module. Latest version must be updated manually above 1.1 once the release goes out.
+            let latestVersion = 1.1
+            try {
+                window.HTTP = require('@ionic-native/http').HTTP
+
+                let req = await HTTP.get("https://itunes.apple.com/lookup?bundleId=com.mahjong4friends.twa", {}, {})
+                let res = await JSON.parse(req.data)
+                latestVersion = res.results[0].version
+            }
+            catch (e) {
+                console.warn("Potential Error fetching latest version code", e)
+            }
+
+            let deviceInfo = await window.Capacitor.Plugins.Device.getInfo()
+            let currentVersion = deviceInfo.appVersion
+
+            //Using numeric comparison, so version codes can't have more than one decimal.
+            if (parseFloat(currentVersion) < parseFloat(latestVersion)) {
+                const Popups = require("./Popups.js")
+                new Popups.Notification("App Update", "There is a Mahjong 4 Friends app update. Downloading it is recommended. You may experience minor issues if you do not update. ").show()
+            }
+        })())
+    }
+    catch (e) {console.error(e)}
+}
+
+
 require("./universalLinks.js")
 
 let sizes = [16,24,32,64,96,160,196]
