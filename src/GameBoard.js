@@ -203,8 +203,12 @@ endGameButton.id = "endGameButton"
 endGameButton.innerHTML = "End Game"
 gameBoard.appendChild(endGameButton)
 
-let shouldConfirm = true
+let newGameNoLobbyButton = document.createElement("button")
+newGameNoLobbyButton.id = "newGameNoLobbyButton"
+newGameNoLobbyButton.innerHTML = "New Game"
+gameBoard.appendChild(newGameNoLobbyButton)
 
+let shouldConfirm = true
 window.stateManager.addEventListener("onStartGame", function() {
 	shouldConfirm = true
 })
@@ -217,6 +221,12 @@ endGameButton.addEventListener("click", function() {
 	) {
 		window.stateManager.endGame()
 	}
+})
+
+newGameNoLobbyButton.addEventListener("click", function() {
+	endGameButton.click()
+	//Calling startGame when in a game does nothing, so it's fine to call it without guards. 
+	document.getElementById("startGameButton").click() //Clicks button on RoomManager - not currently visible.
 })
 
 function gameOver(message, obj) {
@@ -300,6 +310,13 @@ let nametags = nametagIds.map((id) => {
 })
 
 window.stateManager.addEventListener("onStateUpdate", function(obj) {
+	if (window.stateManager.isHost) {
+		newGameNoLobbyButton.style.display = ""
+	}
+	else {
+		newGameNoLobbyButton.style.display = "none"
+	}
+
 	let message = obj.message
 
 	if (!message.inGame) {

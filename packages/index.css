@@ -634,6 +634,22 @@ This means that something using bottom is off the page - hence we must use top. 
 	cursor: not-allowed;
 }
 
+#gameBoard #newGameNoLobbyButton {
+	position: absolute;
+	left: calc(9.52vh + 13.5vw);
+	left: calc(calc(var(--vh) * 9.52) + calc(var(--vw) * 13.5));
+	top: 67vh;
+	top: calc(var(--vh) * 67);
+	width: 10vw;
+	width: calc(var(--vw) * 10);
+	height: 5vh;
+	height: calc(var(--vh) * 5);
+	border-radius: 50vh;
+	border-radius: calc(var(--vh) * 50);
+	font-size: 1.6vh;
+	font-size: calc(var(--vh) * 1.6);
+}
+
 #gameBoard {
 	position: absolute;
 	width: 100vw;
@@ -666,6 +682,8 @@ This means that something using bottom is off the page - hence we must use top. 
 	border-radius: 1vh;
 	border-radius: calc(var(--vh) * 1);
 	text-align: center;
+	padding-left: 8px;
+	padding-right: 8px;
 }
 
 #errorPopup #errorText {

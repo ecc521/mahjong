@@ -564,7 +564,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		gameSettings.setChoices(choices)
 	}
 
-	window.gameSettings = gameSettings //For TESTING!!!
+	window.gameSettings = gameSettings //FOR TESTING!
 
 	renderPlayerView(obj.message.clients, function kickUserCallback(userId) {
 		window.stateManager.kickUser(window.stateManager.roomId, userId)

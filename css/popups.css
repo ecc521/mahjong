@@ -16,6 +16,8 @@
 	border: 5px solid #ffbd17;
 	border-radius: 1vh;
 	text-align: center;
+	padding-left: 8px;
+	padding-right: 8px;
 }
 
 #errorPopup #errorText {
