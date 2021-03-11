@@ -28,8 +28,7 @@ if (window.Capacitor) {
     try {
         ;((async function() {
             //This request needs to be a native request, because itunes isn't setting CORS headers properly for capacitor://localhost
-            //1.1 is the last version that doesn't include the native request module. Latest version must be updated manually above 1.1 once the release goes out.
-            let latestVersion = 1.1
+            let latestVersion = 1.2 //Last version without native request module.
             try {
                 window.HTTP = require('@ionic-native/http').HTTP
 
@@ -47,7 +46,7 @@ if (window.Capacitor) {
             //Using numeric comparison, so version codes can't have more than one decimal.
             if (parseFloat(currentVersion) < parseFloat(latestVersion)) {
                 const Popups = require("./Popups.js")
-                new Popups.Notification("App Update", "There is a Mahjong 4 Friends app update. Downloading it is recommended. You may experience minor issues if you do not update. ").show()
+                new Popups.Notification("App Update", "There is a Mahjong 4 Friends <a href='https://apps.apple.com/us/app/mahjong-4-friends/id1552704332' target='_blank'>app update</a>. Downloading it is recommended. You may experience minor issues if you do not update. ").show()
             }
         })())
     }

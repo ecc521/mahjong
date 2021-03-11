@@ -1,4 +1,4 @@
-let Bot; //Don't want them both scripts importing each other.
+let Bot; //Don't want both scripts importing each other.
 
 class Client {
 	constructor(clientId, websocket) {
