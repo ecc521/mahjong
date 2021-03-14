@@ -385,7 +385,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		}
 	})
 
-	hands.forEach((hand) => {hand.renderTiles(message.currentTurn.lastDrawn)}) //lastDrawn only affects unexposed tiles, so there isn't a problem passing it to all. 
+	hands.forEach((hand) => {hand.renderTiles(message?.currentTurn?.lastDrawn)}) //lastDrawn only affects unexposed tiles, so there isn't a problem passing it to all.
 	if (message.currentTurn?.playersReady?.length > 0) {
 		//The person has thrown their tile. Waiting on players to ready.
 		proceedButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
@@ -463,7 +463,7 @@ function handleScreenResize() {
 	topHand.renderTiles()
 	leftHand.renderTiles()
 	rightHand.renderTiles()
-	userHand.renderTiles(window.stateManager.lastState.message.currentTurn.lastDrawn)
+	userHand.renderTiles()
 }
 window.addEventListener("resize", handleScreenResize)
 window.addEventListener("orientationchange", handleScreenResize)

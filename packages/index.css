@@ -270,6 +270,20 @@
 	background-color: #4c3329;
 }
 
+@keyframes goToCorrectLocation {
+  0% {
+	  transform: translateY(-55vh);
+	  transform: translateY(calc(var(--vh) * -55));
+	}
+  100% {
+	  transform: none;
+  }
+}
+
+.animateTile {
+	animation: goToCorrectLocation 8s cubic-bezier(0.05, 1.14, 0, 0.95) forwards;
+}
+
 /*We would use bottom, however Safari treats bottom as the bottom of the viewport, and Safari has the viewport != visible area bug.
 This means that something using bottom is off the page - hence we must use top. */
 #gameBoard #userHand, #gameBoard #userHandExposed, #gameBoard #tilePlacemat {
@@ -617,7 +631,7 @@ This means that something using bottom is off the page - hence we must use top. 
 }
 
 .scaleAnimation {
-	animation: animateScale 3s linear 5s infinite;
+	animation: animateScale 3s linear 6s infinite;
 }
 
 

@@ -70,7 +70,10 @@ websocketServer.on('connection', function connection(websocket) {
 			//stateManager.messageAllServerClients(password, "Server Update", "Mahjong 4 Friends is shutting down to perform a server update. \nIf all goes well, nothing will be lost, and we should be back up within a minute. Your device should automatically reconnect. ")
 
 			//Then apply the update, and start the server loading from the state.
-			//That should probably be done by editing crontab before reboot, then editing back. 
+			//That should probably be done by editing crontab before reboot, then editing back.
+
+			//stateManager.messageAllServerClients(password, "Reconnected", "Mahjong 4 Friends is back up. You may need to reload your page or restart the app, and your game might have gone back a turn or two. Please report any issues to support@mahjong4friends.com")
+
 
 			if (obj.type === "callServerSave" || obj.type === "messageAllServerClients") {
 				if (!obj.auth) {

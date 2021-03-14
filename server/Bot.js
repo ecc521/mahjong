@@ -52,7 +52,8 @@ class Bot extends Client {
 				}
 			}
 			//Don't error on the manually control bot message (I believe it triggers all other bots to error otherwise), or when we can't place because another player had a higher priority placement.
-			if (status === "error" && !message.includes("manually control the bot") && !message.includes("higher priority placement")) {
+			//If the message is not a string (no message.includes), ignore. 
+			if (status === "error" && message.includes && !message.includes("manually control the bot") && !message.includes("higher priority placement")) {
 				//Only send the message once every 60 seconds at most.
 				lastWasError = true
 				if (!lastSent || Date.now() - lastSent > 60*1000) {

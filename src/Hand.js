@@ -128,7 +128,7 @@ class Hand {
 			}
 			else {console.error("Unable to determine how this tile should be moved. ")}
 
-			this.renderTiles(this.lastDisplayElevated) //Re-render.
+			this.renderTiles() //Re-render.
 			this.renderPlacemat() //Not sure if this is needed?
 		}).bind(this)
 
@@ -323,8 +323,6 @@ class Hand {
 		}).bind(this)
 
 		this.renderTiles = (function(displayElevated) {
-			this.lastDisplayElevated = displayElevated
-
 			if (!this.handToRender) {throw "Unable to render hand. You must pass config.handToRender to the constructor. "}
 
 			while (this.handToRender.firstChild) {this.handToRender.firstChild.remove()} //Delete everything currently rendered in the hand.
@@ -398,7 +396,7 @@ class Hand {
 						if (this.interactive) {
 							if (displayElevated && tile.matches(displayElevated)) {
 								displayElevated = undefined
-								elem.style.transform = "translateY(-2vh)"
+								elem.classList.add("animateTile")
 							}
 							elem.draggable = true
 							elem.addEventListener("click", (function() {
