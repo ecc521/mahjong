@@ -282,7 +282,9 @@ roomManager.appendChild(copyrightNotice)
 
 //TODO: Need some ERROR HANDLING!!!!! speechSynthesis may not work/exist.
 //TODO: Also need a way to deal with reloads.
-speechSynthesis.getVoices() //Not a no-op, Google Chrome bug causes very first call from loaded page to return empty, some sort of delay with it.
+
+//TODO: Use speechSynthesis onvoiceschange event (or whatever it is).
+speechSynthesis.getVoices()
 
 let voiceChoices = {}
 window.voiceChoices = voiceChoices
@@ -516,8 +518,6 @@ window.stateManager.onLeaveRoom = function(obj) {
 }
 
 window.stateManager.addEventListener("onStateUpdate", function(obj) {
-	console.log(obj)
-
 	playerCount.innerHTML = obj.message.clients.length + "/4 Players are Present"
 
 	let choices = gameSettings?.getChoices()

@@ -128,7 +128,7 @@ class Hand {
 			}
 			else {console.error("Unable to determine how this tile should be moved. ")}
 
-			this.renderTiles() //Re-render.
+			this.renderTiles(this.lastDisplayElevated) //Re-render.
 			this.renderPlacemat() //Not sure if this is needed?
 		}).bind(this)
 
@@ -322,7 +322,8 @@ class Hand {
 			}
 		}).bind(this)
 
-		this.renderTiles = (function() {
+		this.renderTiles = (function(displayElevated) {
+			this.lastDisplayElevated = displayElevated
 
 			if (!this.handToRender) {throw "Unable to render hand. You must pass config.handToRender to the constructor. "}
 
@@ -330,6 +331,8 @@ class Hand {
 			if (this.handForExposed) {
 				while (this.handForExposed.firstChild) {this.handForExposed.firstChild.remove()} //Delete everything currently rendered in the hand.
 			}
+
+			if (typeof displayElevated === "string") {displayElevated = Tile.fromJSON(displayElevated)}
 
 			let unexposedTiles = []
 			let exposedTiles = []
@@ -393,6 +396,10 @@ class Hand {
 							elem.style.filter = "brightness(0.8)"
 						}
 						if (this.interactive) {
+							if (displayElevated && tile.matches(displayElevated)) {
+								displayElevated = undefined
+								elem.style.transform = "translateY(-2vh)"
+							}
 							elem.draggable = true
 							elem.addEventListener("click", (function() {
 								this.moveTile(tile) //Closure.

@@ -326,14 +326,12 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	document.body.style.overflow = "hidden"
 
 	if (message.wallTiles !== undefined) {
-		console.log(message.wallTiles)
 		if (typeof message.wallTiles === "object") {
 			message.wallTiles = Hand.convertStringsToTiles(message.wallTiles)
 		}
 		else {
 			message.wallTiles = new Array(message.wallTiles).fill(new Tile({faceDown: true}))
 		}
-		console.log(message.wallTiles)
 		Wall.renderWall(wallRendering, message.wallTiles)
 	}
 
@@ -371,9 +369,6 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		let hand = hands[windPosition]
 
 		if (client.visibleHand && client.wind) {
-			console.log("Client hand stuff")
-			console.log(client)
-			console.log(client.wind)
 			hand.syncContents(Hand.convertStringsToTiles(client.visibleHand))
 			hand.wind = client.wind
 		}
@@ -390,7 +385,7 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		}
 	})
 
-	hands.forEach((hand) => {hand.renderTiles()})
+	hands.forEach((hand) => {hand.renderTiles(message.currentTurn.lastDrawn)}) //lastDrawn only affects unexposed tiles, so there isn't a problem passing it to all. 
 	if (message.currentTurn?.playersReady?.length > 0) {
 		//The person has thrown their tile. Waiting on players to ready.
 		proceedButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
@@ -468,7 +463,7 @@ function handleScreenResize() {
 	topHand.renderTiles()
 	leftHand.renderTiles()
 	rightHand.renderTiles()
-	userHand.renderTiles()
+	userHand.renderTiles(window.stateManager.lastState.message.currentTurn.lastDrawn)
 }
 window.addEventListener("resize", handleScreenResize)
 window.addEventListener("orientationchange", handleScreenResize)

@@ -8,10 +8,8 @@ const Sequence = require("../src/Sequence.js")
 class Room {
 	constructor(roomId, state = {}) {
 		//Note: If loading from state, this.init() must be called.
-		this.roomId = roomId
-
 		this.state = state
-		this.state.roomId = roomId
+		this.roomId = this.state.roomId = roomId
 		this.state.settings = this.state.settings || {}
 
 		this.state.settings.unlimitedSequences = false
@@ -28,60 +26,26 @@ class Room {
 		console.log(state)
 		//TODO: Currently, clientId of other users is shown to users in the same room, allowing for impersonation. This needs to be fixed by using different identifiers.
 
-		this.clientIds = this.state.clientIds || []
+		this.clientIds = this.state.clientIds = this.state.clientIds || []
 		this.inGame = false
-		this.state.gameReady = this.gameReady = this.state.gameReady || Date.now() //For save key
 		this.gameData = {}
-
-		Object.defineProperty(this, "saveId", {
-			get: (function() {
-				return this.roomId + "-" + this.gameReady
-			}).bind(this)
-		})
-
-		let writeStateSuspend = false //Suspend disk writes
-		let updateState = (function update() {
-			this.state.clientIds = this.clientIds
-			if (writeStateSuspend) {console.log("Write suspended");return}
-			try{
-				global.stateManager.writeRoomState(this.roomId)
-			}
-			catch(e) {
-				console.log("Couldn't write room state.")
-				console.error(e)
-			}
-		}).bind(this)
-
-		let updateStateProxy = {
-			deleteProperty: (function(target, property) {
-				updateState()
-				return true;
-			}).bind(this),
-			set: (function(target, property, value, receiver) {
-				target[property] = value;
-				updateState()
-				return true;
-			}).bind(this)
-		}
 
 		let _hostClientId;
 		Object.defineProperty(this, "hostClientId", {
 			set: function(id) {
 				_hostClientId = id
 				this.state.hostClientId = id
-				updateState()
 			},
 			get: function() {return _hostClientId}
 		})
 		this.hostClientId = this.state.hostClientId
 
-		this.state.moves = new Proxy(this.state.moves || [], updateStateProxy);
-		this.clientIds = new Proxy(this.clientIds, updateStateProxy);
+		this.state.moves = this.state.moves || []
+
 
 		let loadState = (function loadState() {
-			if (this.state.wall) {
+			if (this.state.seed) {
 				console.time("Loading Room State... ")
-				writeStateSuspend = true //Suspend disk writes while loading.
 
 				//Make sure we don't blast all the clients with repeat messages.
 				this.clientIds.forEach(((clientId) => {
@@ -102,8 +66,6 @@ class Room {
 				this.clientIds.forEach((clientId) => {
 					global.stateManager.getClient(clientId).unsuppress()
 				})
-
-				writeStateSuspend = false
 
 				this.sendStateToClients()
 				delete this.init
@@ -203,7 +165,6 @@ class Room {
 			state.settings = this.state.settings
 
 			state.discardPile = this.gameData.discardPile
-			state.saveId = this.saveId
 
 			if (this.gameData.currentTurn) {
 				state.currentTurn = {
@@ -211,6 +172,13 @@ class Room {
 					userTurn: this.gameData.currentTurn.userTurn,
 					playersReady: Object.keys(this.gameData.currentTurn.turnChoices || {})
 				}
+
+				//Pass the last drawn tile to the person requesting.
+				//Last drawn tile is cleared every throw to avoid leaking information and stop showing the tile as drawn.
+				if (requestingClientId === this.gameData.currentTurn.userTurn) {
+					state.currentTurn.lastDrawn = this.lastDrawn
+				}
+
 
 				if (this.gameData.charleston) {
 					state.currentTurn.charleston = true
@@ -317,12 +285,8 @@ class Room {
 			let pretty = -1
 			while (!(tile instanceof Tile)) {
 				pretty++
-				if (last) {
-					tile = this.gameData.wall.drawLast()
-				}
-				else {
-					tile = this.gameData.wall.drawFirst()
-				}
+				tile = this.gameData.wall.drawFirst()
+				this.lastDrawn = tile
 				if (!tile) {
 					console.log("Wall Empty");
 					this.messageAll([], "roomActionWallEmpty", this.getSummary(), "success")
@@ -334,7 +298,7 @@ class Room {
 			}
 			let client = global.stateManager.getClient(clientId)
 			if (!doNotMessage) {
-				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), {durationMultiplier: 1.5})
+				client.message("roomActionGameplayAlert", "You drew " + ((pretty > 0?(pretty === 1)?"a pretty and a ":pretty + " prettys and a ":"a ")+ tile.value + " " + tile.type), {durationMultiplier: 1})
 				if (pretty > 0) {
 					this.messageAll([clientId], "roomActionGameplayAlert", client.getNickname() + " drew " + ((pretty === 1)?"a pretty!":pretty + " prettys!"), {clientId, speech: "I'm pretty!"})
 				}
@@ -355,8 +319,7 @@ class Room {
 			if (shouldRotateWinds) {this.rotateWinds()}
 			shouldRotateWinds = true
 			this.inGame = false
-			this.state.gameReady = this.gameReady = Date.now() //Adjust save key.
-			this.state.moves.length = 0 //Clear without resetting proxy.
+			this.state.seed = Math.random()
 			delete this.state.wall
 			this.gameData = {}
 			this.messageAll([clientId], obj.type, gameEndMessage, "success")
@@ -367,7 +330,14 @@ class Room {
 		let placerSequenceOverride = false
 		this.onPlace = (function(obj, clientId) {
 			//Obj.message - a Tile, Match, or Sequence
-			this.state.moves.push([obj, clientId])
+			let move = [obj, clientId]
+			this.state.moves.push(move)
+			if (this.logFile) {
+				try {
+					this.logFile.write(JSON.stringify(move) + "\n")
+				}
+				catch (e) {console.error("ERROR WRITING TO ROOM LOGFILE: ", e)}
+			}
 
 			let client = global.stateManager.getClient(clientId)
 			let hand = this.gameData.playerHands[clientId]
@@ -481,6 +451,7 @@ class Room {
 
 						//Discard tile.
 						this.gameData.currentTurn.thrown = placement
+						delete this.lastDrawn
 						this.gameData.currentTurn.turnChoices[clientId] = "Next"
 						placerMahjongOverride = false
 						this.sendStateToClients()
@@ -659,13 +630,24 @@ class Room {
 		}).bind(this)
 
 		this.toJSON = (function() {
-			return this.state
+			let moves = this.state.moves
+			delete this.state.moves
+			let str = JSON.stringify(this.state)
+			this.state.moves = moves
+			str += "\n"
+			this.state.moves.forEach((move) => {str += JSON.stringify(move) + "\n"})
+			return str
 		}).bind(this)
 	}
 
-	static fromJSON(obj, keepGameStarted = false) {
-		if (typeof obj === "string") {obj = JSON.parse(obj)} //Allow loading state files created with leading quotes.
-		if (!keepGameStarted) {delete obj.gameReady}
+	//Files have the moves after - they aren't all in one place.
+	static fromJSON(str) {
+		let lines = str.trim().split("\n")
+		let obj = JSON.parse(lines[0])
+		let moves = lines.slice(1)
+		moves = moves.map((str) => {return JSON.parse(str)})
+		obj.moves = moves
+
 		return new Room(obj.roomId, obj)
 	}
 }

@@ -3,35 +3,30 @@ const Pretty = require("./Pretty.js")
 const SeedRandom = require("seed-random")
 
 class Wall {
-	constructor(tiles, seed = Math.random()) {
+	constructor(seed = Math.random()) {
 		this.drawFirst = function() {
 			return this.tiles.pop()
 		}
 
-		if (tiles) {
-			this.tiles = tiles
-		}
-		else {
-			this.tiles = []
+		this.tiles = []
 
-			//Time to add the tiles to the deck...
-			this.tiles = this.tiles.concat(Wall.getNonPrettyTiles())
+		//Time to add the tiles to the deck...
+		this.tiles = this.tiles.concat(Wall.getNonPrettyTiles())
 
-			;[false, true].forEach((isSeason) => {
-				for (let i=1;i<=4;i++) {
-					this.tiles.push(new Pretty({
-						value: i,
-						seasonOrFlower: isSeason?"season":"flower"
-					}))
-				}
-			})
+		;[false, true].forEach((isSeason) => {
+			for (let i=1;i<=4;i++) {
+				this.tiles.push(new Pretty({
+					value: i,
+					seasonOrFlower: isSeason?"season":"flower"
+				}))
+			}
+		})
 
-			//Randomly mix the tiles.
-			Wall.shuffleArray(this.tiles, seed)
-		}
+		//Randomly mix the tiles.
+		Wall.shuffleArray(this.tiles, seed)
 
 		this.toJSON = (function() {
-			return JSON.stringify(this.tiles)
+			return seed
 		}).bind(this)
 	}
 
@@ -101,19 +96,8 @@ class Wall {
 	}
 
 	static fromJSON(str) {
-		let tiles = JSON.parse(str)
-		tiles = tiles.map((tileString) => {
-			let obj = JSON.parse(tileString)
-			if (obj.class === "Pretty") {
-				return Pretty.fromJSON(tileString)
-			}
-			else if (obj.class === "Tile") {
-				return Tile.fromJSON(tileString)
-			}
-			else {throw "Unable to identify tileString " + tileString}
-		})
-
-		return new Wall(tiles)
+		let seed = str
+		return new Wall(seed)
 	}
 }
 

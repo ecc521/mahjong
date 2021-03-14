@@ -32,22 +32,10 @@ class StateManager {
 			return rooms[roomId]
 		}
 
-		this.createRoom = function(roomId, room = new Room(roomId)) {
+		this.createRoom = function(roomId, room) {
 			if (rooms[roomId]) {return false} //Room already exists.
-			return rooms[roomId] = room
+			return rooms[roomId] = room || new Room(roomId)
 		}
-
-		this.writeRoomState = (function(roomId) {
-			if (!this.serverDataDirectory) {console.warn("No server data directory. ")}
-			let room = rooms[roomId]
-			try {
-				//Write state to disk.
-				let filePath = path.join(this.serverDataDirectory, room.saveId + ".room.json")
-				console.log("Saved room to " + filePath)
-				fs.writeFileSync(filePath, JSON.stringify(room))
-			}
-			catch(e) {console.error(e)}
-		}).bind(this)
 
 		this.deleteRoom = function(roomId) {
 			delete rooms[roomId]
@@ -70,6 +58,14 @@ class StateManager {
 
 		this.deleteClient = function(clientId) {
 			delete clients[clientId]
+		}
+
+		this.getAllClients = function() {
+			let arr = []
+			for (let clientId in clients) {
+				arr.push(clients[clientId])
+			}
+			return arr
 		}
 
 		this.init = (function fromJSON(str) {

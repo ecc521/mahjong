@@ -23,6 +23,9 @@ class StateManager {
 			else if (obj.type === "getCurrentRoom") {
 				onGetCurrentRoom(obj)
 			}
+			else if (obj.type === "displayMessage") {
+				new Popups.Notification(obj.message.title, obj.message.body).show()
+			}
 			else if (obj.type === "roomActionStartGame") {
 				onStartGame(obj)
 			}
@@ -198,6 +201,25 @@ class StateManager {
 			}))
 		}
 
+		//These are authed for admin use only.
+		this.callServerSave = function(auth, saveName) {
+			this.sendMessage(JSON.stringify({
+				type: "callServerSave",
+				auth,
+				saveName,
+			}))
+			console.warn("You will need to manually kill the server on reboot and reload from save. ")
+		}
+
+		this.messageAllServerClients = function(auth, title, body) {
+			this.sendMessage(JSON.stringify({
+				type: "messageAllServerClients",
+				auth,
+				title,
+				body,
+			}))
+		}
+
 
 		let onCreateRoom = (function onCreateRoom(obj) {
 			if (obj.status === "success") {
@@ -261,8 +283,9 @@ class StateManager {
 			})
 		}).bind(this)
 
+
 		let onStateUpdate = (function onStateUpdate(obj) {
-			console.log(obj)
+			this.lastState = obj
 			this.isHost = obj.message.isHost
 
 			if (this.inGame === false && obj.message.inGame === true) {

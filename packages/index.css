@@ -289,6 +289,10 @@ This means that something using bottom is off the page - hence we must use top. 
 	background-color: #7d4b37;
 }
 
+#gameBoard #userHand {
+	z-index: 1; /*Allows tiles in userHand to show up above tiles in handForExposed - needed for indicating last tile drawn. */
+}
+
 #gameBoard #userHandExposed {
 	/*bottom: 12vh;*/
 	/*bottom: calc(var(--vh) * 12);*/
