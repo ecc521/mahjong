@@ -1,21 +1,19 @@
 let Bot; //Don't want both scripts importing each other.
 
 class Client {
-	constructor(clientId) {
-		this.nickname = this.clientId = clientId
+	constructor(clientId, websocket) {
+		this.clientId = clientId
+		this.nickname = clientId.slice(0,7)
+		this.websocket = websocket
 
-		this.websockets = []
-
-		//TODO: We need to remove these websockets when they close
-		//Also handle when they become unresponsive - ping/pong setup.
-		this.addWebsocket = (function(websocket) {
-			this.websockets.push(websocket)
+		this.setWebsocket = (function(websocket) {
+			this.websocket = websocket
 		}).bind(this)
 
 		this.setNickname = (function(nickname) {
 			//Leave their name as their client id if they don't pick a real one!
 			if (nickname.trim()) {
-				this.nickname = nickname.slice(0, 14) //14 character limit on nicknames.
+				this.nickname = nickname
 			}
 		}).bind(this)
 
@@ -27,36 +25,32 @@ class Client {
 
 		this.message = (function message(type, message, status) {
 			if (this.suppressed) {return}
-
-			for (let index in this.websockets) {
-				let websocket = this.websockets[index]
-
-				try {
-					//Handle errors where the websocket connection has closed.
-					//We can probably do this simply by not sending the message, as the client should sync state if they disconnected.
-					return this.websocket.send(JSON.stringify({
-						type, message, status
-					}))
-				}
-				catch (e) {
-					console.error(e)
-				}
+			if (!this.websocket) {
+				//This should only happen if we loaded from state, as we would for testing.
+				return
+			}
+			try {
+				//Handle errors where the websocket connection has closed.
+				//We can probably do this simply by not sending the message, as the client should sync state if they disconnected.
+				return this.websocket.send(JSON.stringify({
+					type, message, status
+				}))
+			}
+			catch (e) {
+				console.error(e)
 			}
 		}).bind(this)
 
 
 		this.delete = (function(message) {
-			for (let index in this.websockets) {
-					let websocket = this.websockets[index]
-					try {
-						websocket.close(1000) //Status code: Normal close.
-					}
-					catch(e) {}
+			try {
+				websocket.close(1000) //Status code: Normal close.
 			}
+			catch(e) {}
 			global.stateManager.deleteClient(clientId)
 		}).bind(this)
 
-		//this.roomId should be cleared when this client is removed from a room. Probably moot due to getRoomId checks though.
+		//roomId should be removed once this client is removed from a room. Probably moot due to getRoomId checks though.
 		this.setRoomId = function(roomId) {
 			this.roomId = roomId
 		}

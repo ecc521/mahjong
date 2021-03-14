@@ -70,11 +70,9 @@ websocketServer.on('connection', function connection(websocket) {
 				if (clientId.startsWith("bot")) {
 					//Intended for dev use.
 					client = global.stateManager.createBot(clientId, websocket)
-					client.addWebsocket(websocket)
 				}
 				else {
-					client = global.stateManager.createClient(clientId)
-					client.addWebsocket(websocket)
+					client = global.stateManager.createClient(clientId, websocket)
 				}
 			}
 			else {
