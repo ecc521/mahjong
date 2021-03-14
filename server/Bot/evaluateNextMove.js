@@ -4,6 +4,7 @@ const Match = require("../../src/Match.js")
 const Pretty = require("../../src/Pretty.js")
 
 function evaluateNextMove() {
+	//TODO: Use seeded RNG for each game. 
 	let room = this.getRoom()
 
 	if (room.inGame === false) {return} //Nothing for us to do not in a game.

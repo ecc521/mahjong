@@ -140,7 +140,7 @@ websocketServer.on('connection', function connection(websocket) {
 			}
 			//console.log(room)
 			try {
-				return room.onIncomingMessage(clientId, obj)
+				return room.onIncomingMessage(client, obj)
 			}
 			catch(e) {
 				console.error(e)

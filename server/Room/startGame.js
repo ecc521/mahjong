@@ -1,23 +1,22 @@
 const Wall = require("../../src/Wall.js")
 const Hand = require("../../src/Hand.js")
+const fs = require("fs")
+const path = require("path")
 
 function startGame(obj) {
 	if (this.clientIds.length !== 4) {return "Not Enough Clients"}
 	else {
+		let saveId = this.roomId + Date.now() //New save key for every game started.
+		this.outputFile = fs.createWriteStream(path.join(global.stateManager.serverDataDirectory, saveId))
+
 		this.inGame = true
 		this.messageAll([], obj.type, "Game Started", "success")
-		//Build the wall.
-		if (this.state.wall) {
-			this.gameData.wall = Wall.fromJSON(this.state.wall)
-		}
-		else {
-			this.gameData.wall = new Wall()
-		}
 
-		this.state.wall = this.gameData.wall.toJSON()
+		//Build the wall.
+		this.gameData.wall = new Wall(this.state.seed)
 
 		this.state.hostClientId = this.hostClientId
-		this.state.moves.length = 0 //Delete elements, without overwriting proxy.
+		this.moves = []
 
 		this.gameData.discardPile = []
 
@@ -83,6 +82,8 @@ function startGame(obj) {
 
 		this.state.settings.windAssignments = windAssignments
 		console.log(this.state.settings.windAssignments)
+
+		this.outputFile.write(JSON.stringify(this.state) + "\n")
 
 		this.gameData.currentTurn = {
 			thrown: false,
