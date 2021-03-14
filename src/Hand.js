@@ -276,6 +276,7 @@ class Hand {
 		}).bind(this)
 
 		this.renderPlacemat = (function(classForFirst) {
+			classForFirst = classForFirst ?? this.tilePlacemat.firstChild?.className //Don't clear existing class unless classForFirst is ""
 			while (this.tilePlacemat.firstChild) {this.tilePlacemat.firstChild.remove()} //Delete everything currently rendered in the hand.
 
 			for (let i=0;i<4;i++) {

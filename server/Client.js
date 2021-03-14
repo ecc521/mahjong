@@ -13,7 +13,7 @@ class Client {
 		this.setNickname = (function(nickname) {
 			//Leave their name as their client id if they don't pick a real one!
 			if (nickname.trim()) {
-				this.nickname = nickname
+				this.nickname = nickname.slice(0, 14) //Limit nicknames to 14 characters. 
 			}
 		}).bind(this)
 

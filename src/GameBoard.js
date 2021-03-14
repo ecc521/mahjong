@@ -119,12 +119,12 @@ revertStateButton.addEventListener("click", function() {
 })
 
 
-let placeTilesButton = document.createElement("button")
-placeTilesButton.id = "placeTilesButton"
-placeTilesButton.innerHTML = "Proceed"
-gameBoard.appendChild(placeTilesButton)
+let proceedButton = document.createElement("button")
+proceedButton.id = "proceedButton"
+proceedButton.innerHTML = "Proceed"
+gameBoard.appendChild(proceedButton)
 
-placeTilesButton.addEventListener("click", function() {
+proceedButton.addEventListener("click", function() {
 
 	let placement = userHand.inPlacemat
 
@@ -225,7 +225,7 @@ endGameButton.addEventListener("click", function() {
 
 newGameNoLobbyButton.addEventListener("click", function() {
 	endGameButton.click()
-	//Calling startGame when in a game does nothing, so it's fine to call it without guards. 
+	//Calling startGame when in a game does nothing, so it's fine to call it without guards.
 	document.getElementById("startGameButton").click() //Clicks button on RoomManager - not currently visible.
 })
 
@@ -393,11 +393,11 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	hands.forEach((hand) => {hand.renderTiles()})
 	if (message.currentTurn?.playersReady?.length > 0) {
 		//The person has thrown their tile. Waiting on players to ready.
-		placeTilesButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
+		proceedButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
 		goMahjongButton.disabled = message.currentTurn.playersReady.includes(window.clientId)?"disabled":""
-		placeTilesButton.innerHTML = "Proceed (" + message.currentTurn.playersReady.length + "/4)"
+		proceedButton.innerHTML = "Proceed (" + message.currentTurn.playersReady.length + "/4)"
 		//If you haven't thrown, are not in charleston, and it is your turn, override and enable.
-		if (!message.currentTurn.thrown && !message.currentTurn.charleston && message.currentTurn.userTurn === clientId) {placeTilesButton.disabled = ""}
+		if (!message.currentTurn.thrown && !message.currentTurn.charleston && message.currentTurn.userTurn === clientId) {proceedButton.disabled = ""}
 		if (message.currentTurn.charleston && message.currentTurn.userTurn !== clientId) {
 			//You have 13 tiles. Mahjong impossible.
 			goMahjongButton.disabled = "disabled"
@@ -408,12 +408,12 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		else {
 			userHand.setEvictingThrownTile() //Clear evictingThrownTile
 		}
-		userHand.renderPlacemat()
+		userHand.renderPlacemat("")
 	}
 	else {
-		placeTilesButton.disabled = ""
+		proceedButton.disabled = ""
 		goMahjongButton.disabled = ""
-		placeTilesButton.innerHTML = "Proceed"
+		proceedButton.innerHTML = "Proceed"
 		userHand.setEvictingThrownTile() //Clear evictingThrownTile
 		//The person has not yet thrown a tile.
 
@@ -428,11 +428,16 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 		}
 		else {
 			if (!message.currentTurn.charleston) {
-				placeTilesButton.disabled = "disabled"
+				proceedButton.disabled = "disabled"
 				goMahjongButton.disabled = "disabled"
 			}
 		}
 	}
+
+	if (!proceedButton.disabled) {
+		proceedButton.classList.add("scaleAnimation")
+	}
+	else {proceedButton.classList.remove("scaleAnimation")}
 })
 
 //Add hotkeys
@@ -445,7 +450,7 @@ document.addEventListener("keyup", function(e) {
 		goMahjongButton.click()
 	}
 	else if (e.code === "Space") {
-		placeTilesButton.click()
+		proceedButton.click()
 	}
 	else if (Number(e.key) > 0 && Number(e.key) < 5) {
 		//1,2,3, and 4 will correspond to the 4 placemat spots. Pressing them will remove the specified tile.

@@ -581,7 +581,7 @@ This means that something using bottom is off the page - hence we must use top. 
 	font-size: calc(var(--vh) * 1.6);
 }
 
-#gameBoard #placeTilesButton {
+#gameBoard #proceedButton {
 	position: absolute;
 	right: calc(9.52vh + 12vw);
 	right: calc(calc(var(--vh) * 9.52) + calc(var(--vw) * 12));
@@ -596,6 +596,28 @@ This means that something using bottom is off the page - hence we must use top. 
 	font-size: 1.6vh;
 	font-size: calc(var(--vh) * 1.6);
 }
+
+@keyframes animateScale {
+  0% {
+    transform: scale(1);
+  }
+  33% {
+	transform: scale(1.4);
+  }
+  83% {
+	transform: scale(0.8);
+  }
+  100% {
+	transform: scale(1);
+  }
+}
+
+.scaleAnimation {
+	animation: animateScale 3s linear 5s infinite;
+}
+
+
+
 
 #gameBoard #endGameButton {
 	position: absolute;
@@ -629,10 +651,12 @@ This means that something using bottom is off the page - hence we must use top. 
 	font-size: calc(var(--vh) * 1.6);
 }
 
-#gameBoard #placeTilesButton:disabled {
+#gameBoard #proceedButton:disabled {
 	opacity: 0.5;
 	cursor: not-allowed;
 }
+
+
 
 #gameBoard #newGameNoLobbyButton {
 	position: absolute;
