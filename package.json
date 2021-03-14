@@ -46,6 +46,7 @@
     "es6-promise-plugin": "^4.2.2",
     "ionic-plugin-deeplinks": "^1.0.22",
     "qrcode-generator": "^1.4.4",
+    "seed-random": "^2.2.0",
     "webpack": "^4.44.1",
     "ws": "^7.3.1"
   }

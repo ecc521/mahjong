@@ -1,14 +1,11 @@
 const Tile = require("./Tile.js")
 const Pretty = require("./Pretty.js")
+const SeedRandom = require("seed-random")
 
 class Wall {
-	constructor(tiles) {
+	constructor(tiles, seed = Math.random()) {
 		this.drawFirst = function() {
 			return this.tiles.pop()
-		}
-
-		this.drawLast = function() {
-			return this.tiles.shift()
 		}
 
 		if (tiles) {
@@ -30,7 +27,7 @@ class Wall {
 			})
 
 			//Randomly mix the tiles.
-			Wall.shuffleArray(this.tiles)
+			Wall.shuffleArray(this.tiles, seed)
 		}
 
 		this.toJSON = (function() {
@@ -72,10 +69,12 @@ class Wall {
 		return tiles
 	}
 
-	static shuffleArray(array) {
+	static shuffleArray(array, seed) {
+		let random = SeedRandom(seed)
+
 		//Durstenfeld shuffle
 		for (let i = array.length - 1; i > 0; i--) {
-			const j = Math.floor(Math.random() * (i + 1));
+			const j = Math.floor(random() * (i + 1));
 			[array[i], array[j]] = [array[j], array[i]];
 		}
 	}

@@ -82,7 +82,7 @@ let singlePlayerGame = document.createElement("button")
 singlePlayerGame.id = "singlePlayerGame"
 singlePlayerGame.innerHTML = "Single Player"
 singlePlayerGame.addEventListener("click", function() {
-	let roomId = "sp-" + Math.floor(Math.random() * 1e10) //We need to stop depending on randomness - collisions are possible.
+	let roomId = roomIdInput.value.trim() || ("sp-" + Math.floor(Math.random() * 1e10)) //We need to stop depending on randomness - collisions are possible.
 	//Websockets guarantees delivery order, so we should be safe here, unless any calls error.
 
 	let nickname = nicknameInput.value || "Player 1"
