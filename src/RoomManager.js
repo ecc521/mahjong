@@ -47,8 +47,6 @@ let joinOrCreateRoom = document.createElement("div")
 joinOrCreateRoom.id = "joinOrCreateRoom"
 notInRoomContainer.appendChild(joinOrCreateRoom)
 
-const nameWarningCharAmount = 11 //Warn users about names over 11 characters
-
 let joinRoom = document.createElement("button")
 joinRoom.id = "joinRoom"
 joinRoom.innerHTML = "Join Room"
@@ -56,10 +54,7 @@ joinRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Room Name Invalid", "The room name contains at least one character. Please enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	if (nicknameInput.value.length > nameWarningCharAmount
-		&& !confirm("Long names may cause visual display problems. Proceed?")
-	) {return}
-	window.stateManager.joinRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
+	window.stateManager.joinRoom(roomIdInput.value, nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(joinRoom)
 
@@ -70,10 +65,7 @@ createRoom.addEventListener("click", function() {
 	if (roomIdInput.value.trim().length === 0) {
 		return new Popups.Notification("Unable to Create Room", "Please pick a 1+ character long name, and enter it into the box labeled \"Enter Room Name\" ").show()
 	}
-	if (nicknameInput.value.length > nameWarningCharAmount
-		&& !confirm("Long names may cause visual display problems. Proceed?")
-	) {return}
-	window.stateManager.createRoom(roomIdInput.value.toLowerCase(), nicknameInput.value)
+	window.stateManager.createRoom(roomIdInput.value, nicknameInput.value)
 })
 joinOrCreateRoom.appendChild(createRoom)
 
@@ -86,9 +78,6 @@ singlePlayerGame.addEventListener("click", function() {
 	//Websockets guarantees delivery order, so we should be safe here, unless any calls error.
 
 	let nickname = nicknameInput.value || "Player 1"
-	if (nickname.length > nameWarningCharAmount
-		&& !confirm("Long names may cause visual display problems. Proceed?")
-	) {return}
 
 	window.stateManager.createRoom(roomId, nickname)
 	window.stateManager.addBot("Bot 1")
@@ -187,7 +176,6 @@ inRoomContainer.appendChild(addBotButton)
 
 addBotButton.addEventListener("click", function() {
 	let name = prompt("Please enter a name for the bot: ")
-	if (name.length > nameWarningCharAmount && !confirm("Long names may cause visual display problems. Proceed?")) {return}
 	window.stateManager.addBot(name)
 })
 
@@ -517,9 +505,6 @@ window.stateManager.onCreateRoom = function(obj) {
 
 window.stateManager.onLeaveRoom = function(obj) {
 	exitRoom()
-	//We left the room. Change clientId.
-	const StateManager = require("./StateManager.js")
-	StateManager.setClientId(StateManager.createNewClientId())
 	//Don't show somebody that they left the room. Just exit.
 	//Don't show the host that they closed the room. Just exit.
 	if (obj.message !== "You closed the room. " && obj.message !== "You left the room. ") {

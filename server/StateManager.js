@@ -7,23 +7,15 @@ const fs = require("fs")
 const path = require("path")
 
 class StateManager {
-	constructor(rooms = {}, clients = {}) {
+	constructor(config = {}) {
 
-		//We'll trim all leading and trailing spaces for roomIds.
-		rooms = new Proxy(rooms, {
-			get: function(obj, prop) {
-				//Since values are trimmed when added, this is unless we loaded from a saved state.
-				let value = obj[prop]
-				if (value instanceof String) {
-					return value.trim()
-				}
-				return value
+		//We'll trim all leading and trailing spaces for roomIds. Room IDs are case aware but case insensitive.
+		let rooms = new Proxy(config.rooms || {}, {
+			get: function(roomsObj, roomId) {
+				return roomsObj[roomId.toLowerCase()][0]
 			},
-			set: function(obj, prop, value) {
-				if (value instanceof String) {
-					value = value.trim()
-				}
-				obj[prop] = value
+			set: function(roomsObj, roomId, room) {
+				roomsObj[roomId.toLowerCase()] = [room, roomId]
 				return true
 			}
 		})
@@ -32,40 +24,37 @@ class StateManager {
 			return rooms[roomId]
 		}
 
-		this.createRoom = function(roomId, room = new Room(roomId)) {
-			if (rooms[roomId]) {return false} //Room already exists.
-			return rooms[roomId] = room
+		//Should swap single player rooms to using this. 
+		this.createRoomId = function(prefix) {
+			return StateManager.findUniqueId(rooms, prefix)
 		}
 
-		this.writeRoomState = (function(roomId) {
-			if (!this.serverDataDirectory) {console.warn("No server data directory. ")}
-			let room = rooms[roomId]
-			try {
-				//Write state to disk.
-				let filePath = path.join(this.serverDataDirectory, room.saveId + ".room.json")
-				console.log("Saved room to " + filePath)
-				fs.writeFileSync(filePath, JSON.stringify(room))
-			}
-			catch(e) {console.error(e)}
-		}).bind(this)
+		this.createRoom = function(roomId) {
+			if (rooms[roomId]) {return false} //Room already exists.
+			return rooms[roomId] = new Room(roomId)
+		}
 
 		this.deleteRoom = function(roomId) {
 			delete rooms[roomId]
 		}
 
+		//Clients can be temporary or permanent.
+		//Right now, all are temporary, in that deleting them doesn't cause anything to be lost, provided they aren't in a game at the moment.
+
+		let clients = config.clients || {}
+
 		this.getClient = function(clientId) {
 			return clients[clientId]
 		}
 
-		this.createClient = function(clientId, websocket) {
-			clients[clientId] = new Client(clientId, websocket)
-			return clients[clientId]
+		this.createClient = function() {
+			let clientId = StateManager.findUniqueId(clients, "user:")
+			return clients[clientId] = new Client(clientId)
 		}
 
-		this.createBot = function(clientId, websocket) {
-			//Websocket intended for dev use.
-			clients[clientId] = new Bot(clientId, websocket)
-			return clients[clientId]
+		this.createBot = function() {
+			let clientId = StateManager.findUniqueId(clients, "bot:")
+			return clients[clientId] = new Bot(clientId)
 		}
 
 		this.deleteClient = function(clientId) {
@@ -99,6 +88,19 @@ class StateManager {
 				clients
 			})
 		}).bind(this)
+	}
+
+	static findUniqueId(obj, prefix = "") {
+		let random, id;
+		let idLimit = 1e4 //We will use short ids until we have trouble generating ids.
+
+		while (!id || obj[prefix + random]) {
+			random = Math.floor(Math.random() * idLimit)
+			id = prefix + random
+			idLimit = Math.min(2**53, idLimit * 2)
+		}
+
+		return id
 	}
 }
 
