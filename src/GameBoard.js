@@ -435,6 +435,14 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 	else {proceedButton.classList.remove("scaleAnimation")}
 })
 
+proceedButton.addEventListener("click", function() {
+	//When clicked, remove proceed button scale animation. 
+	proceedButton.style.animation = "none"
+	setTimeout(function() {
+		proceedButton.style.animation = ""
+	}, 0)
+})
+
 //Add hotkeys
 document.addEventListener("keyup", function(e) {
 	let chars = ["q", "w", "e", "r", "t", "y", "u", "i", "o", "p", "a", "s", "d", "f"] //qwertyuiopasdf will correspond to first 14 hand spots. Pressing will move to placemat.
