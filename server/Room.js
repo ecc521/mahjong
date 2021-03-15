@@ -110,9 +110,10 @@ class Room {
 		this.goMahjong = (function goMahjong(clientId, drewOwnTile = false, override = false) {
 			//First, verify the user can go mahjong.
 			let client = global.stateManager.getClient(clientId)
-
 			let hand = this.gameData.playerHands[clientId]
-			let isMahjong = hand.isMahjong(this.state.settings.unlimitedSequences)
+			//On override, always allow unlimitedSequences, as if the overrides are purely sequence limits (forgot to change the setting,
+			//the scoring will now be correct, not incorrect)
+			let isMahjong = hand.isMahjong(override?true:this.state.settings.unlimitedSequences)
 			if (isMahjong instanceof Hand) {
 				hand.contents = isMahjong.contents //Autocomplete the mahjong.
 			}

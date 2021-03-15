@@ -50,7 +50,7 @@ function isCalling(discardPile, unlimitedSequences) {
 		this.add(tile)
 		if (this.isMahjong(unlimitedSequences)) {
 			this.remove(tile)
-			return true
+			return tile //TODO: It's possible multiple tiles could make us mahjong. This is just one of them. 
 		}
 		this.remove(tile)
 	}

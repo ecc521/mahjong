@@ -6,8 +6,12 @@ const Tile = require("../Tile.js")
 const Hand = require("../Hand.js")
 
 function isMahjong(unlimitedSequences) {
+
+	let maximumSequences = unlimitedSequences?4:1 //4 sequences is unlimited.
+
 	//Returns 2 for mahjong, and 0 for not mahjong.
 	//If the hand is not currently committed to mahjong, but is mahjong, a hand containing the organization resulting in mahjong will be returned.
+
 	let pongOrKong = 0
 	let pairs = 0
 	let sequences = 0
@@ -35,12 +39,7 @@ function isMahjong(unlimitedSequences) {
 	}
 
 	if (pairs === 1) {
-		if (unlimitedSequences) {
-			if (sequences + pongOrKong === 4) {return 2}
-		}
-		else {
-			if (Math.min(sequences, 1) + pongOrKong === 4) {return 2}
-		}
+		if (Math.min(sequences, maximumSequences) + pongOrKong === 4) {return 2}
 	}
 
 	//Now we need to go through our remaining tiles.
@@ -56,17 +55,29 @@ function isMahjong(unlimitedSequences) {
 		}
 	})
 
-	//TODO: Note that, when unlimitedSequences is true, we can have multiple copies of the same sequence. This code does not cover that scenario.
+	//We might be able to have multiple copies of the same sequence.
+	//TODO: This has potential to be very slow.
 	allTiles.forEach((tile, index) => {
 		if (!Sequence.isValidSequence(allTiles.slice(index, index+3))) {
 			return;
 		}
-		let sequence = new Sequence({
-			exposed: false,
-			tiles: allTiles.slice(index, index+3)
-		})
-		if (testingHand.removeTilesFromHand(sequence, true)) {
-			possibleSequences.push(sequence)
+
+		let copies = 0
+		let tiles = allTiles.slice(index, index+3)
+
+		while (copies < maximumSequences)  {
+			let testTiles = Array(copies + 1).fill(tiles).flat()
+			if (testingHand.removeTilesFromHand(testTiles, true)) {
+				copies++
+			}
+			else {break}
+		}
+
+		for (let i=0;i<copies;i++) {
+			possibleSequences.push(new Sequence({
+				exposed: false,
+				tiles //Is it a problem using the same referenced tiles? And even further, do we need to create seperate sequence objects? I think not.
+			}))
 		}
 	})
 
@@ -102,12 +113,15 @@ function isMahjong(unlimitedSequences) {
 		let sequenceCount = combo.reduce((total, value) => {return total+Number(value instanceof Sequence)}, 0)
 		let matchCount = neededPongEquivs - sequenceCount
 		sequenceCount += sequences
-		if (!unlimitedSequences && 4-pongOrKong-matchCount > Math.min(1, sequenceCount)) {
+		if (4-pongOrKong-matchCount > Math.min(maximumSequences, sequenceCount)) {
 			continue;
 		}
 		combinations.push(combo);
 	}
 
+	console.log("Checking for mahjong from " + combinations.length + " combinations. ")
+
+	//TODO: Now that we support stacked sequences, we could have multiple valid winning hands. We should handle this, and return all valid hands.
 	combos:
 	for (let i=0;i<combinations.length;i++) {
 		let combo = combinations[i]

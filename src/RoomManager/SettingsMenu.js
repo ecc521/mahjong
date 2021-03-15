@@ -79,7 +79,7 @@ function UnlimitedSequencesSelector() {
 
 	let label = document.createElement("label")
 	label.for = "unlimitedSequencesSelectorCheckbox"
-	label.innerHTML = "Allow Unlimited Sequences (WARNING: Some minor bugs)"
+	label.innerHTML = "Allow Unlimited Sequences"
 	label.addEventListener("click", function() {checkbox.click()})
 
 	this.elem = elem
