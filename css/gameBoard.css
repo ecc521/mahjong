@@ -38,7 +38,7 @@
 }
 
 .animateTile {
-	animation: goToCorrectLocation 8s cubic-bezier(0.05, 1.14, 0, 0.95) forwards;
+	animation: goToCorrectLocation 6s cubic-bezier(0.05, 1.14, 0, 0.95) forwards;
 }
 
 /*We would use bottom, however Safari treats bottom as the bottom of the viewport, and Safari has the viewport != visible area bug.
@@ -192,7 +192,6 @@ This means that something using bottom is off the page - hence we must use top. 
 	margin: 0;
 	text-align: center;
 	min-width: 12vh;
-	font-size: 1.2vw;
 	transform: rotate(270deg);
 	right: calc(9.52vh + 9vw);
 	top: 19vh;
@@ -212,7 +211,6 @@ This means that something using bottom is off the page - hence we must use top. 
 	margin: 0;
 	text-align: center;
 	min-width: 12vh;
-	font-size: 1.2vw;
 	transform: rotate(90deg);
 	right: calc(4.52vh + 1vw);
 	top: 19vh;
