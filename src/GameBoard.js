@@ -436,11 +436,11 @@ window.stateManager.addEventListener("onStateUpdate", function(obj) {
 })
 
 proceedButton.addEventListener("click", function() {
-	//When clicked, remove proceed button scale animation. 
+	//When clicked, remove proceed button scale animation.
 	proceedButton.style.animation = "none"
 	setTimeout(function() {
 		proceedButton.style.animation = ""
-	}, 0)
+	}, 100)
 })
 
 //Add hotkeys
