@@ -19,7 +19,7 @@ function evaluateNextMove() {
 		console.log(tiles)
 		if (!(tiles instanceof Array)) {tiles = [tiles]}
 		room.onPlace({
-			mahjong: goMahjong,
+			mahjong: goMahjong || undefined,
 			type: "roomActionPlaceTiles",
 			message: tiles = tiles.map((tile) => {return tile.toJSON()})
 		}, this.clientId)

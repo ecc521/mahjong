@@ -141,11 +141,11 @@ class StateManager {
 			}))
 		}
 
-		this.placeTiles = function(tiles, mahjong = false) {
+		this.placeTiles = function(tiles, mahjong) {
 			this.sendMessage(JSON.stringify({
 				type: "roomActionPlaceTiles",
 				clientId: window.clientId,
-				mahjong,
+				mahjong, //Undefined is equivalent to false. 
 				message: tiles,
 			}))
 		}

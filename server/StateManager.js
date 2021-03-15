@@ -50,7 +50,7 @@ class StateManager {
 			return clients[clientId]
 		}
 
-		this.createBot = function(clientId, websocket) {
+		this.createBot = function(clientId = StateManager.findUniqueId(clients, "bot"), websocket) {
 			//Websocket intended for dev use.
 			clients[clientId] = new Bot(clientId, websocket)
 			return clients[clientId]
@@ -95,6 +95,19 @@ class StateManager {
 				clients
 			})
 		}).bind(this)
+	}
+
+	static findUniqueId(obj, prefix = "", idLimit = 2**9) {
+		let random, id;
+
+		//We will use short ids until we have trouble generating ids.
+		while (!id || obj[prefix + random]) {
+			random = Math.floor(Math.random() * idLimit)
+			id = prefix + random
+			idLimit = Math.min(2**53, idLimit * 2)
+		}
+
+		return id
 	}
 }
 

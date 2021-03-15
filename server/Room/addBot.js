@@ -1,13 +1,11 @@
 function addBot(obj) {
 	//Create a clientId for the bot.
-	let clientId = "bot" + (Math.random() * 2**53)
-
-	client = global.stateManager.createBot(clientId)
+	let client = global.stateManager.createBot()
 
 	if (obj.botName) {client.setNickname(obj.botName)}
 	client.setRoomId(this.roomId)
 
-	this.addClient(clientId)
+	this.addClient(client.clientId)
 	this.sendStateToClients()
 }
 
